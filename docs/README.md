@@ -45,3 +45,4 @@ Esta pasta é a fonte de verdade do projeto. Em conflito, prevalecem: ADR aceito
 - [ADR-0002: simulação determinística](adr/0002-deterministic-simulation.md)
 - [ADR-0003: packs cosméticos data-driven](adr/0003-cosmetic-content-packs.md)
 - [ADR-0004: PRNG versionado e streams independentes](adr/0004-versioned-prng-and-streams.md)
+- [ADR-0005: estado headless e hash canônico da run](adr/0005-headless-run-state-and-hash.md)

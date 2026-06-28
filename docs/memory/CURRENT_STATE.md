@@ -22,6 +22,9 @@ F0 — Fundação documental e técnica.
 - finding de cobertura de `F0-04` corrigido: relatório textual agora explicita os arquivos 100% cobertos em agentes/CI e o teste de 10.000 draws permanece equivalente com uma única asserção agregada; item retornou para `In review`.
 - ADR-0004 aceito e autonomia técnica delegada registrada: decisões internas/reversíveis seguem a recomendação do agente, preservadas as matérias humanas reservadas e autorizações externas.
 - segunda revisão independente de `F0-04` aprovada sem findings; auditoria determinística recebeu `Pass`, item movido para `Done` e `F0-05` liberado como `Ready`.
+- `F0-05` implementado: contratos canônicos de run/input/estado, tick fixo e executor headless atômico, hash `fnv1a64-v1`, corpus independente e execução idêntica em Node/Chromium; ADR-0005 aceito e item em `In review`.
+- revisão independente de `F0-05` confirmou o núcleo e o determinismo, mas retornou `Changes requested`: F0-04/F0-05 seguem misturados como arquivos não rastreados sem unidade versionada isolada, e o índice arquitetural classifica ADR-0005 aceito como proposto e omite ADR-0004.
+- findings de `F0-05` corrigidos sem mudar runtime ou goldens: commit local `9b6568b` materializa F0-04 como baseline aprovado, o sucessor isola F0-05 e o índice lista ADR-0004/0005 como aceitos; item retornado para `In review`.
 
 ## Ainda não iniciado
 
@@ -31,11 +34,11 @@ F0 — Fundação documental e técnica.
 
 ## Próximo passo exato
 
-Executar `$specify-roadmap-item F0-05`. F0-03 permanece em `Changes requested` e deve continuar separada.
+Executar `$review-roadmap-item F0-05`. F0-03 permanece em `Changes requested` e deve continuar separada.
 
 ## Bloqueios
 
-F0-03 permanece em `Changes requested` por findings independentes. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
+F0-05 não possui bloqueio conhecido e aguarda revisão independente; os commits locais ainda não foram enviados ao GitHub. F0-03 permanece em `Changes requested` por findings independentes. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
 
 ## Validações, pendências e riscos da sessão
 
@@ -62,3 +65,19 @@ F0-03 permanece em `Changes requested` por findings independentes. Antes do back
 - realizado em 2026-06-28: segunda revisão independente de F0-04 aprovada sem findings; spec, índice e roadmap movidos para `Done`, F0-05 movido para `Ready` e relatório `docs/audits/determinism/2026-06-28-f0-04.md` registrado com veredito `Pass`. Nenhum código runtime, teste ou golden foi alterado pela revisão.
 - validações da revisão final de F0-04: Node `v24.15.0`, npm `11.12.1`; `npm run check` verde com 30/30 unitários, 5/5 determinísticos e build; cobertura completa e focada mostraram `src/simulation/random` em 100% nas quatro métricas; comando focado com timeout de 1 s passou 29/29 em 605 ms; duas repetições adicionais do corpus Node passaram 5/5; `CI=1 npm run test:e2e` passou 4/4 no Chromium; árvore direta, `git diff --check`, imports/APIs proibidos, worktree e fonte normativa oficial foram inspecionados.
 - pendência após F0-04: executar `$specify-roadmap-item F0-05`; `DET-01` permanece `Planned` até loop, inputs, estado/hash/replay e desafios Daily/Weekly serem entregues. F0-03 continua em `Changes requested` por findings independentes.
+- realizado em 2026-06-28: `SPEC-F0-05` criada em `Awaiting approval`, ADR-0005 proposto, item movido de `Ready` para `Specified` e índice/memória atualizados. Nenhum arquivo de runtime/teste, golden, dependência ou gate foi alterado/executado.
+- validações de especificação F0-05: dependência F0-04 confirmada `Done`; contrato confrontado com ADR-0001/0002/0004, arquitetura de determinismo, requisitos, qualidade e API real de `src/simulation/random`. `DET-01` e `DET-02` permanecem `Planned`.
+- pendência de F0-05: aprovar a spec e ADR-0005, então executar `$implement-roadmap-item F0-05`; a implementação deve produzir corpus golden independente em Node/Chromium e passar os gates definidos.
+- riscos de F0-05: FNV-1a 64-bit detecta divergência, mas não autentica cliente; custo de `BigInt` será medido em F0-06 e o hash fica sob demanda. Extensões futuras do estado/layout exigem versionamento e não podem atualizar goldens silenciosamente.
+- realizado em 2026-06-28: `F0-05` implementado por TDD em `src/simulation/run` com config/input validados, tick/headless atômico, isolamento/cópias defensivas, layout canônico e hash `fnv1a64-v1`; ADR-0005 aceito, rastreabilidade/documentação atualizadas e lifecycle movido para `In review`.
+- validações de F0-05: teste focado 59/59; coverage focada do módulo `run` em 100% nas quatro métricas; `npm run check` verde com 89/89 unitários, 7/7 determinísticos e build; `CI=1 npm run test:e2e` verde 6/6 em dois viewports Chromium; `git diff --check` e scans de fronteira/APIs proibidas verdes.
+- corpus F0-05: script Python temporário independente produziu layout de 392 bytes e hashes hardcoded nos ticks 0/1/3/8, confirmados em Node e Chromium; prova negativa Chromium com expected adulterado falhou nos dois projetos antes da restauração.
+- pendência de F0-05: revisão independente com `$review-roadmap-item F0-05`. O worktree continua contendo mudanças não commitadas de F0-03/F0-04; não houve commit, push ou execução de GitHub Actions. Riscos mantidos: warning de bundle pertence a F0-06; custo/frequência de `BigInt` serão medidos em F0-06; FNV não autentica cliente; `DET-01`/`DET-02` permanecem `Planned`.
+- realizado em 2026-06-28: revisão independente de F0-05 concluída sem alterar runtime, testes ou goldens; spec, índice e roadmap movidos para `Changes requested`; auditoria `docs/audits/determinism/2026-06-28-f0-05.md` registrada com `Pass`.
+- validações da revisão F0-05: Node `v24.15.0`, npm `11.12.1`; `npm run check` verde com 89/89 unitários, 7/7 determinísticos e build; coverage focada 59/59 e `src/simulation/run` em 100% nas quatro métricas; corpus Node verde em três execuções totais; `CI=1 npm run test:e2e` verde 6/6 em Chromium; recomputação Python independente confirmou layouts de 392 bytes e hashes nos ticks 0/1/3/8; árvore direta, scans de fronteira/API, worktree e `git diff --check` inspecionados.
+- pendências F0-05: versionar F0-04 como baseline aprovado, produzir commit/diff isolado de F0-05 e corrigir `docs/README.md` para listar ADR-0004/0005 entre os aceitos; depois executar nova revisão independente. Não alterar runtime ou goldens para resolver estes findings.
+- riscos mantidos após a revisão F0-05: warning do bundle pertence a F0-06; custo/frequência de `BigInt` serão medidos em F0-06; FNV não autentica cliente; restore/checkpoints persistidos, manifests e Firefox/WebKit permanecem fora deste item; `DET-01`/`DET-02` continuam `Planned`.
+- realizado em 2026-06-28: findings de F0-05 corrigidos sem reescrever o remoto: `9b6568b` registra o baseline F0-04 validado e seu sucessor direto contém a unidade F0-05 isolada; `docs/README.md` agora classifica ADR-0004/0005 como aceitos. Runtime, testes e goldens F0-05 coincidem por blob com `06065ee`; item movido para `In review`.
+- validações da correção F0-05: baseline F0-04 passou `npm run check` com 30/30 unitários e 5/5 determinísticos, além de Playwright 4/4; F0-05 passou teste/coverage focados 59/59 com módulo `run` em 100% nas quatro métricas, `npm run check` com 89/89 unitários e 7/7 determinísticos, build e Playwright 6/6 em Chromium. `git diff --check` e comparação dos blobs foram verdes.
+- pendência: executar `$review-roadmap-item F0-05`; não marcar `Done` antes da revisão independente e não fazer push sem autorização explícita.
+- riscos mantidos: warning do bundle Phaser de 1.200,71 kB (gzip 320,30 kB) pertence a F0-06; FNV não autentica cliente; custo/frequência de `BigInt`, restore/checkpoints persistidos, manifests e Firefox/WebKit permanecem fora deste item; `DET-01`/`DET-02` continuam `Planned`.
