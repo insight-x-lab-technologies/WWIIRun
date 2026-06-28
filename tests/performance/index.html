@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WWIIRun performance harness</title>
+  </head>
+  <body>
+    <main>
+      <section class="controls" aria-label="Performance measurement controls">
+        <h1>WWIIRun performance harness</h1>
+        <p>
+          <strong>tier-base-stress-v1</strong> · status:
+          <span id="status" data-testid="status">idle</span>
+        </p>
+        <div class="fields">
+          <label>Build commit <input id="build-commit" required /></label>
+          <label>Device role <input id="device-role" required /></label>
+          <label>Device model <input id="device-model" required /></label>
+          <label>CPU <input id="cpu" /></label>
+          <label>GPU <input id="gpu" /></label>
+          <label>RAM MiB <input id="ram-mib" type="number" min="0" /></label>
+          <label>OS and version <input id="os" /></label>
+          <label>Browser and version <input id="browser" /></label>
+          <label>
+            Power
+            <select id="power">
+              <option value="unknown">unknown</option>
+              <option value="battery">battery</option>
+              <option value="plugged-in">plugged-in</option>
+            </select>
+          </label>
+          <label>
+            Temperature
+            <select id="temperature">
+              <option value="unknown">unknown</option>
+              <option value="normal">normal</option>
+              <option value="warm">warm</option>
+              <option value="hot">hot</option>
+            </select>
+          </label>
+          <label>Throttling <input id="throttling" value="none" /></label>
+        </div>
+        <div class="actions">
+          <button id="start" type="button">Start</button>
+          <button id="stop" type="button">Stop / reset</button>
+          <button id="export-report" type="button" disabled>
+            Export report
+          </button>
+        </div>
+      </section>
+      <section
+        id="game-root"
+        aria-label="Synthetic rendering workload"
+      ></section>
+      <label class="report">
+        Aggregated report
+        <textarea id="report-output" readonly></textarea>
+      </label>
+    </main>
+    <script type="module" src="/main.ts"></script>
+  </body>
+</html>

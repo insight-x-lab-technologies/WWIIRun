@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "rationale": "F0-06 baseline for the production scaffold. Increases require matrix evidence and review.",
+  "limits": {
+    "largestJavaScriptRawBytes": 1250000,
+    "largestJavaScriptGzipBytes": 335000,
+    "initialJavaScriptGzipBytes": 350000,
+    "initialTextGzipBytes": 400000,
+    "initialPayloadBytes": 2097152,
+    "corePayloadBytes": 10485760,
+    "rasterFileBytes": 524288,
+    "audioFileBytes": 1572864
+  }
+}

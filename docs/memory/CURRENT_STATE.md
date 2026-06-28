@@ -25,6 +25,10 @@ F0 — Fundação documental e técnica.
 - `F0-05` implementado: contratos canônicos de run/input/estado, tick fixo e executor headless atômico, hash `fnv1a64-v1`, corpus independente e execução idêntica em Node/Chromium; ADR-0005 aceito e item em `In review`.
 - revisão independente de `F0-05` confirmou o núcleo e o determinismo, mas retornou `Changes requested`: F0-04/F0-05 seguem misturados como arquivos não rastreados sem unidade versionada isolada, e o índice arquitetural classifica ADR-0005 aceito como proposto e omite ADR-0004.
 - findings de `F0-05` corrigidos sem mudar runtime ou goldens: commit local `9b6568b` materializa F0-04 como baseline aprovado, o sucessor isola F0-05 e o índice lista ADR-0004/0005 como aceitos; item retornado para `In review`.
+- segunda revisão independente de `F0-05` aprovada sem findings; todos os critérios e gates passaram, item movido para `Done` e `F0-08` liberado como `Ready`.
+- spec `F0-06` criada em `Draft`: harness de performance isolado, workload sintético versionado, relatório, protocolo real e budgets de bundle/assets definidos; ADR-0006 proposto e item movido para `Specified`.
+- proprietário aprovou SPEC-F0-06/ADR-0006 e registrou ThinkPad T430u, iPhone 17, iPad 10ª geração, Galaxy Tab S9 e desktop i5-9600KF; ADR aceito e item movido para `In progress`.
+- infraestrutura automatizável de F0-06 implementada: workload `tier-base-stress-v1`, coletor/relatório v1, lifecycle com cinco ciclos, smoke Chromium, checker de budgets integrado ao build, protocolo e matriz sem resultados fictícios.
 
 ## Ainda não iniciado
 
@@ -34,11 +38,11 @@ F0 — Fundação documental e técnica.
 
 ## Próximo passo exato
 
-Executar `$review-roadmap-item F0-05`. F0-03 permanece em `Changes requested` e deve continuar separada.
+Executar três repetições físicas válidas no `desktop-primary` (ThinkPad T430u) e `iphone-primary` (iPhone 17), enviar os seis JSONs exportados e confirmar a GPU informada como “RTX 2600 SUPER”. Depois registrar baselines/resumo, concluir os critérios restantes, mover F0-06 para `In review` e executar `$review-roadmap-item F0-06`.
 
 ## Bloqueios
 
-F0-05 não possui bloqueio conhecido e aguarda revisão independente; os commits locais ainda não foram enviados ao GitHub. F0-03 permanece em `Changes requested` por findings independentes. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
+F0-06 não tem dependência técnica incompleta, mas a conclusão exige execução humana do protocolo nos aparelhos físicos; não há acesso remoto a esses dispositivos nesta sessão. F0-08 não possui bloqueio conhecido. Os commits locais de F0-04/F0-05 e as atualizações documentais ainda não foram enviados ao GitHub. F0-03 permanece em `Changes requested` por findings independentes. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
 
 ## Validações, pendências e riscos da sessão
 
@@ -81,3 +85,17 @@ F0-05 não possui bloqueio conhecido e aguarda revisão independente; os commits
 - validações da correção F0-05: baseline F0-04 passou `npm run check` com 30/30 unitários e 5/5 determinísticos, além de Playwright 4/4; F0-05 passou teste/coverage focados 59/59 com módulo `run` em 100% nas quatro métricas, `npm run check` com 89/89 unitários e 7/7 determinísticos, build e Playwright 6/6 em Chromium. `git diff --check` e comparação dos blobs foram verdes.
 - pendência: executar `$review-roadmap-item F0-05`; não marcar `Done` antes da revisão independente e não fazer push sem autorização explícita.
 - riscos mantidos: warning do bundle Phaser de 1.200,71 kB (gzip 320,30 kB) pertence a F0-06; FNV não autentica cliente; custo/frequência de `BigInt`, restore/checkpoints persistidos, manifests e Firefox/WebKit permanecem fora deste item; `DET-01`/`DET-02` continuam `Planned`.
+- realizado em 2026-06-28: segunda revisão independente de F0-05 aprovada sem findings; nenhum runtime, teste ou golden foi alterado; spec, índice e roadmap movidos para `Done`, evidência parcial de `DET-01` confirmada e F0-08 movido para `Ready`.
+- validações da revisão final de F0-05: Node `v24.15.0`, npm `11.12.1`; coverage focada 59/59 e `src/simulation/run` em 100% nas quatro métricas; `npm run check` verde com 89/89 unitários, 7/7 determinísticos, typecheck e build; `CI=1 npm run test:e2e` verde 6/6 em Chromium; recomputação Python independente confirmou 392 bytes e os hashes nos ticks 0/1/3/8; árvore direta, scans de fronteira/API, diff isolado, blobs, worktree e `git diff --check` inspecionados.
+- pendência após F0-05: executar `$specify-roadmap-item F0-08`; F0-03 continua em `Changes requested` e não foi misturado nesta revisão. Não houve push nem qualquer ação externa.
+- riscos mantidos após aprovação de F0-05: warning do bundle pertence a F0-06; FNV não autentica cliente; custo/frequência de `BigInt`, restore/checkpoints persistidos, manifests e Firefox/WebKit pertencem a itens futuros; `DET-01`/`DET-02` permanecem `Planned`.
+- realizado em 2026-06-28: `SPEC-F0-06` criada em `Draft`, ADR-0006 proposto, item movido de `Backlog` para `Specified` e índices/memória atualizados. Nenhum runtime, teste, dependência, budget executável ou golden foi alterado.
+- validações de especificação F0-06: dependência F0-02 confirmada `Done`; contrato confrontado com ADR-0001/0005, arquitetura, pipeline de assets, qualidade, riscos, requisitos e baseline documentado de 1.200,71 kB raw/320,30 kB gzip. F0-03 permanece fora do escopo e `Changes requested`.
+- pendência de F0-06: proprietário deve registrar os modelos físicos disponíveis (mínimo desktop + celular; alvo Android + iPhone + tablet + desktop), aprovar spec/ADR-0006 e então executar `$implement-roadmap-item F0-06`.
+- riscos de F0-06: workload geométrico F0 é sintético e não comprova gameplay futuro; APIs de long task/heap variam por browser; coleta real exige três execuções de dez minutos por cenário/aparelho; budgets iniciais precisarão de revisão justificada conforme conteúdo real entrar. `PERF-01`, `UI-04` e `ASSET-02` permanecem `Planned`.
+- realizado em 2026-06-28: F0-06 implementado até o limite automatizável por TDD, sem dependência nova e sem alterar runtime/goldens F0-04/F0-05. Harness Vite/Phaser isolado, workload/relatório versionados, lifecycle, capabilities, avaliação por três runs, checker fail-closed, budgets, smoke e documentação foram adicionados; status permanece `In progress` por falta das medições físicas.
+- validações de F0-06: Node `v24.15.0`, npm `11.12.1`; 16/16 testes focados, coverage 105/105, `npm run check` verde com 105 unitários/7 determinísticos/build, budget verde (JS 1.200.712 raw/318.817 gzip; payload inicial 319.410; core 1.201.632 bytes), `CI=1 npm run test:e2e` verde em 6/6 existentes + 1/1 harness e `git diff --check` verde.
+- pendência de F0-06: três runs válidos no ThinkPad e três no iPhone no mesmo commit/workload, profiler manual quando capability for `unsupported`, seis JSONs e resumo em `docs/performance/baselines/<data>/`; confirmar o modelo da GPU discreta informado como “RTX 2600 SUPER”.
+- riscos mantidos: smoke virtualizado pode registrar lacuna >1 s e invalidar seu relatório curto, por isso só valida estrutura e não velocidade; o warning genérico do Vite permanece, enquanto o budget aprovado passa; workload sintético não representa gameplay futuro. `PERF-01`, `UI-04` e `ASSET-02` continuam `Planned`.
+- realizado em 2026-06-28: harness F0-06 ajustado por solicitação do proprietário para servir por padrão em `0.0.0.0:8080`, única porta acessível pelos aparelhos na rede local. Configuração, Playwright e instruções foram alinhados; produto e porta 4173 dos E2E existentes não foram alterados.
+- validações do ajuste de porta: teste TDD reproduziu `127.0.0.1:4173` e passou com `0.0.0.0:8080`; `npm run performance:harness` publicou `http://192.168.68.121:8080/` e `curl` recebeu HTTP 200; smoke focado passou 1/1; `npm run check` passou com 106 unitários, 7 determinísticos, build e budget; `git diff --check` passou antes do registro documental.

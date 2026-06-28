@@ -8,6 +8,7 @@ build/
 coverage/
 playwright-report/
 test-results/
+tests/performance/.output/
 .eslintcache
 .vite/
 .vitest/
