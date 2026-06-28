@@ -10,7 +10,6 @@ export default defineConfig({
       include: [
         "src/app/bootstrapApplication.ts",
         "src/simulation/random/**/*.ts",
-        "src/simulation/run/**/*.ts",
       ],
       reportsDirectory: "coverage",
     },
