@@ -6,8 +6,12 @@ export default defineConfig({
     include: ["tests/unit/**/*.test.ts"],
     coverage: {
       provider: "v8",
-      reporter: ["text", "html"],
-      include: ["src/app/bootstrapApplication.ts"],
+      reporter: [["text", { skipFull: false }], "html"],
+      include: [
+        "src/app/bootstrapApplication.ts",
+        "src/simulation/random/**/*.ts",
+        "src/simulation/run/**/*.ts",
+      ],
       reportsDirectory: "coverage",
     },
   },

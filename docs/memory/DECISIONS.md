@@ -5,8 +5,11 @@
 | ADR-0001 | Aceita | Phaser 3 renderiza; TypeScript puro executa regras; Vite empacota. |
 | ADR-0002 | Aceita | Simulação competitiva em ticks fixos, inteiros, PRNG próprio e replay por inputs. |
 | ADR-0003 | Aceita | Expansões são manifests cosméticos e não podem sobrescrever dados de gameplay. |
+| ADR-0004 | Aceita | `xoshiro128**` 1.1 versionado, seed hexadecimal de 128 bits e streams separados por saltos `2^64`. |
+| ADR-0005 | Aceita | Run headless avança por ticks/inputs explícitos e usa layout binário canônico com hash `fnv1a64-v1`. |
 | D-004 | Aceita | “Indiano” significa Hindi (`hi`) e espanhol significa `es-ES`; há 9 locales confirmados e o décimo segue aberto. |
 | D-005 | Aceita | O jogo funciona offline; recursos sociais sincronizam quando há rede. |
 | D-006 | Aceita | Leaderboard central trata o cliente como não confiável e valida submissões. |
+| D-007 | Aceita | Decisões técnicas internas e reversíveis seguem a recomendação do agente sem confirmação; matérias humanas reservadas e ações externas continuam exigindo autorização. |
 
 Detalhes e consequências duráveis pertencem aos ADRs. Decisões propostas precisam de validação humana antes de congelar conteúdo ou contrato externo.

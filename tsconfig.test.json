@@ -6,9 +6,11 @@
   "include": [
     "src",
     "tests/unit/**/*.ts",
+    "tests/determinism/**/*.ts",
     "tests/e2e/**/*.ts",
     "vite.config.ts",
     "vitest.config.ts",
+    "vitest.determinism.config.ts",
     "playwright.config.ts"
   ]
 }

@@ -54,6 +54,7 @@ Atualize `docs/memory/CURRENT_STATE.md` com: realizado, validações, pendência
 
 - Prefira `rg`/`rg --files` para inspeção.
 - Use testes focados durante a implementação e o gate completo antes da entrega.
+- Para decisões técnicas internas, reversíveis e sem impacto nas matérias reservadas abaixo, o agente deve escolher a alternativa que considera tecnicamente melhor, registrar o racional na spec/ADR quando durável e prosseguir sem pedir confirmação. O proprietário delegou essas escolhas às recomendações dos agentes.
 - Não faça deploy, publique pacote, compre serviço, altere backend de produção nem envie mudanças ao GitHub sem autorização explícita.
 - Peça decisão humana para economia monetária, política de privacidade, termos, licenças, identidade visual final e mudanças que invalidem saves ou placares.
 

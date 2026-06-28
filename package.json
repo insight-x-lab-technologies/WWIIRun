@@ -16,10 +16,11 @@
     "typecheck": "npm run typecheck:runtime && npm run typecheck:tooling",
     "test:unit": "vitest run",
     "test:unit:coverage": "vitest run --coverage",
+    "test:determinism": "vitest run --config vitest.determinism.config.ts",
     "test:e2e": "playwright test",
     "build": "npm run typecheck && vite build",
     "preview": "vite preview",
-    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test:unit && npm run build"
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test:unit && npm run test:determinism && npm run build"
   },
   "dependencies": {
     "phaser": "3.90.0"

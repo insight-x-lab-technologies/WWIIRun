@@ -33,6 +33,7 @@ Entregar um bullet hell/roguelike side-scroller gratuito e instalável, com fant
 - conteúdo competitivo tem `rulesetVersion` e `contentVersion`.
 - saves têm schema versionado e migrações.
 - `Endless` pode ser aleatório; diário/semanal jamais depende de entropia externa após a criação da seed.
+- decisões técnicas internas, reversíveis e fora das matérias humanas reservadas seguem a recomendação do agente sem confirmação individual; o racional durável fica em spec/ADR.
 
 ## Fonte de verdade
 
