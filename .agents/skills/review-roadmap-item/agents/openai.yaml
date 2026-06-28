@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Roadmap Item"
+  short_description: "Review one implementation against its spec"
+  default_prompt: "Use $review-roadmap-item to review roadmap item F0-02."

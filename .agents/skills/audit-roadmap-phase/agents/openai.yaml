@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audit Roadmap Phase"
+  short_description: "Audit a phase against all exit criteria"
+  default_prompt: "Use $audit-roadmap-phase to audit phase F0 before closing it."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audit Determinism"
+  short_description: "Audit deterministic simulation and replays"
+  default_prompt: "Use $audit-determinism to audit determinism for the current ruleset."

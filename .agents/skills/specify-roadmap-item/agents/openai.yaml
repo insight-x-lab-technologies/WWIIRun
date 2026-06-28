@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specify Roadmap Item"
+  short_description: "Specify one roadmap item without coding"
+  default_prompt: "Use $specify-roadmap-item to specify roadmap item F0-02."

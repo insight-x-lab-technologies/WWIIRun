@@ -5,4 +5,12 @@ __pycache__/
 *.pyc
 dist/
 build/
+coverage/
+playwright-report/
+test-results/
+.eslintcache
+.vite/
+.vitest/
+.playwright/
+*.tsbuildinfo
 .DS_Store
