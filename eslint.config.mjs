@@ -2,12 +2,7 @@ import js from "@eslint/js";
 import { defineConfig, globalIgnores } from "eslint/config";
 import tseslint from "typescript-eslint";
 
-const typeScriptFiles = [
-  "src/**/*.ts",
-  "tests/**/*.ts",
-  "scripts/**/*.ts",
-  "*.config.ts",
-];
+const typeScriptFiles = ["src/**/*.ts", "tests/**/*.ts", "*.config.ts"];
 
 export default defineConfig(
   globalIgnores([
