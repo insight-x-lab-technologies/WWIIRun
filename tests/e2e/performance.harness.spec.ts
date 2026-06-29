@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 interface PerformanceHarnessApi {
   readonly snapshot: () => {
@@ -37,24 +37,13 @@ test("runs, exports, invalidates, and tears down the isolated performance harnes
   await page.getByLabel("Build commit").fill("e2e-smoke");
   await page.getByLabel("Device role").fill("automated-smoke");
   await page.getByLabel("Device model").fill("Playwright Chromium");
-  await page.getByRole("button", { name: "Start" }).click();
-
-  await expect
-    .poll(() =>
-      page.evaluate(() =>
-        (
-          window as Window & {
-            __WWIIRUN_PERFORMANCE__?: PerformanceHarnessApi;
-          }
-        ).__WWIIRUN_PERFORMANCE__?.snapshot(),
-      ),
-    )
-    .toMatchObject({
-      running: true,
-      imageCount: 1_200,
-      layerCount: 3,
-      canvasCount: 1,
-    });
+  const running = await startRunAndSnapshot(page);
+  expect(running).toMatchObject({
+    running: true,
+    imageCount: 1_200,
+    layerCount: 3,
+    canvasCount: 1,
+  });
   await expect(page.getByTestId("status")).toHaveText("complete", {
     timeout: 15_000,
   });
@@ -78,24 +67,11 @@ test("runs, exports, invalidates, and tears down the isolated performance harnes
     page.getByRole("button", { name: "Export report" }),
   ).toBeEnabled();
 
-  await page.getByRole("button", { name: "Start" }).click();
-  await expect
-    .poll(() =>
-      page.evaluate(
-        () =>
-          (
-            window as Window & {
-              __WWIIRUN_PERFORMANCE__?: PerformanceHarnessApi;
-            }
-          ).__WWIIRUN_PERFORMANCE__?.snapshot().running,
-      ),
-    )
-    .toBe(true);
-  await page.evaluate(() =>
-    (
-      window as Window & { __WWIIRUN_PERFORMANCE__?: PerformanceHarnessApi }
-    ).__WWIIRUN_PERFORMANCE__?.invalidateForTest("e2e-forced-invalid"),
+  const invalidRunStarted = await startRunAndSnapshot(
+    page,
+    "e2e-forced-invalid",
   );
+  expect(invalidRunStarted?.running).toBe(true);
   await expect(page.getByTestId("status")).toHaveText("complete", {
     timeout: 15_000,
   });
@@ -130,3 +106,22 @@ test("runs, exports, invalidates, and tears down the isolated performance harnes
   expect(pageErrors).toEqual([]);
   expect(externalRequests).toEqual([]);
 });
+
+async function startRunAndSnapshot(
+  page: Page,
+  invalidation?: string,
+): Promise<ReturnType<PerformanceHarnessApi["snapshot"]> | undefined> {
+  return page.evaluate((reason) => {
+    const button = document.getElementById("start");
+    if (!(button instanceof HTMLButtonElement)) {
+      throw new Error("performance harness is missing #start.");
+    }
+    const api = (
+      window as Window & { __WWIIRUN_PERFORMANCE__?: PerformanceHarnessApi }
+    ).__WWIIRUN_PERFORMANCE__;
+    button.click();
+    const snapshot = api?.snapshot();
+    if (reason !== undefined) api?.invalidateForTest(reason);
+    return snapshot;
+  }, invalidation);
+}

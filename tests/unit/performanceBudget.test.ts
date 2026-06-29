@@ -154,6 +154,14 @@ describe("performance build budget", () => {
         budgetFile: remoteHtml.budgets,
       }),
     ).toThrow("remote asset URL is forbidden in index.html");
+
+    const remoteCss = await createBuildFixture({ remoteCss: true });
+    expect(() =>
+      inspectProductionBuild({
+        distDirectory: remoteCss.dist,
+        budgetFile: remoteCss.budgets,
+      }),
+    ).toThrow("remote asset URL is forbidden in assets/main.css");
   });
 
   it("uses deterministic typed errors for budget violations", () => {
@@ -187,6 +195,7 @@ async function temporaryDirectory(): Promise<string> {
 async function createBuildFixture(
   options: {
     readonly remoteAsset?: boolean;
+    readonly remoteCss?: boolean;
     readonly remoteHtml?: boolean;
   } = {},
 ): Promise<{ readonly dist: string; readonly budgets: string }> {
@@ -206,7 +215,12 @@ async function createBuildFixture(
   );
   await writeFile(join(assets, "main.js"), "export const value = 1;");
   await writeFile(join(assets, "lazy.js"), "export const lazy = 1;");
-  await writeFile(join(assets, "main.css"), "body{}");
+  await writeFile(
+    join(assets, "main.css"),
+    options.remoteCss
+      ? 'body{background:url("https://example.com/remote.png")}'
+      : "body{}",
+  );
   await writeFile(join(assets, "eager.png"), Buffer.from([1, 2, 3, 4]));
   await writeFile(join(assets, "lazy.png"), Buffer.from([1, 2, 3, 4, 5]));
   await writeFile(

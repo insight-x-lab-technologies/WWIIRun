@@ -1,0 +1,812 @@
+{
+  "schemaVersion": "wwiirun.performance-report.v1",
+  "workloadVersion": "tier-base-stress-v1",
+  "buildCommit": "1d75de79e7f5f340787a88e7d018a3a406bf59c0",
+  "status": "valid",
+  "evaluation": "fail",
+  "device": {
+    "role": "iphone-primary",
+    "model": "IPhone 17",
+    "cpu": "Apple A19 (6 núcleos)",
+    "gpu": "Apple GPU (5 núcleos)",
+    "ramMiB": 8192
+  },
+  "platform": {
+    "os": "unknown",
+    "browser": "Safari",
+    "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1",
+    "renderer": "webgl",
+    "viewportCss": {
+      "width": 402,
+      "height": 714
+    },
+    "devicePixelRatio": 3,
+    "observedRefreshHz": 58.8235294117647
+  },
+  "conditions": {
+    "power": "unknown",
+    "temperature": "unknown",
+    "throttling": "none",
+    "orientation": "portrait"
+  },
+  "measurement": {
+    "warmupMs": 30000,
+    "durationMs": 600000,
+    "frameSamples": 35982,
+    "tickSamples": 35966
+  },
+  "frames": {
+    "count": 35982,
+    "p50": 17,
+    "p95": 17,
+    "p99": 17,
+    "windows": [
+      {
+        "startMs": 0,
+        "endMs": 5000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 5000,
+        "endMs": 10000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 10000,
+        "endMs": 15000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 15000,
+        "endMs": 20000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 20000,
+        "endMs": 25000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 25000,
+        "endMs": 30000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 30000,
+        "endMs": 35000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 35000,
+        "endMs": 40000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 40000,
+        "endMs": 45000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 45000,
+        "endMs": 50000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 50000,
+        "endMs": 55000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 55000,
+        "endMs": 60000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 60000,
+        "endMs": 65000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 65000,
+        "endMs": 70000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 70000,
+        "endMs": 75000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 75000,
+        "endMs": 80000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 80000,
+        "endMs": 85000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 85000,
+        "endMs": 90000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 90000,
+        "endMs": 95000,
+        "callbacks": 299,
+        "fps": 59.8
+      },
+      {
+        "startMs": 95000,
+        "endMs": 100000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 100000,
+        "endMs": 105000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 105000,
+        "endMs": 110000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 110000,
+        "endMs": 115000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 115000,
+        "endMs": 120000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 120000,
+        "endMs": 125000,
+        "callbacks": 297,
+        "fps": 59.4
+      },
+      {
+        "startMs": 125000,
+        "endMs": 130000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 130000,
+        "endMs": 135000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 135000,
+        "endMs": 140000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 140000,
+        "endMs": 145000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 145000,
+        "endMs": 150000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 150000,
+        "endMs": 155000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 155000,
+        "endMs": 160000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 160000,
+        "endMs": 165000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 165000,
+        "endMs": 170000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 170000,
+        "endMs": 175000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 175000,
+        "endMs": 180000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 180000,
+        "endMs": 185000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 185000,
+        "endMs": 190000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 190000,
+        "endMs": 195000,
+        "callbacks": 299,
+        "fps": 59.8
+      },
+      {
+        "startMs": 195000,
+        "endMs": 200000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 200000,
+        "endMs": 205000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 205000,
+        "endMs": 210000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 210000,
+        "endMs": 215000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 215000,
+        "endMs": 220000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 220000,
+        "endMs": 225000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 225000,
+        "endMs": 230000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 230000,
+        "endMs": 235000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 235000,
+        "endMs": 240000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 240000,
+        "endMs": 245000,
+        "callbacks": 297,
+        "fps": 59.4
+      },
+      {
+        "startMs": 245000,
+        "endMs": 250000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 250000,
+        "endMs": 255000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 255000,
+        "endMs": 260000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 260000,
+        "endMs": 265000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 265000,
+        "endMs": 270000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 270000,
+        "endMs": 275000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 275000,
+        "endMs": 280000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 280000,
+        "endMs": 285000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 285000,
+        "endMs": 290000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 290000,
+        "endMs": 295000,
+        "callbacks": 299,
+        "fps": 59.8
+      },
+      {
+        "startMs": 295000,
+        "endMs": 300000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 300000,
+        "endMs": 305000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 305000,
+        "endMs": 310000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 310000,
+        "endMs": 315000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 315000,
+        "endMs": 320000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 320000,
+        "endMs": 325000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 325000,
+        "endMs": 330000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 330000,
+        "endMs": 335000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 335000,
+        "endMs": 340000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 340000,
+        "endMs": 345000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 345000,
+        "endMs": 350000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 350000,
+        "endMs": 355000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 355000,
+        "endMs": 360000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 360000,
+        "endMs": 365000,
+        "callbacks": 297,
+        "fps": 59.4
+      },
+      {
+        "startMs": 365000,
+        "endMs": 370000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 370000,
+        "endMs": 375000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 375000,
+        "endMs": 380000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 380000,
+        "endMs": 385000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 385000,
+        "endMs": 390000,
+        "callbacks": 299,
+        "fps": 59.8
+      },
+      {
+        "startMs": 390000,
+        "endMs": 395000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 395000,
+        "endMs": 400000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 400000,
+        "endMs": 405000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 405000,
+        "endMs": 410000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 410000,
+        "endMs": 415000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 415000,
+        "endMs": 420000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 420000,
+        "endMs": 425000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 425000,
+        "endMs": 430000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 430000,
+        "endMs": 435000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 435000,
+        "endMs": 440000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 440000,
+        "endMs": 445000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 445000,
+        "endMs": 450000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 450000,
+        "endMs": 455000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 455000,
+        "endMs": 460000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 460000,
+        "endMs": 465000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 465000,
+        "endMs": 470000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 470000,
+        "endMs": 475000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 475000,
+        "endMs": 480000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 480000,
+        "endMs": 485000,
+        "callbacks": 297,
+        "fps": 59.4
+      },
+      {
+        "startMs": 485000,
+        "endMs": 490000,
+        "callbacks": 299,
+        "fps": 59.8
+      },
+      {
+        "startMs": 490000,
+        "endMs": 495000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 495000,
+        "endMs": 500000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 500000,
+        "endMs": 505000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 505000,
+        "endMs": 510000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 510000,
+        "endMs": 515000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 515000,
+        "endMs": 520000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 520000,
+        "endMs": 525000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 525000,
+        "endMs": 530000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 530000,
+        "endMs": 535000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 535000,
+        "endMs": 540000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 540000,
+        "endMs": 545000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 545000,
+        "endMs": 550000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 550000,
+        "endMs": 555000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 555000,
+        "endMs": 560000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 560000,
+        "endMs": 565000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 565000,
+        "endMs": 570000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 570000,
+        "endMs": 575000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 575000,
+        "endMs": 580000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 580000,
+        "endMs": 585000,
+        "callbacks": 300,
+        "fps": 60
+      },
+      {
+        "startMs": 585000,
+        "endMs": 590000,
+        "callbacks": 299,
+        "fps": 59.8
+      },
+      {
+        "startMs": 590000,
+        "endMs": 595000,
+        "callbacks": 300,
+        "fps": 60
+      }
+    ],
+    "minimumWindowFps": 59.4
+  },
+  "ticks": {
+    "count": 35966,
+    "p50": 0.9999999998835847,
+    "p95": 1.0000000001164153,
+    "p99": 3
+  },
+  "capabilities": {
+    "longTask": "unsupported",
+    "heap": "unsupported",
+    "renderer": "supported",
+    "vram": "unsupported"
+  },
+  "longTasks": null,
+  "heap": null,
+  "vramBytes": null,
+  "lifecycle": {
+    "cycles": 5,
+    "transitions": 4,
+    "gapsAbove1000Ms": []
+  },
+  "budgets": {
+    "frameP95": {
+      "limit": 16.67,
+      "observed": 17,
+      "status": "fail"
+    },
+    "tickP95": {
+      "limit": 4,
+      "observed": 1.0000000001164153,
+      "status": "pass"
+    },
+    "longTasksAbove50Ms": {
+      "limit": 0,
+      "observed": null,
+      "status": "not-evaluated"
+    },
+    "minimumWindowFps": {
+      "limit": 55,
+      "observed": 59.4,
+      "status": "pass"
+    },
+    "heapGrowth": {
+      "limit": 0,
+      "observed": null,
+      "status": "not-evaluated"
+    }
+  },
+  "failures": [
+    "frameP95"
+  ],
+  "invalidations": []
+}

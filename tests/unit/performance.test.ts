@@ -59,8 +59,11 @@ describe("performance measurement contracts", () => {
   });
 
   it("calculates consecutive non-overlapping five-second FPS windows", () => {
-    const timestamps = Array.from({ length: 601 }, (_, index) => index * 100);
-    expect(calculateFpsWindows(timestamps, 5_000)).toEqual([
+    const timestamps = Array.from(
+      { length: 600 },
+      (_, index) => index * 100 + 50,
+    );
+    expect(calculateFpsWindows(timestamps, 0, 60_000, 5_000)).toEqual([
       { startMs: 0, endMs: 5_000, callbacks: 50, fps: 10 },
       { startMs: 5_000, endMs: 10_000, callbacks: 50, fps: 10 },
       { startMs: 10_000, endMs: 15_000, callbacks: 50, fps: 10 },
@@ -74,6 +77,29 @@ describe("performance measurement contracts", () => {
       { startMs: 50_000, endMs: 55_000, callbacks: 50, fps: 10 },
       { startMs: 55_000, endMs: 60_000, callbacks: 50, fps: 10 },
     ]);
+  });
+
+  it("covers the full collection interval without waiting for a callback after it", () => {
+    const timestamps = Array.from(
+      { length: 600 },
+      (_, index) => 30_000 + index * 1_000 + 500,
+    );
+
+    const windows = calculateFpsWindows(timestamps, 30_000, 600_000, 5_000);
+
+    expect(windows).toHaveLength(120);
+    expect(windows[0]).toEqual({
+      startMs: 0,
+      endMs: 5_000,
+      callbacks: 5,
+      fps: 1,
+    });
+    expect(windows.at(-1)).toEqual({
+      startMs: 595_000,
+      endMs: 600_000,
+      callbacks: 5,
+      fps: 1,
+    });
   });
 
   it("marks interruptions and incomplete lifecycle invalid without granting pass", () => {
@@ -215,32 +241,150 @@ describe("performance measurement contracts", () => {
 
   it("evaluates a device only from exactly three comparable valid reports", () => {
     const report = completedCollector().finish(environment, 5_000);
+    const distinctPassReports = [
+      report,
+      {
+        ...report,
+        measurement: { ...report.measurement, frameSamples: 299 },
+      },
+      {
+        ...report,
+        measurement: { ...report.measurement, frameSamples: 298 },
+      },
+    ];
 
     expect(evaluateDeviceReports([report])).toEqual({
       evaluation: "not-evaluated",
       failures: ["requires-exactly-three-reports"],
     });
-    expect(evaluateDeviceReports([report, report, report])).toEqual({
+    expect(evaluateDeviceReports(distinctPassReports)).toEqual({
       evaluation: "pass",
       failures: [],
     });
     expect(
       evaluateDeviceReports([
         report,
-        report,
-        { ...report, evaluation: "fail", failures: ["tickP95"] },
+        distinctPassReports[1]!,
+        {
+          ...distinctPassReports[2]!,
+          evaluation: "fail",
+          failures: ["tickP95"],
+        },
       ]),
     ).toEqual({ evaluation: "fail", failures: ["run-3:tickP95"] });
     expect(
       evaluateDeviceReports([
         report,
-        report,
-        { ...report, status: "invalid", evaluation: "not-evaluated" },
+        distinctPassReports[1]!,
+        {
+          ...distinctPassReports[2]!,
+          status: "invalid",
+          evaluation: "not-evaluated",
+        },
       ]),
     ).toEqual({
       evaluation: "not-evaluated",
       failures: ["run-3-invalid"],
     });
+  });
+
+  it("rejects duplicate exports as independent physical repetitions", () => {
+    const report = completedCollector().finish(environment, 5_000);
+    const distinctReport = {
+      ...report,
+      measurement: { ...report.measurement, frameSamples: 299 },
+    };
+
+    expect(evaluateDeviceReports([report, report, distinctReport])).toEqual({
+      evaluation: "not-evaluated",
+      failures: ["reports-not-distinct"],
+    });
+  });
+
+  it("rejects reports whose FPS windows do not cover the declared duration", () => {
+    const report = completedCollector().finish(environment, 5_000);
+    const incompleteReport = {
+      ...report,
+      frames: {
+        ...report.frames,
+        windows: [],
+      },
+    };
+
+    expect(
+      evaluateDeviceReports([
+        incompleteReport,
+        {
+          ...incompleteReport,
+          measurement: { ...incompleteReport.measurement, frameSamples: 299 },
+        },
+        {
+          ...incompleteReport,
+          measurement: { ...incompleteReport.measurement, frameSamples: 298 },
+        },
+      ]),
+    ).toEqual({
+      evaluation: "not-evaluated",
+      failures: [
+        "run-1-incomplete-fps-windows",
+        "run-2-incomplete-fps-windows",
+        "run-3-incomplete-fps-windows",
+      ],
+    });
+  });
+
+  it("rejects reports collected in different browser environments", () => {
+    const report = completedCollector().finish(environment, 5_000);
+    const distinctReports = [
+      report,
+      {
+        ...report,
+        measurement: { ...report.measurement, frameSamples: 299 },
+      },
+      {
+        ...report,
+        measurement: { ...report.measurement, frameSamples: 298 },
+      },
+    ];
+    const environmentChanges = [
+      {
+        platform: {
+          ...report.platform,
+          browser: "Firefox 127",
+        },
+      },
+      {
+        platform: {
+          ...report.platform,
+          viewportCss: { width: 1024, height: 768 },
+        },
+      },
+      {
+        platform: {
+          ...report.platform,
+          devicePixelRatio: 2,
+        },
+      },
+      {
+        conditions: {
+          ...report.conditions,
+          orientation: "portrait" as const,
+        },
+      },
+    ];
+
+    for (const change of environmentChanges) {
+      expect(
+        evaluateDeviceReports([
+          distinctReports[0]!,
+          { ...distinctReports[1]!, ...change },
+          distinctReports[2]!,
+        ]),
+      ).toEqual({
+        evaluation: "not-evaluated",
+        failures: ["reports-not-comparable"],
+      });
+    }
   });
 });
 

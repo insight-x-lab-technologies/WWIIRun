@@ -112,6 +112,7 @@ export function inspectProductionBuild(options: {
   }
   const coreFiles = collectCoreFiles(options.distDirectory);
   validateFilesExist(options.distDirectory, initialFiles);
+  validateCssReferences(options.distDirectory, coreFiles);
 
   const metrics = calculateMetrics(
     options.distDirectory,
@@ -357,6 +358,21 @@ function validateFilesExist(
     const absolutePath = join(distDirectory, file);
     if (!existsSync(absolutePath) || !statSync(absolutePath).isFile()) {
       throw new Error(`manifest file is missing: ${file}`);
+    }
+  }
+}
+
+function validateCssReferences(
+  distDirectory: string,
+  files: ReadonlySet<string>,
+): void {
+  const remoteReferencePattern =
+    /(?:url\(\s*["']?|@import\s+(?:url\(\s*)?["']?)(?:https?:)?\/\//iu;
+  for (const file of files) {
+    if (extname(file).toLowerCase() !== ".css") continue;
+    const css = readFileSync(join(distDirectory, file), "utf8");
+    if (remoteReferencePattern.test(css)) {
+      throw new Error(`remote asset URL is forbidden in ${file}.`);
     }
   }
 }

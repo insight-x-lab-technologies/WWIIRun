@@ -140,25 +140,28 @@ export function summarizeSamples(samples: readonly number[]): SampleSummary {
 
 export function calculateFpsWindows(
   timestamps: readonly number[],
+  collectionStartMs: number,
+  collectionDurationMs: number,
   windowMs = 5_000,
 ): readonly FpsWindow[] {
-  if (timestamps.length < 2 || windowMs <= 0) return [];
+  if (collectionDurationMs <= 0 || windowMs <= 0) return [];
   const sorted = [...timestamps].sort((left, right) => left - right);
-  const first = sorted[0];
-  const last = sorted.at(-1);
-  if (first === undefined || last === undefined) return [];
-
   const windows: FpsWindow[] = [];
-  for (let start = first; start + windowMs <= last; start += windowMs) {
-    const end = start + windowMs;
+  const collectionEndMs = collectionStartMs + collectionDurationMs;
+  for (
+    let start = collectionStartMs;
+    start < collectionEndMs;
+    start += windowMs
+  ) {
+    const end = Math.min(start + windowMs, collectionEndMs);
     const callbacks = sorted.filter(
       (timestamp) => timestamp >= start && timestamp < end,
     ).length;
     windows.push({
-      startMs: start - first,
-      endMs: end - first,
+      startMs: start - collectionStartMs,
+      endMs: end - collectionStartMs,
       callbacks,
-      fps: callbacks / (windowMs / 1_000),
+      fps: callbacks / ((end - start) / 1_000),
     });
   }
   return windows;
@@ -272,7 +275,11 @@ export class MeasurementCollector {
 
     const frames = summarizeSamples(this.#frameDurations);
     const ticks = summarizeSamples(this.#tickDurations);
-    const windows = calculateFpsWindows(this.#frameTimestamps);
+    const windows = calculateFpsWindows(
+      this.#frameTimestamps,
+      startedAt + this.#config.warmupMs,
+      this.#config.collectionMs,
+    );
     const minimumWindowFps =
       windows.length === 0
         ? null
@@ -402,19 +409,26 @@ export function evaluateDeviceReports(reports: readonly PerformanceReport[]): {
   const first = reports[0];
   if (
     first === undefined ||
-    reports.some(
-      (report) =>
-        report.schemaVersion !== first.schemaVersion ||
-        report.workloadVersion !== first.workloadVersion ||
-        report.buildCommit !== first.buildCommit ||
-        report.device.role !== first.device.role ||
-        report.device.model !== first.device.model,
-    )
+    reports.some((report) => !hasComparableEnvironment(first, report))
   ) {
     return {
       evaluation: "not-evaluated",
       failures: ["reports-not-comparable"],
     };
+  }
+  if (new Set(reports.map((report) => stableReportJson(report))).size !== 3) {
+    return {
+      evaluation: "not-evaluated",
+      failures: ["reports-not-distinct"],
+    };
+  }
+  const incompleteWindows = reports.flatMap((report, index) =>
+    hasCompleteFpsWindows(report)
+      ? []
+      : [`run-${index + 1}-incomplete-fps-windows`],
+  );
+  if (incompleteWindows.length > 0) {
+    return { evaluation: "not-evaluated", failures: incompleteWindows };
   }
   const invalid = reports.flatMap((report, index) =>
     report.status === "invalid" ? [`run-${index + 1}-invalid`] : [],
@@ -434,6 +448,51 @@ export function evaluateDeviceReports(reports: readonly PerformanceReport[]): {
     return { evaluation: "not-evaluated", failures: ["run-not-evaluated"] };
   }
   return { evaluation: "pass", failures: [] };
+}
+
+function hasComparableEnvironment(
+  expected: PerformanceReport,
+  actual: PerformanceReport,
+): boolean {
+  const comparableEnvironment = (report: PerformanceReport): string =>
+    JSON.stringify({
+      schemaVersion: report.schemaVersion,
+      workloadVersion: report.workloadVersion,
+      buildCommit: report.buildCommit,
+      device: report.device,
+      platform: {
+        os: report.platform.os,
+        browser: report.platform.browser,
+        userAgent: report.platform.userAgent,
+        renderer: report.platform.renderer,
+        viewportCss: report.platform.viewportCss,
+        devicePixelRatio: report.platform.devicePixelRatio,
+      },
+      conditions: {
+        power: report.conditions.power,
+        throttling: report.conditions.throttling,
+        orientation: report.conditions.orientation,
+      },
+      measurement: {
+        warmupMs: report.measurement.warmupMs,
+        durationMs: report.measurement.durationMs,
+      },
+    });
+  return comparableEnvironment(actual) === comparableEnvironment(expected);
+}
+
+function hasCompleteFpsWindows(report: PerformanceReport): boolean {
+  const windowMs = 5_000;
+  const expectedWindows = Math.ceil(report.measurement.durationMs / windowMs);
+  if (report.frames.windows.length !== expectedWindows) return false;
+  return report.frames.windows.every((window, index) => {
+    const startMs = index * windowMs;
+    return (
+      window.startMs === startMs &&
+      window.endMs ===
+        Math.min(startMs + windowMs, report.measurement.durationMs)
+    );
+  });
 }
 
 function budgetMaximum(limit: number, observed: number | null): BudgetResult {

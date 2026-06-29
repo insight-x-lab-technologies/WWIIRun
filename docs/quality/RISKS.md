@@ -5,6 +5,9 @@
 | Phaser/float/ordem quebra replay | Alta | Crítico | Core inteiro determinístico, inteiros, goldens cross-browser. |
 | Conteúdo procedural cria situação impossível | Alta | Alto | Templates, clearance validator, reaction-time budget e seed corpus. |
 | Bullet hell + arte AAA estoura GPU/VRAM | Alta | Crítico | Atlases, pooling, caps, culling, tiers e matriz real. |
+| Workload sintético excede frame p95/Long Tasks na matriz F0 | Alta | Alto | Preservar baselines/failures, perfilar em item corretivo e não afrouxar threshold ou workload. |
+| Evidência física F0 cobre apenas 595 de 600 segundos | Alta | Alto | Coletor/evaluator exigem 120 janelas; preservar JSONs históricos e recoletar desktop + iPhone antes da revisão final. |
+| Matriz F0 não cobre desktop com GPU integrada | Média | Médio | Desktop Windows dedicado cobre o exit autorizado; medir perfil integrado antes de alegações amplas de suporte. |
 | Aspect ratio dá vantagem competitiva | Média | Alto | Viewport lógico/câmera limitada e mesmos bounds de spawn. |
 | Perks/moedas criam pay-to-win | Alta | Alto | Challenge loadout normalizado e categorias explícitas. |
 | Cliente falsifica placar/moedas | Alta | Alto | RLS, Edge Function, replay/checkpoints, ledger, rate limit. |
