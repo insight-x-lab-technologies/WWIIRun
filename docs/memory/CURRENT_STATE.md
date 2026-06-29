@@ -41,6 +41,7 @@ F0 — Fundação documental e técnica.
 - segunda revisão independente de `F0-06` solicitou mudanças por `F0-06-PERF-04`: `PerformanceObserver` classifica o lote pelo instante de entrega e é desconectado imediatamente no fim, podendo incluir Long Task do warm-up ou descartar a do frame final e fabricar `pass` no budget de zero Long Tasks. Todos os demais critérios e gates passaram; os nove baselines/hashes e seus resultados `fail` permanecem intactos.
 - `F0-06-PERF-04` corrigido por TDD: Long Tasks são filtradas pelo `startTime`, o observer permanece ativo até o task seguinte e o buffer é drenado antes de desconectar. Regressões cobrem warm-up, limites da coleta e ordem de drenagem; item retornado para `In review`.
 - terceira revisão independente confirmou a correção funcional e todos os gates, mas retornou `Changes requested` por `F0-06-TRACE-01`: o range F0-06 ainda contém o fechamento de F0-05 e o patch final de Long Tasks permanece sem commit, impedindo demonstrar unidade isolada/versionada e rollback sem reabrir F0-05.
+- `F0-06-TRACE-01` corrigido: `d4cec96` materializa o baseline aprovado de F0-05 sem F0-06 e `373ca17` restaura a unidade F0-06 completa, incluindo `F0-06-PERF-04`, sem tocar na spec F0-05, simulation ou goldens; item retornado para `In review`.
 
 ## Ainda não iniciado
 
@@ -50,14 +51,18 @@ F0 — Fundação documental e técnica.
 
 ## Próximo passo exato
 
-Executar `$implement-roadmap-item F0-06` para materializar uma unidade isolada e versionada que preserve o fechamento de F0-05 e inclua `F0-06-PERF-04`; depois retornar F0-06 para `In review` sem alterar runtime, thresholds, workload, ADR-0007, goldens ou baselines.
+Executar `$review-roadmap-item F0-06` sobre o range isolado `d4cec96..HEAD`; não marcar `Done` antes da revisão independente.
 
 ## Bloqueios
 
-F0-06 está em `Changes requested`, sem bloqueio externo: falta isolar/versionar a unidade final sem reverter o fechamento de F0-05. ADR-0007 aceita 595/600 s para os baselines existentes sem presumir a janela ausente; os três trios permanecem `fail`. Riscos explícitos: desktop integrado ainda não possui trio e profiling remoto do iPhone está `unavailable` por ausência de Mac. F0-08 não possui bloqueio conhecido. F0-03 permanece em `Changes requested` por findings independentes. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
+F0-06 está em `In review`, sem bloqueio externo. ADR-0007 aceita 595/600 s para os baselines existentes sem presumir a janela ausente; os três trios permanecem `fail`. Riscos explícitos: desktop integrado ainda não possui trio e profiling remoto do iPhone está `unavailable` por ausência de Mac. F0-08 não possui bloqueio conhecido. F0-03 permanece em `Changes requested` por findings independentes. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
 
 ## Validações, pendências e riscos da sessão
 
+- realizado nesta implementação: checkpoint `bf11403` versiona `F0-06-PERF-04`; baseline `d4cec96` preserva F0-05 `Done` sem F0-06; unidade `373ca17` restaura exatamente o checkpoint. `git diff d4cec96..373ca17` não toca a spec F0-05, `src/simulation` ou goldens.
+- validações: Node `v24.15.0`, npm `11.12.1`; 24/24 focados; coverage 113/113 com random/run em 100%; `npm run check` exit 0 com 113 unitários, 7 determinísticos, build e budget; Playwright 6/6 produto + 1/1 harness; harness HTTP 200; `git diff --check` verde.
+- preservação: nove SHA-256 conferem; não há diff em runtime do produto, thresholds, workload, ADR-0007, goldens ou baselines. Avaliação direta permanece `fail` para desktop, iPhone e Galaxy Tab S9 com os findings documentados.
+- pendência: revisão independente com `$review-roadmap-item F0-06` sobre `d4cec96..HEAD`; não marcar `Done` antes dela e não fazer push sem autorização explícita.
 - realizado nesta terceira revisão: a correção `F0-06-PERF-04` foi confirmada sem finding funcional; `recordLongTask` filtra por `startTime` e a finalização adia `takeRecords()`/`disconnect()`. Nenhum runtime, golden ou baseline foi alterado pela revisão.
 - validações da terceira revisão: Node `v24.15.0`, npm `11.12.1`; 24/24 focados; coverage 113/113 com random/run em 100%; `npm run check` verde com 113 unitários, 7 determinísticos, build e budget; Playwright 6/6 produto + 1/1 harness; `git diff --check` e diff completo verdes; nove hashes conferem e os três avaliadores retornam `fail` com findings preservados.
 - finding `F0-06-TRACE-01`: `git diff 8f8d7c2..HEAD` ainda altera a spec F0-05, e a correção final existe somente no worktree. O rollback de F0-06 não está isolado e pode reabrir uma dependência já aprovada.
