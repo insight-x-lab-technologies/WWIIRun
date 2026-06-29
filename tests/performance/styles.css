@@ -1,0 +1,97 @@
+:root {
+  color: #f4f0e6;
+  background: #07131f;
+  font-family: system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+main {
+  display: grid;
+  grid-template-columns: minmax(18rem, 26rem) minmax(20rem, 1fr);
+  min-height: 100vh;
+}
+
+.controls,
+.report {
+  padding: 1rem;
+  background: #102638;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
+
+label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+}
+
+input,
+select,
+button,
+textarea {
+  border: 1px solid #56758c;
+  border-radius: 0.25rem;
+  color: inherit;
+  background: #07131f;
+  padding: 0.5rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+#game-root {
+  min-height: 55vh;
+  overflow: hidden;
+}
+
+#game-root canvas {
+  display: block;
+}
+
+.report {
+  grid-column: 1 / -1;
+}
+
+textarea {
+  min-height: 16rem;
+  resize: vertical;
+  font-family: ui-monospace, monospace;
+}
+
+@media (max-width: 760px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+
+  .fields {
+    grid-template-columns: 1fr;
+  }
+
+  #game-root {
+    min-height: 50vh;
+  }
+}

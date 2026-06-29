@@ -12,6 +12,7 @@ Esta pasta é a fonte de verdade do projeto. Em conflito, prevalecem: ADR aceito
 - [Roadmap](roadmap/ROADMAP.md)
 - [Especificações de incremento](specs/README.md)
 - [Qualidade e performance](quality/QUALITY.md)
+- [Harness, protocolo e matriz de performance](performance/README.md)
 - [Modelo SDD e trabalho com agentes](operations/AGENTIC_DEVELOPMENT.md)
 
 ## Tópicos especializados
@@ -46,3 +47,5 @@ Esta pasta é a fonte de verdade do projeto. Em conflito, prevalecem: ADR aceito
 - [ADR-0003: packs cosméticos data-driven](adr/0003-cosmetic-content-packs.md)
 - [ADR-0004: PRNG versionado e streams independentes](adr/0004-versioned-prng-and-streams.md)
 - [ADR-0005: estado headless e hash canônico da run](adr/0005-headless-run-state-and-hash.md)
+- [ADR-0006: evidência de performance e budgets versionados](adr/0006-performance-evidence-and-budgets.md)
+- [ADR-0007: exceção de cobertura para baselines físicos F0](adr/0007-f0-performance-coverage-exception.md)
