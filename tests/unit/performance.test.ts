@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   MeasurementCollector,
   calculateFpsWindows,
+  drainLongTaskObserver,
   evaluateDeviceReports,
   nearestRank,
   stableReportJson,
@@ -164,6 +165,59 @@ describe("performance measurement contracts", () => {
     expect(report.heap).toBeNull();
     expect(report.platform.renderer).toBeNull();
     expect(report.vramBytes).toBeNull();
+  });
+
+  it("classifies each long task by its start time inside the collection interval", () => {
+    const collector = new MeasurementCollector({
+      warmupMs: 100,
+      collectionMs: 500,
+      cycleMs: 500,
+      expectedCycles: 0,
+      expectedTransitions: 0,
+    });
+    collector.setCapabilities({ longTask: "supported", heap: "unsupported" });
+    collector.begin(1_000);
+
+    collector.recordLongTask(1_099.999, 75);
+    collector.recordLongTask(1_100, 60);
+    collector.recordLongTask(1_600, 70);
+    collector.recordLongTask(1_600.001, 80);
+
+    const report = collector.finish(environment, 1_600);
+
+    expect(report.longTasks).toEqual({
+      thresholdMs: 50,
+      count: 2,
+      totalDurationMs: 130,
+    });
+  });
+
+  it("drains buffered long tasks on the next task before disconnecting", async () => {
+    const events: string[] = [];
+    const collector = {
+      recordLongTask(startTime: number, duration: number): void {
+        events.push(`record:${startTime}:${duration}`);
+      },
+    };
+    const observer = {
+      takeRecords(): readonly Pick<
+        PerformanceEntry,
+        "duration" | "startTime"
+      >[] {
+        events.push("takeRecords");
+        return [{ startTime: 1_500, duration: 65 }];
+      },
+      disconnect(): void {
+        events.push("disconnect");
+      },
+    };
+
+    const draining = drainLongTaskObserver(observer, collector);
+
+    expect(events).toEqual([]);
+    await draining;
+
+    expect(events).toEqual(["takeRecords", "record:1500:65", "disconnect"]);
   });
 
   it("evaluates every threshold without rounding away a failure", () => {

@@ -62,6 +62,18 @@ interface BudgetResult {
   readonly status: Evaluation;
 }
 
+interface BufferedLongTaskObserver {
+  readonly takeRecords: () => readonly Pick<
+    PerformanceEntry,
+    "duration" | "startTime"
+  >[];
+  readonly disconnect: () => void;
+}
+
+interface LongTaskRecorder {
+  readonly recordLongTask: (startTime: number, durationMs: number) => void;
+}
+
 export interface PerformanceReport {
   readonly schemaVersion: typeof PERFORMANCE_REPORT_SCHEMA;
   readonly workloadVersion: typeof PERFORMANCE_WORKLOAD_VERSION;
@@ -237,8 +249,10 @@ export class MeasurementCollector {
     this.#tickDurations.push(durationMs);
   }
 
-  public recordLongTask(durationMs: number): void {
-    if (durationMs > 50) this.#longTasks.push(durationMs);
+  public recordLongTask(startTime: number, durationMs: number): void {
+    if (this.isCollecting(startTime) && durationMs > 50) {
+      this.#longTasks.push(durationMs);
+    }
   }
 
   public recordHeap(bytes: number): void {
@@ -392,6 +406,19 @@ export class MeasurementCollector {
     }
     return this.#startedAt;
   }
+}
+
+export async function drainLongTaskObserver(
+  observer: BufferedLongTaskObserver,
+  collector: LongTaskRecorder,
+): Promise<void> {
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, 0);
+  });
+  for (const entry of observer.takeRecords()) {
+    collector.recordLongTask(entry.startTime, entry.duration);
+  }
+  observer.disconnect();
 }
 
 export function stableReportJson(report: PerformanceReport): string {

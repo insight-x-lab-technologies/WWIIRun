@@ -3,6 +3,7 @@ import Phaser from "phaser";
 import { StressScene } from "./lib/StressScene";
 import {
   MeasurementCollector,
+  drainLongTaskObserver,
   nearestRank,
   stableReportJson,
   type Capability,
@@ -165,7 +166,7 @@ class PerformanceHarness {
         measurementConfig.warmupMs +
         measurementConfig.collectionMs
     ) {
-      this.#finish(timestamp);
+      void this.#finish(timestamp);
       return;
     }
     this.#animationFrame = requestAnimationFrame(this.#onFrame);
@@ -186,13 +187,19 @@ class PerformanceHarness {
     this.#collector?.invalidate("webgl-context-lost");
   };
 
-  #finish(timestamp: number): void {
+  async #finish(timestamp: number): Promise<void> {
     if (this.#collector === null) return;
-    this.#recordHeap();
-    this.#report = this.#collector.finish(this.#environment(), timestamp);
     this.#running = false;
-    this.#observer?.disconnect();
-    this.#observer = null;
+    this.#recordHeap();
+    const collector = this.#collector;
+    const observer = this.#observer;
+    if (observer !== null) {
+      await drainLongTaskObserver(observer, collector);
+      if (this.#collector !== collector || this.#observer !== observer) return;
+      this.#observer = null;
+    }
+    if (this.#collector !== collector) return;
+    this.#report = collector.finish(this.#environment(), timestamp);
     document.removeEventListener("visibilitychange", this.#onVisibilityChange);
     window.removeEventListener("resize", this.#onResize);
     this.#destroyGame();
@@ -240,9 +247,8 @@ class PerformanceHarness {
       return "unsupported";
     }
     this.#observer = new PerformanceObserver((list) => {
-      if (!this.#collector?.isCollecting(performance.now())) return;
       for (const entry of list.getEntries()) {
-        this.#collector.recordLongTask(entry.duration);
+        this.#collector?.recordLongTask(entry.startTime, entry.duration);
       }
     });
     this.#observer.observe({ entryTypes: ["longtask"] });
