@@ -28,7 +28,7 @@ Use `http://<IPv4-do-servidor>:8080/` ou o endereço LAN exibido pelo Vite. A po
 3. Em celular/tablet, testar rotação antes da janela medida e reiniciar o harness; resize durante a coleta invalida a repetição.
 4. Preencher commit, papel/modelo, CPU/GPU/RAM conhecidos, SO/browser e condições. Não preencher dado desconhecido por estimativa.
 5. Executar `Start`. O harness descarta 30 s, coleta 600 s e recria completamente o Phaser quatro vezes, produzindo cinco ciclos.
-6. Exportar o relatório e confirmar 120 janelas consecutivas de cinco segundos, de `0–5.000` até `595.000–600.000`. Repetição `invalid` ou com cobertura incompleta deve ser refeita; sua evidência não pode ser renomeada como pass.
+6. Exportar o relatório e confirmar 120 janelas consecutivas de cinco segundos, de `0–5.000` até `595.000–600.000`. Repetição futura `invalid` ou com cobertura incompleta deve ser refeita; sua evidência não pode ser renomeada como pass. A única exceção é o conjunto histórico F0 descrito no ADR-0007.
 7. Produzir três repetições válidas e distintas com o mesmo commit, workload, aparelho, SO, browser/user agent, renderer, viewport, DPR, energia, throttling, orientação, warm-up e duração. Renomear os arquivos como `<papel>-run-01.json` a `run-03.json`. O avaliador rejeita exports de conteúdo idêntico com `reports-not-distinct`, ambiente divergente com `reports-not-comparable` e cobertura incompleta com `run-N-incomplete-fps-windows`; copiar ou renomear o mesmo JSON não cria outra repetição.
 8. Guardar relatórios aprovados em `docs/performance/baselines/<AAAA-MM-DD>/` e atualizar [MATRIX.md](MATRIX.md) com valores e findings.
 
@@ -41,4 +41,4 @@ Um aparelho passa somente se as três repetições válidas passam individualmen
 - Long Task, heap e renderer dependem da API do browser. VRAM permanece `unsupported`; quando heap/Long Task não existirem, registrar inspeção manual do profiler na matriz.
 - Profiling remoto de Safari em iPhone exige um Mac. Quando esse equipamento não estiver disponível, registrar `unavailable`, motivo e aceitação explícita do proprietário; isso preserva a lacuna como risco e nunca transforma capability `unsupported` em `pass`.
 - Aumentos de budget exigem medição, justificativa e revisão. Uma falha gera finding; não autoriza reduzir workload ou afrouxar threshold no mesmo diff.
-- Os relatórios coletados em 2026-06-28/29 pelo coletor anterior preservam somente 119 janelas. Eles permanecem como evidência histórica, mas o avaliador corrigido os classifica `not-evaluated`; novos trios físicos são necessários.
+- Os relatórios coletados em 2026-06-28/29 pelo coletor anterior preservam somente 119 janelas. ADR-0007 aceita 595 s como cobertura suficiente para esses baselines sem inventar a janela ausente; eles são avaliáveis como `fail`. O coletor futuro continua exigindo 120 janelas.

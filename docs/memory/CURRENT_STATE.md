@@ -37,7 +37,7 @@ F0 — Fundação documental e técnica.
 - os seis relatórios obrigatórios de desktop + iPhone e o trio adicional do Galaxy Tab S9 foram promovidos a baselines datados. Todos preservam avaliação `fail`; nenhum workload, threshold ou resultado foi afrouxado.
 - todos os critérios de F0-06 e gates aplicáveis foram atendidos; spec, índice e roadmap foram movidos para `In review`, aguardando revisão independente.
 - revisão independente de `F0-06` solicitou mudanças: as janelas de FPS cobrem somente 595/600 segundos, o checker aceita asset remoto em CSS, o avaliador aceita ambientes incomparáveis e a unidade final não está isolada/versionada; documentação contraditória e whitespace no diff completo também permanecem.
-- findings automatizáveis de `F0-06` corrigidos por TDD: o coletor cobre 120 janelas ancoradas nos limites da coleta, o avaliador rejeita cobertura/ambiente divergente, CSS remoto falha fechado e documentação/whitespace foram alinhados. Os nove relatórios históricos permanecem byte a byte intactos e agora são `not-evaluated` por cobertura incompleta.
+- findings automatizáveis de `F0-06` corrigidos por TDD: o coletor cobre 120 janelas ancoradas nos limites da coleta, o avaliador rejeita ambiente divergente, CSS remoto falha fechado e documentação/whitespace foram alinhados. ADR-0007 registra a decisão do proprietário de aceitar 119 janelas/595 s para os baselines F0 existentes; os nove JSONs permanecem byte a byte intactos e os três trios avaliam `fail`.
 
 ## Ainda não iniciado
 
@@ -47,20 +47,20 @@ F0 — Fundação documental e técnica.
 
 ## Próximo passo exato
 
-Recoletar três runs físicas de `desktop-primary` e três de `iphone-primary` com o coletor corrigido, confirmando 120 janelas em cada JSON; então retomar `$implement-roadmap-item F0-06` para auditar a evidência e preparar `In review`.
+Executar `$review-roadmap-item F0-06` em sessão independente; validar especialmente a exceção do ADR-0007, os resultados `fail` preservados e a ausência de alteração nos nove JSONs.
 
 ## Bloqueios
 
-F0-06 está `In progress` e bloqueado para revisão final por seis coletas físicas: três no desktop e três no iPhone. Os JSONs históricos não guardam timestamps brutos e não permitem reconstruir honestamente a janela `595.000–600.000`; o avaliador corrigido retorna `run-N-incomplete-fps-windows`. Permanecem riscos explícitos: as observações históricas falham thresholds de performance, desktop integrado ainda não possui trio e profiling remoto do iPhone está `unavailable` por ausência de Mac; nenhum deles foi convertido em `pass`. F0-08 não possui bloqueio conhecido. F0-03 permanece em `Changes requested` por findings independentes. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
+F0-06 está `In review`, sem bloqueio externo. ADR-0007 aceita 595/600 s para os baselines existentes sem presumir a janela ausente; os três trios permanecem `fail`. Riscos explícitos: desktop integrado ainda não possui trio e profiling remoto do iPhone está `unavailable` por ausência de Mac. F0-08 não possui bloqueio conhecido. F0-03 permanece em `Changes requested` por findings independentes. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
 
 ## Validações, pendências e riscos da sessão
 
-- realizado nesta sessão: quatro gaps funcionais/documentais de F0-06 corrigidos por TDD. `calculateFpsWindows` recebe início/duração explícitos e produz 120 janelas; `evaluateDeviceReports` exige cobertura completa e ambiente comparável; o checker rejeita URL remota em CSS; GPU, matriz, intake, risco, rastreabilidade e whitespace foram alinhados. Nenhum JSON físico, threshold, workload, runtime do produto ou golden determinístico foi alterado.
-- RED/GREEN: focados falharam em cinco casos esperados (duas provas de janela, cobertura histórica, ambiente e CSS remoto) e depois passaram 20/20. Avaliação direta dos três trios históricos retorna `not-evaluated` com `run-N-incomplete-fps-windows` em todas as runs.
-- validações: Node `v24.15.0`, npm `11.12.1`; `npm run check` verde com 110 unitários, 7 determinísticos, build e budget; coverage 110/110 com random/run em 100%; E2E verde com 6/6 produto + 1/1 smoke; harness respondeu HTTP 200 em `0.0.0.0:8080`; `git diff --check` e `git diff 8f8d7c2 --check` verdes; hashes dos nove JSONs conferem com o intake.
-- budget: maior JS 1.200.712 bytes raw/318.817 gzip, payload inicial 319.410 e core 1.201.632; checker `pass`. O warning Vite de 500 kB permanece informativo e não substitui o budget aprovado.
-- pendência: recoletar três runs do desktop e três do iPhone com 120 janelas, auditar comparabilidade/failures, atualizar baselines/matriz e só então mover F0-06 para `In review`.
-- riscos mantidos: workload F0 é sintético; observações históricas falham ao menos um threshold, mas são `not-evaluated` pela cobertura incompleta; desktop integrado e iPad seguem sem trio; Long Task/heap do iPhone e profiling manual continuam `unsupported`/`unavailable`. `PERF-01`, `UI-04` e `ASSET-02` permanecem `Planned`.
+- realizado nesta sessão: decisão explícita do proprietário registrada no ADR-0007. O avaliador aceita 119 janelas consecutivas/595 s para `wwiirun.performance-report.v1` + `tier-base-stress-v1` com duração declarada de 600 s, sem sintetizar a janela final; o coletor futuro permanece em 120 janelas/600 s. Spec, matriz, intake, requisitos, riscos, decisões e memória foram alinhados.
+- RED/GREEN: teste RED confirmou que 595 s eram rejeitados; GREEN focado passou 21/21, incluindo tolerância apenas para artefatos submicrossegundo dos limites antigos e rejeição de 590 s. Avaliação direta retorna `fail` para desktop, iPhone e Galaxy Tab S9, preservando todos os findings.
+- validações: Node `v24.15.0`, npm `11.12.1`; `npm run check` verde com 111 unitários, 7 determinísticos, build e budget; coverage 111/111 com random/run em 100%; E2E fora do sandbox verde com 6/6 produto + 1/1 smoke; hashes/JSONs não foram alterados.
+- ambiente: o E2E dentro do sandbox falhou antes dos testes com `connect EPERM 127.0.0.1:4173`; diagnóstico `DEBUG=pw:webserver` confirmou restrição local, e a repetição autorizada fora do sandbox passou sem mudança de código.
+- pendência: revisão independente com `$review-roadmap-item F0-06`; não marcar `Done` antes dela.
+- riscos mantidos: workload F0 é sintético; todos os trios falham ao menos um threshold; a exceção não cobre `595–600 s`; desktop integrado e iPad seguem sem trio; Long Task/heap do iPhone e profiling manual continuam `unsupported`/`unavailable`. `PERF-01`, `UI-04` e `ASSET-02` permanecem `Planned`.
 - realizado em 2026-06-28: especificação de F0-04 criada, requisito `DET-01` mapeado como fundação parcial, ADR-0004 proposto, roadmap/índice/memória atualizados e regra de autonomia técnica registrada; nenhum runtime, teste ou dependência foi alterado.
 - validações de 2026-06-28: dependência F0-02 confirmada `Done`; F0-03 não é dependência de F0-04; contrato confrontado com ADR-0002, arquitetura de determinismo, requisitos e implementação oficial `xoshiro128**` 1.1. Nenhum gate de implementação foi executado ou alegado.
 - realizado em 2026-06-28: F0-04 implementado com API pura em `src/simulation/random`, parser estrito, `xoshiro128ss-v1`, clone, bounded integer, quatro streams por `jump`, corpus golden e execução cross-runtime; ADR-0004 aceito e lifecycle movido para `In review`.

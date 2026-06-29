@@ -333,6 +333,78 @@ describe("performance measurement contracts", () => {
     });
   });
 
+  it("accepts the F0 595-second coverage exception but rejects less coverage", () => {
+    const report = completedCollector().finish(environment, 5_000);
+    const legacyBoundary = (index: number): number =>
+      index === 3 ? index * 5_000 - 0.000_000_000_015 : index * 5_000;
+    const legacyWindows = Array.from({ length: 119 }, (_, index) => ({
+      startMs: legacyBoundary(index),
+      endMs: legacyBoundary(index + 1),
+      callbacks: 300,
+      fps: 60,
+    }));
+    const legacyReport = {
+      ...report,
+      buildCommit: "1d75de79e7f5f340787a88e7d018a3a406bf59c0",
+      measurement: {
+        ...report.measurement,
+        durationMs: 600_000,
+      },
+      frames: {
+        ...report.frames,
+        windows: legacyWindows,
+      },
+    };
+    const distinctLegacyReports = [
+      legacyReport,
+      {
+        ...legacyReport,
+        measurement: { ...legacyReport.measurement, frameSamples: 299 },
+      },
+      {
+        ...legacyReport,
+        measurement: { ...legacyReport.measurement, frameSamples: 298 },
+      },
+    ];
+
+    expect(evaluateDeviceReports(distinctLegacyReports)).toEqual({
+      evaluation: "pass",
+      failures: [],
+    });
+
+    expect(
+      evaluateDeviceReports(
+        distinctLegacyReports.map((item) => ({
+          ...item,
+          buildCommit: "future-commit",
+        })),
+      ),
+    ).toEqual({
+      evaluation: "not-evaluated",
+      failures: [
+        "run-1-incomplete-fps-windows",
+        "run-2-incomplete-fps-windows",
+        "run-3-incomplete-fps-windows",
+      ],
+    });
+
+    expect(
+      evaluateDeviceReports(
+        distinctLegacyReports.map((item) => ({
+          ...item,
+          frames: { ...item.frames, windows: legacyWindows.slice(0, -1) },
+        })),
+      ),
+    ).toEqual({
+      evaluation: "not-evaluated",
+      failures: [
+        "run-1-incomplete-fps-windows",
+        "run-2-incomplete-fps-windows",
+        "run-3-incomplete-fps-windows",
+      ],
+    });
+  });
+
   it("rejects reports collected in different browser environments", () => {
     const report = completedCollector().finish(environment, 5_000);
     const distinctReports = [

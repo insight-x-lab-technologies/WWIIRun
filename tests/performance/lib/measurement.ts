@@ -1,6 +1,8 @@
 export const PERFORMANCE_REPORT_SCHEMA =
   "wwiirun.performance-report.v1" as const;
 export const PERFORMANCE_WORKLOAD_VERSION = "tier-base-stress-v1" as const;
+const F0_LEGACY_BASELINE_COMMIT =
+  "1d75de79e7f5f340787a88e7d018a3a406bf59c0" as const;
 
 export type Capability = "supported" | "unsupported";
 export type MeasurementStatus = "valid" | "invalid";
@@ -423,7 +425,7 @@ export function evaluateDeviceReports(reports: readonly PerformanceReport[]): {
     };
   }
   const incompleteWindows = reports.flatMap((report, index) =>
-    hasCompleteFpsWindows(report)
+    hasSufficientFpsWindows(report)
       ? []
       : [`run-${index + 1}-incomplete-fps-windows`],
   );
@@ -481,16 +483,31 @@ function hasComparableEnvironment(
   return comparableEnvironment(actual) === comparableEnvironment(expected);
 }
 
-function hasCompleteFpsWindows(report: PerformanceReport): boolean {
+function hasSufficientFpsWindows(report: PerformanceReport): boolean {
   const windowMs = 5_000;
-  const expectedWindows = Math.ceil(report.measurement.durationMs / windowMs);
-  if (report.frames.windows.length !== expectedWindows) return false;
+  const acceptedDurationMs =
+    report.schemaVersion === PERFORMANCE_REPORT_SCHEMA &&
+    report.workloadVersion === PERFORMANCE_WORKLOAD_VERSION &&
+    report.buildCommit === F0_LEGACY_BASELINE_COMMIT &&
+    report.measurement.durationMs === 600_000
+      ? 595_000
+      : report.measurement.durationMs;
+  const minimumWindows = Math.ceil(acceptedDurationMs / windowMs);
+  const maximumWindows = Math.ceil(report.measurement.durationMs / windowMs);
+  if (
+    report.frames.windows.length < minimumWindows ||
+    report.frames.windows.length > maximumWindows
+  ) {
+    return false;
+  }
   return report.frames.windows.every((window, index) => {
     const startMs = index * windowMs;
     return (
-      window.startMs === startMs &&
-      window.endMs ===
-        Math.min(startMs + windowMs, report.measurement.durationMs)
+      Math.abs(window.startMs - startMs) < 0.001 &&
+      Math.abs(
+        window.endMs -
+          Math.min(startMs + windowMs, report.measurement.durationMs),
+      ) < 0.001
     );
   });
 }

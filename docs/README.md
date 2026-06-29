@@ -48,3 +48,4 @@ Esta pasta é a fonte de verdade do projeto. Em conflito, prevalecem: ADR aceito
 - [ADR-0004: PRNG versionado e streams independentes](adr/0004-versioned-prng-and-streams.md)
 - [ADR-0005: estado headless e hash canônico da run](adr/0005-headless-run-state-and-hash.md)
 - [ADR-0006: evidência de performance e budgets versionados](adr/0006-performance-evidence-and-budgets.md)
+- [ADR-0007: exceção de cobertura para baselines físicos F0](adr/0007-f0-performance-coverage-exception.md)
