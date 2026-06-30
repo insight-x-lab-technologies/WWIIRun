@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "wwiirun.content-manifest.v1",
+  "manifestId": "fixture.valid.v1",
+  "contentVersion": "content.v1",
+  "documents": [
+    {
+      "id": "fixture.assets.v1",
+      "schema": "wwiirun.asset-catalog.v1",
+      "path": "asset-catalog.json"
+    }
+  ]
+}

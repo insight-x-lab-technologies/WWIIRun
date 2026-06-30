@@ -49,3 +49,8 @@ Esta pasta é a fonte de verdade do projeto. Em conflito, prevalecem: ADR aceito
 - [ADR-0005: estado headless e hash canônico da run](adr/0005-headless-run-state-and-hash.md)
 - [ADR-0006: evidência de performance e budgets versionados](adr/0006-performance-evidence-and-budgets.md)
 - [ADR-0007: exceção de cobertura para baselines físicos F0](adr/0007-f0-performance-coverage-exception.md)
+- [ADR-0008: contratos executáveis de conteúdo e save](adr/0008-executable-content-and-save-contracts.md)
+
+## ADRs propostos
+
+Nenhum.

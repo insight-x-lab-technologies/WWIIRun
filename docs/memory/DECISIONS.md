@@ -9,6 +9,7 @@
 | ADR-0005 | Aceita | Run headless avança por ticks/inputs explícitos e usa layout binário canônico com hash `fnv1a64-v1`. |
 | ADR-0006 | Aceita | Performance usa harness isolado, smoke estrutural sem threshold temporal em CI, medição física e budgets versionados do build. |
 | ADR-0007 | Aceita | Baselines físicos F0 podem ser avaliados com 119 janelas consecutivas/595 s; o coletor futuro mantém 120 janelas/600 s. |
+| ADR-0008 | Aceita | Conteúdo/save usam decoders TypeScript puros, estritos e versionados; o build reutiliza os decoders e acrescenta verificações de filesystem/integridade. |
 | D-004 | Aceita | “Indiano” significa Hindi (`hi`) e espanhol significa `es-ES`; há 9 locales confirmados e o décimo segue aberto. |
 | D-005 | Aceita | O jogo funciona offline; recursos sociais sincronizam quando há rede. |
 | D-006 | Aceita | Leaderboard central trata o cliente como não confiável e valida submissões. |

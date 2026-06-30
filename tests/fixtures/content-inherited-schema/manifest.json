@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "wwiirun.content-manifest.v1",
+  "manifestId": "fixture.inherited-schema.v1",
+  "contentVersion": "content.v1",
+  "documents": [
+    {
+      "id": "a.constructor",
+      "schema": "constructor",
+      "path": "asset-catalog.json"
+    },
+    {
+      "id": "z.unknown",
+      "schema": "wwiirun.unknown.v1",
+      "path": "missing.json"
+    }
+  ]
+}

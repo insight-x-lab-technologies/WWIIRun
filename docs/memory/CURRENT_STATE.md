@@ -43,6 +43,10 @@ F0 — Fundação documental e técnica.
 - terceira revisão independente confirmou a correção funcional e todos os gates, mas retornou `Changes requested` por `F0-06-TRACE-01`: o range F0-06 ainda contém o fechamento de F0-05 e o patch final de Long Tasks permanece sem commit, impedindo demonstrar unidade isolada/versionada e rollback sem reabrir F0-05.
 - `F0-06-TRACE-01` corrigido: `d4cec96` materializa o baseline aprovado de F0-05 sem F0-06 e `373ca17` restaura a unidade F0-06 completa, incluindo `F0-06-PERF-04`, sem tocar na spec F0-05, simulation ou goldens; item retornado para `In review`.
 - quarta revisão independente de `F0-06` aprovada sem findings: rollback em `d4cec96` preserva F0-05 `Done` e build funcional, o range isolado inclui `F0-06-PERF-04`, todos os critérios/gates passaram e o item foi movido para `Done`.
+- `SPEC-F0-08` criada em `Awaiting approval`: decoders TypeScript puros para content/save, manifest core, catálogo de assets, validator integrado ao build e save v1 fundacional; ADR-0008 proposto e item movido para `Specified`.
+- proprietário aprovou SPEC-F0-08/ADR-0008; implementação TDD entregou contratos puros e fechados de validation/content/save, manifest e catálogo core vazio, validator fail-closed integrado ao build, fixtures e documentação. Todos os gates aplicáveis passaram e o item foi para `In review`.
+- revisão independente de `F0-08` solicitou mudanças: lookup herdado do registro fazia o schema desconhecido `constructor` lançar, canonicalização anterior às verificações deslocava JSON Pointers para índices diferentes do arquivo-fonte e não existia unidade versionada/rollback isolado sobre o fechamento documental preexistente de F0-06.
+- findings `F0-08-SCHEMA-01`, `F0-08-DIAG-01` e `F0-08-TRACE-01` corrigidos por TDD: lookup exclusivamente próprio, diagnósticos nos índices-fonte sem perder canonicalização e baseline F0-06 `2ef8132`; item retornado para `In review`.
 
 ## Ainda não iniciado
 
@@ -52,14 +56,27 @@ F0 — Fundação documental e técnica.
 
 ## Próximo passo exato
 
-Executar `$specify-roadmap-item F0-08`; não fazer push sem autorização explícita.
+Executar `$review-roadmap-item F0-08` sobre o range `2ef8132..HEAD`; não marcar `Done` antes da revisão independente e não fazer push sem autorização explícita.
 
 ## Bloqueios
 
-F0-06 está `Done`, mas os riscos documentados permanecem: ADR-0007 aceita 595/600 s sem presumir a janela ausente, os três trios avaliam `fail`, desktop integrado ainda não possui trio e profiling remoto do iPhone está `unavailable` por ausência de Mac. F0-08 não possui bloqueio conhecido. F0-03 permanece em `Changes requested` por findings independentes. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
+F0-08 está em `In review`, sem bloqueio funcional externo. F0-06 está `Done`, mas os riscos documentados permanecem: ADR-0007 aceita 595/600 s sem presumir a janela ausente, os três trios avaliam `fail`, desktop integrado ainda não possui trio e profiling remoto do iPhone está `unavailable` por ausência de Mac. F0-03 permanece em `Changes requested` por findings independentes. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
 
 ## Validações, pendências e riscos da sessão
 
+- realizado nesta correção F0-08: o registro usa prototype nulo e lookup próprio centralizado; o validator preserva índices-fonte de documentos/assets nas verificações de filesystem sem mudar a ordem canônica dos decoders. Fixture versionada cobre o token `constructor`, agrega três diagnósticos e não produz `[io-error]`.
+- RED/GREEN: o focado inicial falhou 4/39 exatamente por throw/interrupção/pointers deslocados; após a correção passou 40/40. Coverage focada final passou 75/75 nos quatro arquivos de validation/content/save/validator.
+- validações da correção: Node `v24.15.0`, npm `11.12.1`; `npm run check` exit 0 com 188 unitários, 7 determinísticos, validator, build e budget; Playwright 6/6 produto + 1/1 harness; `content:validate`, dependências, fronteiras e diff revalidados.
+- rastreabilidade: commit `2ef8132` contém somente os seis documentos do fechamento aprovado de F0-06, mantendo F0-08 `Ready`; esse snapshot passou `npm run check` com 113 unitários, 7 determinísticos e build/budget. A unidade sucessora F0-08 é isolável pelo range `2ef8132..HEAD` e o rollback não reabre F0-06.
+- preservação: nenhuma dependência/lockfile, `src/simulation`, golden, threshold, workload ou JSON de baseline foi alterado por F0-08. `ASSET-02`/`DET-02` permanecem `Planned`; nenhum asset, licença ou proveniência fictícia foi criado.
+- pendência exata: revisão independente com `$review-roadmap-item F0-08` sobre `2ef8132..HEAD`; não marcar `Done` nem fazer push antes dela. Riscos mantidos: decoders manuais exigem vetores contra drift; F0-08 confere dimensões declaradas, não pixels/codec; licença é declaração, não auditoria jurídica; save ainda não persiste nem recupera dados.
+- realizado na revisão F0-08: item movido para `Changes requested`; critérios 2 e 5 reabertos. Findings: `F0-08-SCHEMA-01` (`High`), `F0-08-TRACE-01` (`High`) e `F0-08-DIAG-01` (`Medium`). Nenhum runtime, teste, golden ou baseline foi alterado pela revisão.
+- validações independentes da revisão: Node `v24.15.0`, npm `11.12.1`; 70/70 focados com coverage; `npm run content:validate`, `npm ls --depth=0`, `npm run check` com 183 unitários/7 determinísticos/build/budget, Playwright 6/6 produto + 1/1 harness, scans de fronteira e `git diff --check` verdes. Provas negativas reproduziram throw para `constructor` e pointer `/documents/1/schema` para entrada no índice 0.
+- realizado na implementação inicial F0-08: ADR-0008 aceito; primitives de validation, manifest/catalog/registry content, save v1/migrator, validator Node, manifest e catálogo core vazio, fixtures e documentação implementados. O build executa `content:validate` após typecheck e antes do Vite.
+- RED/GREEN e segurança da implementação inicial: 70 testes focados cobriram decoders, canonicalização, paridade de tokens, save, filesystem/integridade e CLI. Uma revisão de path revelou que o manifest podia ser um symlink de escape; regressão RED reproduziu o caso e a resolução real confinada ao repositório corrigiu o gap.
+- validações da implementação inicial: `npm run check` exit 0 com 183 unitários, 7 determinísticos, validator, build e budget; cobertura focada 70/70; Playwright 6/6 produto + 1/1 harness; CLI válido exit 0 e inválidos exit 1; `npm ls --depth=0`, scans de fronteira e `git diff --check` verdes.
+- realizado na especificação: `SPEC-F0-08` e ADR-0008 proposto criados; roadmap/índices/requisitos/memória atualizados. A recomendação usa decoders puros e estritos, manifest/catalog core vazio, gate build fail-closed e save v1 sem dados de produto, storage ou migração destrutiva.
+- validações documentais da especificação: dependência F0-02 confirmada `Done`; compatibilidade confrontada com F0-05, ADR-0001/0003/0005, arquitetura, pipeline de assets, qualidade, requisitos e roadmap futuro F3/F4/F6. F0-03 não é dependência e suas mudanças não foram misturadas.
 - realizado nesta quarta revisão: `F0-06-TRACE-01` e `F0-06-PERF-04` confirmados no range `d4cec96..HEAD`; nenhum finding permaneceu. Spec, índice e roadmap foram movidos para `Done`, requisitos receberam evidência parcial aprovada e o próximo item elegível continua F0-08.
 - validações independentes: Node `v24.15.0`, npm `11.12.1`; 24/24 focados; coverage 113/113 com random/run em 100%; `npm run check` verde com 113 unitários, 7 determinísticos, build e budget; Playwright 6/6 produto + 1/1 harness; `git diff --check` verde. O snapshot de rollback `d4cec96` passou `npm run check` com 89 unitários, 7 determinísticos e build.
 - preservação confirmada: o range não altera a spec F0-05, `src/simulation` ou goldens; nove SHA-256 conferem e os avaliadores preservam `fail` para desktop, iPhone e Galaxy Tab S9 com os findings documentados.

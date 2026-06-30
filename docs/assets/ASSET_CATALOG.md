@@ -2,6 +2,8 @@
 
 Este é o registro mestre inicial. Cada linha vira uma ficha individual pelo template antes da geração final.
 
+O contrato executável fundacional está em `src/content/schema/` e o catálogo core versionado em `src/content/data/core/asset-catalog.json`. O catálogo permanece vazio até uma ficha e seus arquivos reais existirem; `npm run content:validate` exige spec, evidência de licença, proveniência, tamanho e SHA-256, mas a validação de pixels/dimensões/codec continua reservada a F6-04.
+
 ## Convenções globais
 
 - gameplay aponta para `visualId`, nunca caminho de arquivo;

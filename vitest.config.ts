@@ -9,8 +9,12 @@ export default defineConfig({
       reporter: [["text", { skipFull: false }], "html"],
       include: [
         "src/app/bootstrapApplication.ts",
+        "src/content/schema/**/*.ts",
+        "src/services/save/**/*.ts",
+        "src/shared/validation/**/*.ts",
         "src/simulation/random/**/*.ts",
         "src/simulation/run/**/*.ts",
+        "scripts/validateContent.ts",
       ],
       reportsDirectory: "coverage",
     },
