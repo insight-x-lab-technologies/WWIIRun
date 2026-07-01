@@ -12,7 +12,7 @@ Objetivo: provar stack, determinismo, performance e deploy antes de criar volume
 |---|---|---|---|
 | F0-01 | Documentação base, requisitos, ADRs, templates e memória | — | Done |
 | F0-02 | Scaffold Vite + TS strict + Phaser, módulos e scripts | F0-01 | Done |
-| F0-03 | ESLint/Prettier, Vitest, Playwright e CI gratuito | F0-02 | Changes requested |
+| F0-03 | ESLint/Prettier, Vitest, Playwright e CI gratuito | F0-02 | In review |
 | F0-04 | PRNG versionado, seed parser, streams e golden vectors | F0-02 | Done |
 | F0-05 | Loop fixo/headless, InputFrame, RunConfig/State e hash | F0-04 | Done |
 | F0-06 | Performance harness, matriz real e budgets de bundle/assets | F0-02 | Done |
