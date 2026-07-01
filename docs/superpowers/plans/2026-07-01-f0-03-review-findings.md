@@ -4,7 +4,7 @@
 
 **Goal:** Close the documented F0-03 lint-isolation and local-traceability findings without pushing or running GitHub Actions.
 
-**Architecture:** Keep the existing ESLint flat configuration and strengthen only its `src/simulation` override. Exercise the actual rule map through ESLint's in-process `Linter`, then record the correction as a single local commit over the approved `fec1d5a` baseline so later completed roadmap items remain untouched.
+**Architecture:** Keep the existing ESLint flat configuration and strengthen only its `src/simulation` override. Exercise the actual rule map through ESLint's in-process `Linter`, then record the correction as a single local commit over the approved `b2390a5` baseline so later completed roadmap items remain untouched.
 
 **Tech Stack:** ESLint 10 flat config, TypeScript 6, Vitest 4, Git.
 
@@ -58,7 +58,7 @@ Run the focused Vitest regression, `npm run lint`, `npm run test:unit:coverage`,
 
 - [x] **Step 3: Record the local traceable unit**
 
-Commit only F0-03 code, regressions, plan, and lifecycle/evidence documents as `fix(F0-03): close quality isolation findings`. Verify `fec1d5a..HEAD` contains no F0-08 runtime, simulation behavior, golden, baseline, dependency, or lockfile changes.
+Commit only F0-03 code, regressions, plan, and lifecycle/evidence documents as `fix(F0-03): close quality isolation findings`. Verify `b2390a5..HEAD` contains no F0-08 runtime, simulation behavior, golden, baseline, dependency, or lockfile changes.
 
 - [x] **Step 4: Return the item to In review**
 

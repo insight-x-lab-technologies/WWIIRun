@@ -13,4 +13,4 @@ Specs concluídas permanecem no repositório como ligação entre requisito, dec
 - [`F0-04 — PRNG versionado, seeds, streams e golden vectors`](SPEC-F0-04-versioned-prng-seeds-streams.md) — `Done`.
 - [`F0-05 — loop fixo/headless, contratos da run e hash`](SPEC-F0-05-fixed-headless-run-state-hash.md) — `Done`.
 - [`F0-06 — harness de performance, matriz real e budgets`](SPEC-F0-06-performance-harness-matrix-budgets.md) — `Done`.
-- [`F0-08 — schemas de conteúdo/save e validadores de build`](SPEC-F0-08-content-save-schemas-build-validators.md) — `In review`.
+- [`F0-08 — schemas de conteúdo/save e validadores de build`](SPEC-F0-08-content-save-schemas-build-validators.md) — `Done`.
