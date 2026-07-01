@@ -1,6 +1,6 @@
 # SPEC-F0-03: toolchain de qualidade e CI
 
-Status: In progress
+Status: In review
 Owner: proprietário do projeto  
 Requisitos: `AGENT-01` (reforço operacional); `COST-01` (parcial); habilita os gates de `DET-01`, `DET-02`, `PERF-01` e `PWA-01` sem concluí-los  
 Dependências: `F0-02` (`Done`), ADR-0001 (`Accepted`)
@@ -177,6 +177,16 @@ O rollback é reverter a unidade F0-03 inteira — manifesto/lockfile, configs, 
 - Workflow localmente inspecionado: PR e push em `main`, `contents: read`, concurrency/cancelamento, timeout de 20 min, runner `ubuntu-latest`, actions fixadas por SHA, `npm ci` → `check` → instalação Chromium → E2E e upload de diagnóstico somente em falha por 7 dias. Não há secret, escrita, deploy, serviço externo ou runner premium.
 - Pendente para a revisão: execução real do workflow no GitHub Actions, pois esta sessão não recebeu autorização para commit/push. O nono critério permanece desmarcado por esse motivo.
 
+### Evidências da correção de 2026-07-01
+
+- TDD reproduziu os findings antes da configuração: `npm run test:unit -- tests/unit/eslintConfig.test.ts --reporter=verbose` falhou 2/3, com zero diagnósticos para `globalThis.Math.random()` e `../../../game/createGame`; o controle `../../../shared/value` permaneceu permitido. Após a correção, o mesmo comando passou 3/3.
+- O override agora proíbe `globalThis` no núcleo e usa regex ancorado para qualquer quantidade de segmentos `../` rumo a `app`, `game`, `platform` ou `services`, preservando as restrições de Phaser. Uma fixture temporária no terceiro nível de `src/simulation` fez o ESLint real falhar com exatamente `no-restricted-imports` e `no-restricted-globals`; a fixture foi removida antes dos gates finais.
+- Ambiente reproduzido com Node `v24.15.0` e npm `11.12.1`; `npm ci` instalou 154 pacotes, `npm ls --depth=0` passou e não houve mudança em dependência, manifesto ou lockfile.
+- `npm run test:unit:coverage` passou 191/191 e emitiu resumo V8. `npm run check` passou com 191 unitários, 7 determinísticos, validator de conteúdo, build e budget; o warning conhecido do chunk Phaser permaneceu inalterado.
+- A execução final `CI=1 npm run test:e2e` passou 6/6 testes de produto e 1/1 harness de performance. Duas tentativas anteriores expuseram risco preexistente do harness F0-06: uma excedeu 30 s sob contenção e outra reutilizou em `127.0.0.1:8080` um servidor alheio (“Titan Code Hero”) por `reuseExistingServer: true`; o harness isolado passou e o gate completo passou depois que as portas foram confirmadas livres. Nenhum arquivo F0-06 foi alterado.
+- O commit local `3506dba` contém somente as regras ESLint, três regressões, plano e lifecycle de F0-03 sobre o baseline `fec1d5a`. O range `fec1d5a..HEAD` não altera dependências, lockfile, workflow, runtime do produto, `src/simulation`, goldens ou baselines; o rollback preserva F0-04/F0-05/F0-06/F0-08 existentes no baseline.
+- A execução real do GitHub Actions continua pendente: o proprietário proibiu push e Actions sem autorização explícita nesta sessão. Nenhum push, chamada à API do GitHub ou workflow remoto foi executado; o nono critério permanece desmarcado.
+
 ## Base técnica verificada
 
 - ESLint documenta flat config como formato atual; typescript-eslint documenta os presets com informação de tipo e o custo associado ao typed linting.
@@ -192,3 +202,4 @@ Fontes consultadas em 2026-06-27: [ESLint flat config](https://eslint.org/docs/l
 - 2026-06-27 — aprovação humana registrada; implementação iniciada.
 - 2026-06-27 — toolchain, regras de fronteira, testes e workflow implementados; gates locais e E2E verdes; item movido para `In review`, pendente execução real do workflow e revisão independente.
 - 2026-06-27 — revisão independente: `Changes requested`. Findings: **High** — o override de `src/simulation` pode ser contornado por `globalThis.Math.random()` e por imports relativos válidos a partir do terceiro nível, por exemplo `../../../game/createGame`; ambos passaram no ESLint com exit `0`, portanto o gate não garante o isolamento exigido. **High** — não há commit/diff isolado de F0-03 nem execução real do GitHub Actions: `git status` mostra F0-02/F0-03 juntos como mudanças não versionadas, `main...origin/main [gone]`, e nenhum URL/identificador de run foi fornecido; a consulta remota também não pôde ser autenticada. Checks independentes: Node `v24.15.0`, npm `11.12.1`; `npm ci`, `npm ls --depth=0`, `format:check`, `lint`, typechecks, unitário (1/1), cobertura V8, build e `npm run check` passaram; `CI=1 npm run test:e2e` passou 2/2 em 12,8 s fora do sandbox; provas negativas de formatação, warning, import simples e `Math.random` simples falharam como esperado e as fixtures foram removidas. O critério de execução real do workflow continua não atendido. Próxima ação: reforçar as restrições contra acessos/imports equivalentes, adicionar regressões automatizadas para os bypasses, organizar unidades versionadas rastreáveis e obter uma run real verde do workflow antes de nova revisão.
+- 2026-07-01 — findings locais corrigidos por TDD no commit `3506dba`: acessos via `globalThis` e imports relativos profundos agora falham, regressões automatizadas cobrem ambos e o range sucessor de `fec1d5a` isola a correção F0-03. Gates locais passaram e o item retornou para `In review`. A execução real do Actions permanece pendente e não houve push por instrução explícita do proprietário.

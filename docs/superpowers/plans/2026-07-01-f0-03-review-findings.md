@@ -56,11 +56,11 @@ Set the spec, spec index, and roadmap item to `In progress` without changing any
 
 Run the focused Vitest regression, `npm run lint`, `npm run test:unit:coverage`, `npm run check`, `CI=1 npm run test:e2e`, dependency inspection, boundary scans, and `git diff --check`. Record only factual exit codes/counts.
 
-- [ ] **Step 3: Record the local traceable unit**
+- [x] **Step 3: Record the local traceable unit**
 
 Commit only F0-03 code, regressions, plan, and lifecycle/evidence documents as `fix(F0-03): close quality isolation findings`. Verify `fec1d5a..HEAD` contains no F0-08 runtime, simulation behavior, golden, baseline, dependency, or lockfile changes.
 
-- [ ] **Step 4: Return the item to In review**
+- [x] **Step 4: Return the item to In review**
 
 Set the spec, index, and roadmap to `In review`. Keep the real GitHub Actions criterion unchecked and document that push/run evidence remains blocked by the user's explicit no-push instruction.
 

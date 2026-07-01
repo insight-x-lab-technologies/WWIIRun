@@ -1,6 +1,6 @@
 # Estado atual
 
-Atualizado em: 2026-06-30
+Atualizado em: 2026-07-01
 
 ## Fase
 
@@ -18,6 +18,7 @@ F0 — Fundação documental e técnica.
 - revisão independente de `F0-02` aprovada sem findings; item movido para `Done` e `F0-03` liberado como `Ready`.
 - spec `F0-03` implementada: ESLint/Prettier, typecheck separado de runtime/tooling, Vitest com cobertura V8, Playwright Chromium em dois viewports e CI GitHub Actions de privilégio mínimo;
 - revisão independente de `F0-03` solicitou mudanças: regras de isolamento aceitam bypass por `globalThis.Math.random()` e import relativo profundo; a unidade também não possui commit/diff isolado nem execução real do Actions.
+- bypasses locais de `F0-03` corrigidos por TDD no commit `3506dba`: `globalThis` é proibido no núcleo, imports relativos para camadas externas são bloqueados em qualquer profundidade e três regressões exercem a configuração real; item retornado para `In review`.
 - `F0-04` implementado e revisado: algoritmo, streams e corpus golden passaram nos gates principais, mas a revisão independente retornou `Changes requested` porque a evidência de cobertura focada do módulo random não é reproduzível com a configuração atual.
 - finding de cobertura de `F0-04` corrigido: relatório textual agora explicita os arquivos 100% cobertos em agentes/CI e o teste de 10.000 draws permanece equivalente com uma única asserção agregada; item retornou para `In review`.
 - ADR-0004 aceito e autonomia técnica delegada registrada: decisões internas/reversíveis seguem a recomendação do agente, preservadas as matérias humanas reservadas e autorizações externas.
@@ -56,14 +57,18 @@ F0 — Fundação documental e técnica.
 
 ## Próximo passo exato
 
-Executar `$review-roadmap-item F0-08` sobre o range `2ef8132..HEAD`; não marcar `Done` antes da revisão independente e não fazer push sem autorização explícita.
+Executar `$review-roadmap-item F0-03` sobre o range `fec1d5a..HEAD`; não marcar `Done` e não fazer push/Actions sem autorização explícita.
 
 ## Bloqueios
 
-F0-08 está em `In review`, sem bloqueio funcional externo. F0-06 está `Done`, mas os riscos documentados permanecem: ADR-0007 aceita 595/600 s sem presumir a janela ausente, os três trios avaliam `fail`, desktop integrado ainda não possui trio e profiling remoto do iPhone está `unavailable` por ausência de Mac. F0-03 permanece em `Changes requested` por findings independentes. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
+F0-03 está em `In review`: os findings locais foram corrigidos e versionados, mas o critério de execução real do GitHub Actions permanece pendente porque push/Actions não foram autorizados. F0-08 também está em `In review` neste baseline. F0-06 está `Done`, mas os riscos documentados permanecem: ADR-0007 aceita 595/600 s sem presumir a janela ausente, os três trios avaliam `fail`, desktop integrado ainda não possui trio e profiling remoto do iPhone está `unavailable` por ausência de Mac. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
 
 ## Validações, pendências e riscos da sessão
 
+- realizado nesta correção F0-03: os dois bypasses documentados foram reproduzidos RED e fechados com regras nativas ESLint; três regressões passaram GREEN. Nenhuma dependência, workflow, runtime, simulation, golden ou baseline foi alterado.
+- validações: Node `v24.15.0`, npm `11.12.1`; coverage 191/191; `npm run check` com 191 unitários, 7 determinísticos, validator, build e budget; execução final `CI=1 npm run test:e2e` com 6/6 produto + 1/1 harness; `npm ls --depth=0`, scans de fronteira e `git diff --check` verdes.
+- rastreabilidade: commit local `3506dba` sobre `fec1d5a` isola código/testes/plano/lifecycle F0-03. Não houve push nem GitHub Actions. O risco observado de colisão/reuso da porta 8080 pertence ao harness F0-06 e não foi alterado incidentalmente.
+- pendência exata: revisão independente com `$review-roadmap-item F0-03` sobre `fec1d5a..HEAD`; a run real do Actions exige autorização futura separada.
 - realizado nesta correção F0-08: o registro usa prototype nulo e lookup próprio centralizado; o validator preserva índices-fonte de documentos/assets nas verificações de filesystem sem mudar a ordem canônica dos decoders. Fixture versionada cobre o token `constructor`, agrega três diagnósticos e não produz `[io-error]`.
 - RED/GREEN: o focado inicial falhou 4/39 exatamente por throw/interrupção/pointers deslocados; após a correção passou 40/40. Coverage focada final passou 75/75 nos quatro arquivos de validation/content/save/validator.
 - validações da correção: Node `v24.15.0`, npm `11.12.1`; `npm run check` exit 0 com 188 unitários, 7 determinísticos, validator, build e budget; Playwright 6/6 produto + 1/1 harness; `content:validate`, dependências, fronteiras e diff revalidados.
