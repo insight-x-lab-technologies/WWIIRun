@@ -1,6 +1,6 @@
 # SPEC-F0-03: toolchain de qualidade e CI
 
-Status: Changes requested  
+Status: In progress
 Owner: proprietário do projeto  
 Requisitos: `AGENT-01` (reforço operacional); `COST-01` (parcial); habilita os gates de `DET-01`, `DET-02`, `PERF-01` e `PWA-01` sem concluí-los  
 Dependências: `F0-02` (`Done`), ADR-0001 (`Accepted`)

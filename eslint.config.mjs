@@ -78,24 +78,19 @@ export default defineConfig(
         "clearTimeout",
         "setInterval",
         "clearInterval",
+        "globalThis",
       ],
       "no-restricted-imports": [
         "error",
         {
           patterns: [
             {
-              group: [
-                "phaser",
-                "phaser/*",
-                "../game/**",
-                "../../game/**",
-                "../app/**",
-                "../../app/**",
-                "../platform/**",
-                "../../platform/**",
-                "../services/**",
-                "../../services/**",
-              ],
+              group: ["phaser", "phaser/*"],
+              message:
+                "simulation must remain independent from presentation, platform, and adapters",
+            },
+            {
+              regex: "^(?:\\.\\./)+(?:app|game|platform|services)(?:/|$)",
               message:
                 "simulation must remain independent from presentation, platform, and adapters",
             },

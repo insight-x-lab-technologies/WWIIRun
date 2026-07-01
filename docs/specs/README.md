@@ -9,7 +9,7 @@ Specs concluídas permanecem no repositório como ligação entre requisito, dec
 ## Índice
 
 - [`F0-02 — scaffold Vite, TypeScript strict e Phaser`](SPEC-F0-02-project-scaffold.md) — `Done`.
-- [`F0-03 — toolchain de qualidade e CI`](SPEC-F0-03-quality-toolchain-and-ci.md) — `Changes requested`.
+- [`F0-03 — toolchain de qualidade e CI`](SPEC-F0-03-quality-toolchain-and-ci.md) — `In progress`.
 - [`F0-04 — PRNG versionado, seeds, streams e golden vectors`](SPEC-F0-04-versioned-prng-seeds-streams.md) — `Done`.
 - [`F0-05 — loop fixo/headless, contratos da run e hash`](SPEC-F0-05-fixed-headless-run-state-hash.md) — `Done`.
 - [`F0-06 — harness de performance, matriz real e budgets`](SPEC-F0-06-performance-harness-matrix-budgets.md) — `Done`.
