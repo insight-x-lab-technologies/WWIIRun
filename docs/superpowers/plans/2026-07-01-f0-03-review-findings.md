@@ -64,6 +64,6 @@ Commit only F0-03 code, regressions, plan, and lifecycle/evidence documents as `
 
 Set the spec, index, and roadmap to `In review`. Keep the real GitHub Actions criterion unchecked and document that push/run evidence remains blocked by the user's explicit no-push instruction.
 
-- [ ] **Step 5: Verify the final documentation commit**
+- [x] **Step 5: Verify the final documentation commit**
 
 Commit the final evidence/lifecycle update, rerun `git diff --check`, inspect `git status --short`, and hand off to `$review-roadmap-item F0-03` without marking the item `Done`.
