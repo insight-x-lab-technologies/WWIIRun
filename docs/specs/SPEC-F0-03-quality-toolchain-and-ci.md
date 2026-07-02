@@ -1,6 +1,6 @@
 # SPEC-F0-03: toolchain de qualidade e CI
 
-Status: In progress
+Status: In review
 Owner: proprietário do projeto  
 Requisitos: `AGENT-01` (reforço operacional); `COST-01` (parcial); habilita os gates de `DET-01`, `DET-02`, `PERF-01` e `PWA-01` sem concluí-los  
 Dependências: `F0-02` (`Done`), ADR-0001 (`Accepted`)
@@ -120,7 +120,7 @@ O `package.json` deve expor, no mínimo, contratos equivalentes a:
 - [x] Given Chromium instalado pelo Playwright, when `npm run test:e2e` roda, then os dois viewports passam com exatamente um canvas contido no viewport, sem overflow, page errors ou requests locais falhos.
 - [x] Given o Playwright config em ambiente CI, when a configuração é inspecionada/executada, then `forbidOnly` está ativo, há um worker, timeout finito, no máximo um retry e servidor local com encerramento gerenciado.
 - [x] Given o workflow versionado, when ele é inspecionado, then dispara em PR/push de `main`, tem permissões somente de leitura, timeouts/concurrency, actions por SHA e nenhuma dependência de secret, serviço pago, deploy ou runner premium.
-- [ ] Given execução real do workflow no GitHub Actions, when o commit/PR é processado, then `npm ci`, `check` e E2E ficam verdes; em falha E2E, diagnóstico curto é disponibilizado sem publicar o app.
+- [x] Given execução real do workflow no GitHub Actions, when o commit/PR é processado, then `npm ci`, `check` e E2E ficam verdes; em falha E2E, diagnóstico curto é disponibilizado sem publicar o app.
 - [x] A documentação lista pré-requisitos, instalação do browser, scripts, ordem dos gates, artefatos ignorados, limitações e próximo item sem declarar `DET-01`, `PERF-01`, `PWA-01` ou `COST-01` como concluído.
 
 ## Plano de teste
@@ -196,7 +196,7 @@ O rollback é reverter a unidade F0-03 inteira — manifesto/lockfile, configs, 
 - O override de `src/simulation` agora resolve specifiers relativos contra o arquivo de origem e compara o destino normalizado com as raízes `src/app`, `src/game`, `src/platform` e `src/services`. A regra cobre imports, reexports e `import()`; `self` foi acrescentado aos globais proibidos. A regra lexical anterior permanece como defesa adicional.
 - Uma fixture temporária real em `src/simulation/random/internal` produziu exit `1`, com dois diagnósticos `simulation-boundaries/no-external-imports` para import estático/dinâmico equivalentes e dois `no-restricted-globals` para `self`; a fixture foi removida antes dos gates finais.
 - Ambiente: Node `v24.15.0`, npm `11.12.1`; `npm ci` instalou 154 pacotes e `npm ls --depth=0` confirmou as versões diretas sem mudança em manifesto ou lockfile. Coverage passou 196/196; `npm run check` cobriu 196 unitários, 7 determinísticos, typechecks, validator, build e budget; `CI=1 npm run test:e2e` passou 6/6 produto e 1/1 harness.
-- `F0-03-CI-02` permanece aberto: a consulta read-only de runs para `2e8ba30` retornou novamente `404`. Não houve push nem disparo remoto sem autorização, e nenhum ID/URL de run, job ou log verificável ficou disponível nesta sessão.
+- `F0-03-CI-02` foi fechado após o repositório se tornar público e o push autorizado de `f40f716`: o workflow `Quality` run `28559326341`, attempt 1, concluiu `success`. O job `quality` `84673521702` concluiu `success`; os steps `Install dependencies`, `Run local quality gate`, `Install Playwright Chromium` e `Run browser smoke tests` concluíram `success`, enquanto o upload condicional de diagnóstico foi corretamente ignorado. Evidência: `https://github.com/insight-x-lab-technologies/WWIIRun/actions/runs/28559326341`.
 
 ## Base técnica verificada
 
@@ -218,3 +218,4 @@ Fontes consultadas em 2026-06-27: [ESLint flat config](https://eslint.org/docs/l
 - 2026-07-01 — correção externa `F0-03-CI-01`: com autorização do proprietário, os 12 commits ainda locais tiveram autor/committer corrigidos para Codex e foram publicados até `2e8ba30`, sucessor de árvore idêntica a `c35266b`. O proprietário confirmou diretamente no GitHub privado que o workflow `Quality` desse SHA concluiu verde. O nono critério foi marcado atendido e o item retornou para `In review`, aguardando nova revisão independente.
 - 2026-07-01 — terceira revisão independente: `Changes requested`. **High — F0-03-BOUNDARY-02:** a restrição lexical ainda aceita imports equivalentes por prefixo `./`, normalização com `segmento/..` e `import()` dinâmico, além de permitir `self.Math.random()`/`self.fetch()`; uma fixture temporária sob `src/simulation` passou no ESLint real com exit `0`, portanto o terceiro critério foi reaberto. **High — F0-03-CI-02:** `2e8ba30` está em `origin/main` e o proprietário confirmou `Quality` verde, mas a consulta independente do Actions retornou `404` e não há run ID/job/log verificável; pela regra fail-closed da revisão, o nono critério foi reaberto. Checks independentes: Node `v24.15.0`, npm `11.12.1`; `npm ci`, `npm ls --depth=0`, regressões existentes 3/3, coverage 191/191, `npm run check` com 191 unitários/7 determinísticos/validator/build/budget, E2E 6/6 produto + 1/1 harness, `git diff --check` e worktree sem fixture passaram. O range `b2390a5..2e8ba30` permanece isolado e sem dependência, lockfile, runtime, simulation, golden ou baseline alterado.
 - 2026-07-01 — `F0-03-BOUNDARY-02` corrigido por TDD com resolução semântica de imports, cobertura de import estático/dinâmico/computado e proibição de `self`; gates locais passaram. `F0-03-CI-02` continua aberto porque o conector retornou `404` e a sessão não possui run/job ID verificável nem autorização para push. O item permanece `In progress` até obter essa evidência externa.
+- 2026-07-01 — após o repositório se tornar público, os commits pendentes foram confirmados com autor/committer `Codex <codex@openai.com>` e publicados com autorização. `F0-03-CI-02` foi fechado pela run `28559326341` e job `84673521702`, ambos `success` no commit `f40f716`; dependências, gate local, Chromium e E2E passaram. O item retornou para `In review`, aguardando revisão independente.

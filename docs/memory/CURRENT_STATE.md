@@ -23,6 +23,8 @@ F0 — Fundação documental e técnica.
 - autorização externa de F0-03 executada: os 12 commits locais tiveram autor/committer reescritos para `Codex <codex@openai.com>` sem mudança de árvore; `c35266b` foi sucedido por `2e8ba30`, publicado em `origin/main`, e o proprietário confirmou o workflow `Quality` verde nesse SHA.
 - terceira revisão independente de `F0-03` solicitou mudanças: a regra lexical ainda aceita imports equivalentes por `./`, normalização `segmento/..` e `import()` dinâmico, além de `self` expor browser/entropia; a confirmação humana do Actions não pôde ser verificada pelo revisor porque o conector retornou `404` e não há run ID/job/log disponível.
 - `F0-03-BOUNDARY-02` corrigido por TDD: imports relativos são resolvidos semanticamente contra o arquivo de origem, imports/reexports/dynamic imports para camadas externas são rejeitados, imports dinâmicos computados falham fechados e `self` é proibido no núcleo; oito regressões e fixture real passaram.
+- repositório tornado público pelo proprietário; autoria/committer dos commits pendentes confirmados como `Codex <codex@openai.com>` e correção publicada em `f40f716`.
+- `F0-03-CI-02` fechado com evidência pública: workflow `Quality` run `28559326341` e job `quality` `84673521702` concluíram `success`; instalação, gate local, Chromium e E2E passaram.
 - `F0-04` implementado e revisado: algoritmo, streams e corpus golden passaram nos gates principais, mas a revisão independente retornou `Changes requested` porque a evidência de cobertura focada do módulo random não é reproduzível com a configuração atual.
 - finding de cobertura de `F0-04` corrigido: relatório textual agora explicita os arquivos 100% cobertos em agentes/CI e o teste de 10.000 draws permanece equivalente com uma única asserção agregada; item retornou para `In review`.
 - ADR-0004 aceito e autonomia técnica delegada registrada: decisões internas/reversíveis seguem a recomendação do agente, preservadas as matérias humanas reservadas e autorizações externas.
@@ -56,20 +58,23 @@ F0 — Fundação documental e técnica.
 
 ## Ainda não iniciado
 
-- evidência verificável do workflow CI no GitHub e PWA manifest;
+- PWA manifest;
 - protótipo jogável;
 - projeto Supabase e qualquer integração externa.
 
 ## Próximo passo exato
 
-Fornecer um ID/URL consultável de run ou job do workflow `Quality` para `2e8ba30` ou autorizar o push da correção atual e disponibilizar sua evidência de Actions; então registrar `F0-03-CI-02`, mover F0-03 para `In review` e executar `$review-roadmap-item F0-03`.
+Executar `$review-roadmap-item F0-03` sobre a correção `f40f716` e a run pública `28559326341`; não mover o item para `Done` sem essa revisão independente.
 
 ## Bloqueios
 
-F0-03 está em `In progress`: `F0-03-BOUNDARY-02` foi corrigido e validado localmente, mas `F0-03-CI-02` continua bloqueado porque a execução remota confirmada pelo proprietário não é verificável por run/job/log na credencial disponível. F0-08 e F0-06 estão `Done`, com os riscos já documentados preservados. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
+F0-03 está em `In review`: `F0-03-BOUNDARY-02` foi corrigido e `F0-03-CI-02` possui run/job públicos verdes, aguardando revisão independente. F0-08 e F0-06 estão `Done`, com os riscos já documentados preservados. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
 
 ## Validações, pendências e riscos da sessão
 
+- publicação autorizada: `origin/main` avançou de `2e8ba30` para `f40f716`; os commits `3a3ef29` e `f40f716` registram autor e committer `Codex <codex@openai.com>`, e a configuração local permanece `Codex <codex@openai.com>`.
+- evidência remota F0-03: workflow `Quality` run `28559326341`, attempt 1, e job `quality` `84673521702` concluíram `success` para `f40f716`; instalação, `npm run check`, Chromium e E2E ficaram verdes, com upload diagnóstico ignorado por ausência de falha.
+- lifecycle: `F0-03-CI-02` fechado, spec/índice/roadmap movidos para `In review`; próximo passo é `$review-roadmap-item F0-03`, sem marcar `Done` nesta sessão.
 - realizado nesta correção F0-03: `F0-03-BOUNDARY-02` fechado com regra semântica para imports/reexports/dynamic imports e proibição de `self`; nenhum runtime, arquivo de `src/simulation`, golden, baseline, dependência ou workflow foi alterado.
 - RED/GREEN: 4/7 falharam exatamente para os bypasses revisados; após a correção, 8/8 passaram, incluindo dynamic import computado fail-closed. Fixture real temporária retornou exit `1` com diagnósticos para import estático, dinâmico e `self`, e foi removida.
 - validações locais: Node `v24.15.0`, npm `11.12.1`; `npm ci`/árvore direta verdes; coverage 196/196; `npm run check` com 196 unitários, 7 determinísticos, validator, build e budget; E2E CI 6/6 produto + 1/1 harness.

@@ -60,4 +60,6 @@ Atualize `docs/memory/CURRENT_STATE.md` com: realizado, validações, pendência
 
 ## Commits
 
+Todos os commits produzidos por agentes devem usar autor e committer `Codex <codex@openai.com>`.
+
 Formato sugerido: `tipo(roadmap-id): resumo`, por exemplo `feat(F1-03): add seeded spawn scheduler`. Um commit deve representar uma unidade coerente e testada.
