@@ -19,11 +19,11 @@ npm run test:e2e
 npm run dev
 ```
 
-`npm run check` executa, em ordem, formatação, lint, typecheck de runtime/tooling, unitários e build. O E2E fica separado porque requer Chromium; a CI executa ambos. `npm run preview` serve localmente o build estático criado em `dist/`.
+`npm run check` executa, em ordem, verificação de formatação, lint, typecheck de runtime/tooling, unitários, determinismo e `build`. O `build` repete o typecheck, valida conteúdo, gera o bundle Vite e aplica os budgets versionados de bundle/assets. O E2E fica separado porque requer Chromium; ele executa o smoke do produto e o smoke estrutural do harness de performance, e a CI executa `check` antes do E2E. `npm run preview` serve localmente o build estático criado em `dist/`.
 
-Scripts individuais: `format`, `format:check`, `lint`, `typecheck`, `test:unit`, `test:unit:coverage`, `build` e `test:e2e`. Coverage, relatórios/traces do Playwright, build e caches são gerados e ignorados. A CI em GitHub Actions usa runner Linux padrão, não publica o app e não requer secrets. A execução em repositório privado continua sujeita à franquia da conta.
+Scripts individuais: `format`, `format:check`, `lint`, `typecheck`, `test:unit`, `test:unit:coverage`, `test:determinism`, `content:validate`, `performance:budget`, `performance:harness`, `build` e `test:e2e`. Coverage, relatórios/traces do Playwright, build e caches são gerados e ignorados. A CI em GitHub Actions usa runner Linux padrão, não publica o app e não requer secrets. A execução em repositório privado continua sujeita à franquia da conta.
 
-Este harness ainda não comprova determinismo, budgets de performance nem comportamento PWA/offline; esses gates pertencem a F0-04–F0-07.
+O gate automatizado comprova os vetores/hashes determinísticos atuais e os budgets versionados de build/conteúdo. Isso não conclui os requisitos amplos `DET-01`, `PERF-01`, `PWA-01` ou `COST-01`: metas de performance em aparelhos reais permanecem representadas pelos baselines e riscos publicados, e o comportamento PWA/offline ainda pertence a F0-07.
 
 ## Stack decidida
 

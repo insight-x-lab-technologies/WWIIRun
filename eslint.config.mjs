@@ -14,16 +14,37 @@ const restrictedSimulationRoots = ["app", "game", "platform", "services"].map(
   (layer) => path.join(import.meta.dirname, "src", layer),
 );
 
+function normalizeModulePath(specifier) {
+  const [pathWithoutSuffix] = specifier.split(/[?#]/u, 1);
+  const slashNormalizedPath = pathWithoutSuffix.replaceAll("\\", "/");
+
+  try {
+    return decodeURIComponent(slashNormalizedPath);
+  } catch {
+    return undefined;
+  }
+}
+
 function isRestrictedSimulationImport(specifier, filename) {
   if (specifier === "phaser" || specifier.startsWith("phaser/")) {
     return true;
   }
 
-  if (!specifier.startsWith(".")) {
-    return false;
+  const modulePath = normalizeModulePath(specifier);
+
+  if (modulePath === undefined) {
+    return specifier.replaceAll("\\", "/").startsWith("/src");
   }
 
-  const resolvedImport = path.resolve(path.dirname(filename), specifier);
+  let resolvedImport;
+
+  if (modulePath.startsWith(".")) {
+    resolvedImport = path.resolve(path.dirname(filename), modulePath);
+  } else if (modulePath === "/src" || modulePath.startsWith("/src/")) {
+    resolvedImport = path.resolve(import.meta.dirname, modulePath.slice(1));
+  } else {
+    return false;
+  }
 
   return restrictedSimulationRoots.some(
     (root) =>

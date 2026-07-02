@@ -25,6 +25,8 @@ F0 — Fundação documental e técnica.
 - `F0-03-BOUNDARY-02` corrigido por TDD: imports relativos são resolvidos semanticamente contra o arquivo de origem, imports/reexports/dynamic imports para camadas externas são rejeitados, imports dinâmicos computados falham fechados e `self` é proibido no núcleo; oito regressões e fixture real passaram.
 - repositório tornado público pelo proprietário; autoria/committer dos commits pendentes confirmados como `Codex <codex@openai.com>` e correção publicada em `f40f716`.
 - `F0-03-CI-02` fechado com evidência pública: workflow `Quality` run `28559326341` e job `quality` `84673521702` concluíram `success`; instalação, gate local, Chromium e E2E passaram.
+- quarta revisão independente de `F0-03` confirmou a evidência remota, mas solicitou mudanças: imports Vite root-relative `/src/...` ainda contornam a fronteira de `simulation`, e o README não descreve o gate efetivo após F0-04/F0-06.
+- `F0-03-BOUNDARY-03` e `F0-03-DOC-01` corrigidos por TDD: resolução root-relative/URL cobre as quatro camadas em imports, reexports e `import()`, com controles puros preservados; o README agora corresponde ao gate executável. Critérios 3 e 10 foram fechados e o item retornou para `In review`.
 - `F0-04` implementado e revisado: algoritmo, streams e corpus golden passaram nos gates principais, mas a revisão independente retornou `Changes requested` porque a evidência de cobertura focada do módulo random não é reproduzível com a configuração atual.
 - finding de cobertura de `F0-04` corrigido: relatório textual agora explicita os arquivos 100% cobertos em agentes/CI e o teste de 10.000 draws permanece equivalente com uma única asserção agregada; item retornou para `In review`.
 - ADR-0004 aceito e autonomia técnica delegada registrada: decisões internas/reversíveis seguem a recomendação do agente, preservadas as matérias humanas reservadas e autorizações externas.
@@ -64,14 +66,24 @@ F0 — Fundação documental e técnica.
 
 ## Próximo passo exato
 
-Executar `$review-roadmap-item F0-03` sobre a correção `f40f716` e a run pública `28559326341`; não mover o item para `Done` sem essa revisão independente.
+Executar `$review-roadmap-item F0-03` sobre a correção de `F0-03-BOUNDARY-03`/`F0-03-DOC-01` e a evidência remota já aceita; não mover o item para `Done` sem essa revisão independente.
 
 ## Bloqueios
 
-F0-03 está em `In review`: `F0-03-BOUNDARY-02` foi corrigido e `F0-03-CI-02` possui run/job públicos verdes, aguardando revisão independente. F0-08 e F0-06 estão `Done`, com os riscos já documentados preservados. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
+F0-03 está em `In review`: os dois findings da quarta revisão foram corrigidos e todos os gates locais aplicáveis passaram; falta somente a revisão independente. F0-08 e F0-06 estão `Done`, com os riscos já documentados preservados. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
 
 ## Validações, pendências e riscos da sessão
 
+- realizado nesta correção F0-03: `F0-03-BOUNDARY-03` fechado por resolução canônica de specifiers relativos e Vite `/src`, incluindo query/hash, percent-encoding e separadores; matriz cobre `app`, `game`, `platform` e `services` em import estático, dois reexports e import dinâmico. `F0-03-DOC-01` fechado pelo alinhamento do README com os scripts reais.
+- RED/GREEN: a matriz falhou 19/28 exatamente nos bypasses root-relative antes da correção; a suíte final passou 32/32 com raízes exatas e controles de `simulation`/`shared`. A fixture real temporária fez o lint falhar com três diagnósticos de fronteira e um de global proibido, foi removida e o lint seguinte passou.
+- validações frescas: Node `v24.15.0`, npm `11.12.1`; `npm ci` (154 pacotes), árvore direta e instalação Chromium passaram; coverage 220/220; `npm run check` passou com 220 unitários, 7 determinísticos, typechecks, content validation, build e budget; E2E CI 6/6 produto + 1/1 harness; `git diff --check` e scan de fixture passaram.
+- escopo preservado: nenhuma dependência, lockfile, workflow, runtime, fonte de `src/simulation`, golden ou baseline foi alterado. O warning conhecido do chunk Phaser e os baselines físicos `fail` de F0-06 permanecem inalterados; nenhuma ação externa foi executada.
+- pendência exata: revisão independente com `$review-roadmap-item F0-03`; o item permanece `In review`, nunca `Done`, nesta sessão.
+- quarta revisão F0-03: `F0-03-BOUNDARY-03` (`High`) e `F0-03-DOC-01` (`Medium`) registrados; spec, índice e roadmap movidos para `Changes requested`. Nenhum runtime, teste versionado, golden ou baseline foi alterado.
+- prova do bypass: fixture temporária em `src/simulation` importando `/src/game/createGame` e `/src/services/save/index.ts` passou `npm run lint`, `npm run typecheck` e build com exit `0`; a fixture foi removida. O retorno antecipado em `eslint.config.mjs` ignora todo specifier que não começa por `.`.
+- validações independentes: Node `v24.15.0`, npm `11.12.1`; `npm ci`/árvore direta; regressões ESLint 8/8; coverage 196/196; `npm run check` com 196 unitários, 7 determinísticos, validator, build e budget; E2E 6/6 produto + 1/1 harness; provas negativas de formato/warning e `git diff --check` verdes.
+- evidência remota confirmada independentemente: run pública `28559326341` e job `84673521702`, attempt 1, concluíram `success` para `f40f716`; instalação, gate local, Chromium e E2E passaram. `F0-03-CI-02` permanece fechado.
+- próxima ação exata: usar `$implement-roadmap-item F0-03` para cobrir `/src/app`, `/src/game`, `/src/platform` e `/src/services` em imports/reexports/dynamic imports, adicionar regressões e corrigir o README; não alterar workflow, dependências, runtime ou goldens.
 - publicação autorizada: `origin/main` avançou de `2e8ba30` para `f40f716`; os commits `3a3ef29` e `f40f716` registram autor e committer `Codex <codex@openai.com>`, e a configuração local permanece `Codex <codex@openai.com>`.
 - evidência remota F0-03: workflow `Quality` run `28559326341`, attempt 1, e job `quality` `84673521702` concluíram `success` para `f40f716`; instalação, `npm run check`, Chromium e E2E ficaram verdes, com upload diagnóstico ignorado por ausência de falha.
 - lifecycle: `F0-03-CI-02` fechado, spec/índice/roadmap movidos para `In review`; próximo passo é `$review-roadmap-item F0-03`, sem marcar `Done` nesta sessão.

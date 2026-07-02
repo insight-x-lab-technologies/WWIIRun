@@ -47,6 +47,33 @@ function lintSimulation(code: string): Linter.LintMessage[] {
 }
 
 describe("ESLint simulation boundaries", () => {
+  const restrictedRootRelativeImports = [
+    "app",
+    "game",
+    "platform",
+    "services",
+  ] as const;
+
+  const rootRelativeImportForms = [
+    {
+      name: "static imports",
+      code: (layer: string) =>
+        `import value from "/src/${layer}/module"; void value;`,
+    },
+    {
+      name: "named reexports",
+      code: (layer: string) => `export { value } from "/src/${layer}/module";`,
+    },
+    {
+      name: "export-all declarations",
+      code: (layer: string) => `export * from "/src/${layer}/module";`,
+    },
+    {
+      name: "dynamic imports",
+      code: (layer: string) => `void import("/src/${layer}/module");`,
+    },
+  ] as const;
+
   it("rejects entropy accessed through globalThis", () => {
     const messages = lintSimulation("globalThis.Math.random();");
 
@@ -109,6 +136,66 @@ describe("ESLint simulation boundaries", () => {
     expect(messages.map(({ ruleId }) => ruleId)).toContain(
       "no-restricted-globals",
     );
+  });
+
+  for (const layer of restrictedRootRelativeImports) {
+    for (const importForm of rootRelativeImportForms) {
+      it(`rejects ${importForm.name} into root-relative ${layer}`, () => {
+        const messages = lintSimulation(importForm.code(layer));
+
+        expect(messages.map(({ ruleId }) => ruleId)).toContain(
+          "simulation-boundaries/no-external-imports",
+        );
+      });
+    }
+  }
+
+  it("rejects normalized root-relative architecture import paths", () => {
+    const messages = lintSimulation(
+      'void import("/src/simulation/../services/scoreService");',
+    );
+
+    expect(messages.map(({ ruleId }) => ruleId)).toContain(
+      "simulation-boundaries/no-external-imports",
+    );
+  });
+
+  it("rejects URL-normalized root-relative architecture imports", () => {
+    const messages = lintSimulation(
+      'import value from "/src/%67ame/createGame?raw#module"; void value;',
+    );
+
+    expect(messages.map(({ ruleId }) => ruleId)).toContain(
+      "simulation-boundaries/no-external-imports",
+    );
+  });
+
+  for (const layer of restrictedRootRelativeImports) {
+    it(`rejects the root-relative ${layer} layer root with a Vite query`, () => {
+      const messages = lintSimulation(`void import("/src/${layer}?raw");`);
+
+      expect(messages.map(({ ruleId }) => ruleId)).toContain(
+        "simulation-boundaries/no-external-imports",
+      );
+    });
+  }
+
+  it("rejects root-relative architecture imports with URL separators", () => {
+    const messages = lintSimulation(
+      'import value from "/src\\\\services\\\\scoreService"; void value;',
+    );
+
+    expect(messages.map(({ ruleId }) => ruleId)).toContain(
+      "simulation-boundaries/no-external-imports",
+    );
+  });
+
+  it("allows root-relative imports within pure layers", () => {
+    const messages = lintSimulation(
+      'import state from "/src/simulation/state?raw"; import value from "/src/shared/value"; void state; void value;',
+    );
+
+    expect(messages).toEqual([]);
   });
 
   it("allows deep relative imports outside restricted layers", () => {
