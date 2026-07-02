@@ -21,6 +21,8 @@ F0 — Fundação documental e técnica.
 - bypasses locais de `F0-03` corrigidos por TDD no commit `78ce175`: `globalThis` é proibido no núcleo, imports relativos para camadas externas são bloqueados em qualquer profundidade e três regressões exercem a configuração real; item retornado para `In review`.
 - segunda revisão independente de `F0-03` confirmou os dois fixes locais e todos os gates locais, mas retornou `Changes requested`: o predecessor `c35266b` ainda não estava em `origin/main` e nenhuma URL/ID de execução real do GitHub Actions comprovava o nono critério de aceitação.
 - autorização externa de F0-03 executada: os 12 commits locais tiveram autor/committer reescritos para `Codex <codex@openai.com>` sem mudança de árvore; `c35266b` foi sucedido por `2e8ba30`, publicado em `origin/main`, e o proprietário confirmou o workflow `Quality` verde nesse SHA.
+- terceira revisão independente de `F0-03` solicitou mudanças: a regra lexical ainda aceita imports equivalentes por `./`, normalização `segmento/..` e `import()` dinâmico, além de `self` expor browser/entropia; a confirmação humana do Actions não pôde ser verificada pelo revisor porque o conector retornou `404` e não há run ID/job/log disponível.
+- `F0-03-BOUNDARY-02` corrigido por TDD: imports relativos são resolvidos semanticamente contra o arquivo de origem, imports/reexports/dynamic imports para camadas externas são rejeitados, imports dinâmicos computados falham fechados e `self` é proibido no núcleo; oito regressões e fixture real passaram.
 - `F0-04` implementado e revisado: algoritmo, streams e corpus golden passaram nos gates principais, mas a revisão independente retornou `Changes requested` porque a evidência de cobertura focada do módulo random não é reproduzível com a configuração atual.
 - finding de cobertura de `F0-04` corrigido: relatório textual agora explicita os arquivos 100% cobertos em agentes/CI e o teste de 10.000 draws permanece equivalente com uma única asserção agregada; item retornou para `In review`.
 - ADR-0004 aceito e autonomia técnica delegada registrada: decisões internas/reversíveis seguem a recomendação do agente, preservadas as matérias humanas reservadas e autorizações externas.
@@ -54,20 +56,27 @@ F0 — Fundação documental e técnica.
 
 ## Ainda não iniciado
 
-- execução real do workflow CI no GitHub e PWA manifest;
+- evidência verificável do workflow CI no GitHub e PWA manifest;
 - protótipo jogável;
 - projeto Supabase e qualquer integração externa.
 
 ## Próximo passo exato
 
-Executar `$review-roadmap-item F0-03` sobre o range reescrito `b2390a5..2e8ba30`, incluindo a evidência do workflow `Quality` verde confirmada pelo proprietário; não mover o item para `Done` sem essa revisão independente.
+Fornecer um ID/URL consultável de run ou job do workflow `Quality` para `2e8ba30` ou autorizar o push da correção atual e disponibilizar sua evidência de Actions; então registrar `F0-03-CI-02`, mover F0-03 para `In review` e executar `$review-roadmap-item F0-03`.
 
 ## Bloqueios
 
-F0-03 está em `In review`: findings locais, autoria do histórico e execução real do GitHub Actions estão corrigidos/evidenciados, aguardando revisão independente. O ID numérico da run não está disponível à deploy key; o proprietário confirmou o resultado verde de `2e8ba30` diretamente no GitHub privado. F0-08 e F0-06 estão `Done`, com os riscos já documentados preservados. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
+F0-03 está em `In progress`: `F0-03-BOUNDARY-02` foi corrigido e validado localmente, mas `F0-03-CI-02` continua bloqueado porque a execução remota confirmada pelo proprietário não é verificável por run/job/log na credencial disponível. F0-08 e F0-06 estão `Done`, com os riscos já documentados preservados. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
 
 ## Validações, pendências e riscos da sessão
 
+- realizado nesta correção F0-03: `F0-03-BOUNDARY-02` fechado com regra semântica para imports/reexports/dynamic imports e proibição de `self`; nenhum runtime, arquivo de `src/simulation`, golden, baseline, dependência ou workflow foi alterado.
+- RED/GREEN: 4/7 falharam exatamente para os bypasses revisados; após a correção, 8/8 passaram, incluindo dynamic import computado fail-closed. Fixture real temporária retornou exit `1` com diagnósticos para import estático, dinâmico e `self`, e foi removida.
+- validações locais: Node `v24.15.0`, npm `11.12.1`; `npm ci`/árvore direta verdes; coverage 196/196; `npm run check` com 196 unitários, 7 determinísticos, validator, build e budget; E2E CI 6/6 produto + 1/1 harness.
+- pendência exata F0-03: `F0-03-CI-02` permanece aberto após nova consulta read-only retornar `404`; obter run/job ID verificável ou autorização/evidência de nova execução remota, então mover o item para `In review`.
+- realizado nesta terceira revisão F0-03: `F0-03-BOUNDARY-02` e `F0-03-CI-02` registrados como `High`; spec, índice e roadmap movidos para `Changes requested`. A fixture negativa temporária foi removida e nenhum runtime, teste versionado, golden ou baseline foi alterado.
+- validações independentes da terceira revisão F0-03: Node `v24.15.0`, npm `11.12.1`; `npm ci`, árvore direta, regressões ESLint 3/3, coverage 191/191, `npm run check` com 191 unitários/7 determinísticos/validator/build/budget, E2E 6/6 produto + 1/1 harness e `git diff --check` passaram. O ESLint real retornou exit `0` para import por `./`, caminho normalizável, import dinâmico e acesso via `self`; o conector GitHub retornou `404` ao consultar runs de `2e8ba30`.
+- pendência exata F0-03: restringir semanticamente todos os caminhos/imports equivalentes e globais browser no core, adicionar regressões executáveis e disponibilizar ID/URL de run ou jobs/logs consultáveis do workflow verde em `2e8ba30` ou sucessor; então retornar para `In review`.
 - tentativa de especificar `F1-01` interrompida na verificação de dependências; nenhuma spec, ADR, requisito, estado de roadmap, código runtime ou teste de `F1-01` foi criado/alterado.
 - validação de `F1-01`: o roadmap declara dependência na fase `F0`, que ainda não satisfaz seus exit criteria porque `F0-03` está em `Changes requested`, `F0-07` permanece em `Backlog` e ainda não há execução real verde do GitHub Actions nem shell PWA offline concluído.
 - pendência para `F1-01`: concluir e revisar independentemente `F0-03`, especificar/implementar/revisar `F0-07` e fechar a fase `F0`; somente então repetir `$specify-roadmap-item F1-01`.

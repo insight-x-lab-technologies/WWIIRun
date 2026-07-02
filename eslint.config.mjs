@@ -1,5 +1,6 @@
 import js from "@eslint/js";
 import { defineConfig, globalIgnores } from "eslint/config";
+import path from "node:path";
 import tseslint from "typescript-eslint";
 
 const typeScriptFiles = [
@@ -8,6 +9,75 @@ const typeScriptFiles = [
   "scripts/**/*.ts",
   "*.config.ts",
 ];
+
+const restrictedSimulationRoots = ["app", "game", "platform", "services"].map(
+  (layer) => path.join(import.meta.dirname, "src", layer),
+);
+
+function isRestrictedSimulationImport(specifier, filename) {
+  if (specifier === "phaser" || specifier.startsWith("phaser/")) {
+    return true;
+  }
+
+  if (!specifier.startsWith(".")) {
+    return false;
+  }
+
+  const resolvedImport = path.resolve(path.dirname(filename), specifier);
+
+  return restrictedSimulationRoots.some(
+    (root) =>
+      resolvedImport === root ||
+      resolvedImport.startsWith(`${root}${path.sep}`),
+  );
+}
+
+const simulationBoundariesPlugin = {
+  rules: {
+    "no-external-imports": {
+      meta: {
+        type: "problem",
+        docs: {
+          description:
+            "Keep simulation independent from presentation, platform, and adapters.",
+        },
+        messages: {
+          computedDynamicImport:
+            "Simulation dynamic imports must use a static module specifier.",
+          restrictedImport:
+            "Simulation must remain independent from presentation, platform, and adapters.",
+        },
+        schema: [],
+      },
+      create(context) {
+        function checkStaticImport(node) {
+          const specifier = node.source?.value;
+
+          if (
+            typeof specifier === "string" &&
+            isRestrictedSimulationImport(specifier, context.filename)
+          ) {
+            context.report({ node, messageId: "restrictedImport" });
+          }
+        }
+
+        return {
+          ExportAllDeclaration: checkStaticImport,
+          ExportNamedDeclaration: checkStaticImport,
+          ImportDeclaration: checkStaticImport,
+          ImportExpression(node) {
+            if (typeof node.source.value !== "string") {
+              context.report({ node, messageId: "computedDynamicImport" });
+              return;
+            }
+
+            checkStaticImport(node);
+          },
+        };
+      },
+    },
+  },
+};
 
 export default defineConfig(
   globalIgnores([
@@ -57,6 +127,9 @@ export default defineConfig(
   },
   {
     files: ["src/simulation/**/*.ts"],
+    plugins: {
+      "simulation-boundaries": simulationBoundariesPlugin,
+    },
     rules: {
       "no-restricted-globals": [
         "error",
@@ -79,7 +152,9 @@ export default defineConfig(
         "setInterval",
         "clearInterval",
         "globalThis",
+        "self",
       ],
+      "simulation-boundaries/no-external-imports": "error",
       "no-restricted-imports": [
         "error",
         {
