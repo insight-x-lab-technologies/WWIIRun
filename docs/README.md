@@ -14,6 +14,7 @@ Esta pasta é a fonte de verdade do projeto. Em conflito, prevalecem: ADR aceito
 - [Qualidade e performance](quality/QUALITY.md)
 - [Harness, protocolo e matriz de performance](performance/README.md)
 - [Modelo SDD e trabalho com agentes](operations/AGENTIC_DEVELOPMENT.md)
+- [PWA local e preview Pages manual](operations/PWA_PREVIEW.md)
 
 ## Tópicos especializados
 
@@ -50,7 +51,8 @@ Esta pasta é a fonte de verdade do projeto. Em conflito, prevalecem: ADR aceito
 - [ADR-0006: evidência de performance e budgets versionados](adr/0006-performance-evidence-and-budgets.md)
 - [ADR-0007: exceção de cobertura para baselines físicos F0](adr/0007-f0-performance-coverage-exception.md)
 - [ADR-0008: contratos executáveis de conteúdo e save](adr/0008-executable-content-and-save-contracts.md)
+- [ADR-0009: cache PWA, atualização segura e preview Pages](adr/0009-pwa-cache-update-and-pages-preview.md)
 
 ## ADRs propostos
 
-Nenhum.
+- Nenhum no momento.

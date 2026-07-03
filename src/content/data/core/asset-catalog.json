@@ -1,5 +1,78 @@
 {
   "schemaVersion": "wwiirun.asset-catalog.v1",
   "catalogId": "core.assets.v1",
-  "assets": []
+  "assets": [
+    {
+      "id": "pwa.icon.192.v1",
+      "kind": "image",
+      "specPath": "docs/assets/specs/pwa-technical-icons.md",
+      "runtimeFiles": [
+        {
+          "path": "public/assets/core/pwa/pwa-192x192.png",
+          "mediaType": "image/png",
+          "byteLength": 11542,
+          "sha256": "eccef3ec8f81f3ed42424e2fc5b8c7f03c97e1382c28bed78eb004e25da6cd93",
+          "width": 192,
+          "height": 192
+        }
+      ],
+      "license": {
+        "expression": "CC0-1.0",
+        "evidencePath": "docs/assets/licenses/pwa-technical-icons-cc0-1.0.md"
+      },
+      "provenance": {
+        "kind": "original",
+        "creator": "OpenAI Codex for WWIIRun",
+        "source": "docs/assets/sources/pwa-technical-icon.svg"
+      }
+    },
+    {
+      "id": "pwa.icon.512.v1",
+      "kind": "image",
+      "specPath": "docs/assets/specs/pwa-technical-icons.md",
+      "runtimeFiles": [
+        {
+          "path": "public/assets/core/pwa/pwa-512x512.png",
+          "mediaType": "image/png",
+          "byteLength": 36523,
+          "sha256": "b1808c50b6630c7a52c432ac53d7f055dca22ff37c670f90c144c1847b2b1519",
+          "width": 512,
+          "height": 512
+        }
+      ],
+      "license": {
+        "expression": "CC0-1.0",
+        "evidencePath": "docs/assets/licenses/pwa-technical-icons-cc0-1.0.md"
+      },
+      "provenance": {
+        "kind": "original",
+        "creator": "OpenAI Codex for WWIIRun",
+        "source": "docs/assets/sources/pwa-technical-icon.svg"
+      }
+    },
+    {
+      "id": "pwa.icon.maskable.512.v1",
+      "kind": "image",
+      "specPath": "docs/assets/specs/pwa-technical-icons.md",
+      "runtimeFiles": [
+        {
+          "path": "public/assets/core/pwa/pwa-maskable-512x512.png",
+          "mediaType": "image/png",
+          "byteLength": 36523,
+          "sha256": "b1808c50b6630c7a52c432ac53d7f055dca22ff37c670f90c144c1847b2b1519",
+          "width": 512,
+          "height": 512
+        }
+      ],
+      "license": {
+        "expression": "CC0-1.0",
+        "evidencePath": "docs/assets/licenses/pwa-technical-icons-cc0-1.0.md"
+      },
+      "provenance": {
+        "kind": "original",
+        "creator": "OpenAI Codex for WWIIRun",
+        "source": "docs/assets/sources/pwa-technical-icon.svg"
+      }
+    }
+  ]
 }

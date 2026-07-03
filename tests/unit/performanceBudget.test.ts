@@ -96,6 +96,34 @@ describe("performance build budget", () => {
     );
   });
 
+  it("maps public subpath URLs back to dist files and rejects paths outside it", async () => {
+    const fixture = await createBuildFixture();
+    await writeFile(
+      join(fixture.dist, "index.html"),
+      '<!doctype html><script type="module" src="/WWIIRun/assets/main.js"></script>',
+    );
+
+    expect(
+      inspectProductionBuild({
+        distDirectory: fixture.dist,
+        budgetFile: fixture.budgets,
+        publicBasePath: "/WWIIRun/",
+      }).initialFiles,
+    ).toContain("assets/main.js");
+
+    await writeFile(
+      join(fixture.dist, "index.html"),
+      '<!doctype html><script src="/assets/root-leak.js"></script>',
+    );
+    expect(() =>
+      inspectProductionBuild({
+        distDirectory: fixture.dist,
+        budgetFile: fixture.budgets,
+        publicBasePath: "/WWIIRun/",
+      }),
+    ).toThrow("root-relative asset URL is outside WWIIRUN_BASE_PATH");
+  });
+
   it("fails closed for missing config, dist, manifest, and entrypoint", async () => {
     const root = await temporaryDirectory();
     const dist = join(root, "dist");

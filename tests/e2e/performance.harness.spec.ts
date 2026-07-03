@@ -28,7 +28,7 @@ test("runs, exports, invalidates, and tears down the isolated performance harnes
   const externalRequests: string[] = [];
   page.on("pageerror", (error) => pageErrors.push(error.message));
   page.on("request", (request) => {
-    if (new URL(request.url()).origin !== "http://127.0.0.1:8080") {
+    if (new URL(request.url()).origin !== "http://127.0.0.1:8081") {
       externalRequests.push(request.url());
     }
   });

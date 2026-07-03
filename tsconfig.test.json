@@ -8,6 +8,7 @@
     "tests/unit/**/*.ts",
     "tests/determinism/**/*.ts",
     "tests/e2e/**/*.ts",
+    "tests/pwa/**/*.ts",
     "tests/performance/**/*.ts",
     "scripts/**/*.ts",
     "vite.config.ts",

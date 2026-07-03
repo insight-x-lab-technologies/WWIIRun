@@ -2,7 +2,7 @@
 
 Este é o registro mestre inicial. Cada linha vira uma ficha individual pelo template antes da geração final.
 
-O contrato executável fundacional está em `src/content/schema/` e o catálogo core versionado em `src/content/data/core/asset-catalog.json`. O catálogo permanece vazio até uma ficha e seus arquivos reais existirem; `npm run content:validate` exige spec, evidência de licença, proveniência, tamanho e SHA-256, mas a validação de pixels/dimensões/codec continua reservada a F6-04.
+O contrato executável fundacional está em `src/content/schema/` e o catálogo core versionado em `src/content/data/core/asset-catalog.json`. F0-07 adiciona os três PNGs técnicos PWA sob `CC0-1.0`; `npm run content:validate` exige spec, evidência de licença, proveniência, tamanho e SHA-256, mas a validação geral de pixels/dimensões/codec continua reservada a F6-04.
 
 ## Convenções globais
 

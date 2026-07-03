@@ -3,6 +3,8 @@ import { gzipSync } from "node:zlib";
 import { extname, join, relative, resolve, sep } from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { parsePublicBasePath } from "../src/platform/pwa/config.ts";
+
 export interface PerformanceBudgets {
   readonly schemaVersion: 1;
   readonly rationale: string;
@@ -81,8 +83,10 @@ export class BudgetCheckError extends Error {
 export function inspectProductionBuild(options: {
   readonly distDirectory: string;
   readonly budgetFile: string;
+  readonly publicBasePath?: string | undefined;
 }): BudgetCheckResult {
   const budgets = readBudgets(options.budgetFile);
+  const publicBasePath = parsePublicBasePath(options.publicBasePath);
   if (
     !existsSync(options.distDirectory) ||
     !statSync(options.distDirectory).isDirectory()
@@ -107,7 +111,10 @@ export function inspectProductionBuild(options: {
   validateManifestReferences(manifest);
   const initialFiles = collectInitialFiles(manifest, entryKey);
   initialFiles.add("index.html");
-  for (const file of collectHtmlReferences(options.distDirectory)) {
+  for (const file of collectHtmlReferences(
+    options.distDirectory,
+    publicBasePath,
+  )) {
     initialFiles.add(file);
   }
   const coreFiles = collectCoreFiles(options.distDirectory);
@@ -306,7 +313,10 @@ function collectInitialFiles(
   return files;
 }
 
-function collectHtmlReferences(distDirectory: string): ReadonlySet<string> {
+function collectHtmlReferences(
+  distDirectory: string,
+  publicBasePath: string,
+): ReadonlySet<string> {
   const html = readFileSync(join(distDirectory, "index.html"), "utf8");
   const files = new Set<string>();
   const attributePattern = /\b(?:src|href)\s*=\s*["']([^"']+)["']/giu;
@@ -319,8 +329,18 @@ function collectHtmlReferences(distDirectory: string): ReadonlySet<string> {
       );
     }
     if (/^(?:data:|#)/u.test(reference)) continue;
-    const path = reference.split(/[?#]/u, 1)[0]?.replace(/^\//u, "");
-    if (path !== undefined && path !== "") files.add(path);
+    const rawPath = reference.split(/[?#]/u, 1)[0];
+    if (rawPath === undefined) continue;
+    let path = rawPath;
+    if (rawPath.startsWith("/")) {
+      if (!rawPath.startsWith(publicBasePath)) {
+        throw new Error(
+          `root-relative asset URL is outside WWIIRUN_BASE_PATH: ${reference}`,
+        );
+      }
+      path = rawPath.slice(publicBasePath.length);
+    }
+    if (path !== "") files.add(path);
   }
   return files;
 }
@@ -455,6 +475,7 @@ function runCli(): void {
   const result = inspectProductionBuild({
     distDirectory: resolve("dist"),
     budgetFile: resolve("performance-budgets.json"),
+    publicBasePath: process.env.WWIIRUN_BASE_PATH,
   });
   process.stdout.write(`${formatBudgetSummary(result)}\n`);
   if (result.violations.length > 0)

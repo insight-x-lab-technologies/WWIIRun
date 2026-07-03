@@ -1,6 +1,6 @@
 # Estado atual
 
-Atualizado em: 2026-07-01
+Atualizado em: 2026-07-03
 
 ## Fase
 
@@ -27,6 +27,8 @@ F0 — Fundação documental e técnica.
 - `F0-03-CI-02` fechado com evidência pública: workflow `Quality` run `28559326341` e job `quality` `84673521702` concluíram `success`; instalação, gate local, Chromium e E2E passaram.
 - quarta revisão independente de `F0-03` confirmou a evidência remota, mas solicitou mudanças: imports Vite root-relative `/src/...` ainda contornam a fronteira de `simulation`, e o README não descreve o gate efetivo após F0-04/F0-06.
 - `F0-03-BOUNDARY-03` e `F0-03-DOC-01` corrigidos por TDD: resolução root-relative/URL cobre as quatro camadas em imports, reexports e `import()`, com controles puros preservados; o README agora corresponde ao gate executável. Critérios 3 e 10 foram fechados e o item retornou para `In review`.
+- quinta revisão independente de `F0-03` aprovada sem findings: o commit `3a30841`, os dez critérios e todos os gates aplicáveis passaram; item movido para `Done` e `F0-07` liberado como `Ready`.
+- spec `F0-07` criada em `Draft`: shell PWA precache-only, base `/WWIIRun/`, update adiado durante runs, E2E offline/A-B e workflow Pages manual definidos; ADR-0009 proposto e item movido para `Specified`.
 - `F0-04` implementado e revisado: algoritmo, streams e corpus golden passaram nos gates principais, mas a revisão independente retornou `Changes requested` porque a evidência de cobertura focada do módulo random não é reproduzível com a configuração atual.
 - finding de cobertura de `F0-04` corrigido: relatório textual agora explicita os arquivos 100% cobertos em agentes/CI e o teste de 10.000 draws permanece equivalente com uma única asserção agregada; item retornou para `In review`.
 - ADR-0004 aceito e autonomia técnica delegada registrada: decisões internas/reversíveis seguem a recomendação do agente, preservadas as matérias humanas reservadas e autorizações externas.
@@ -57,23 +59,45 @@ F0 — Fundação documental e técnica.
 - revisão independente de `F0-08` solicitou mudanças: lookup herdado do registro fazia o schema desconhecido `constructor` lançar, canonicalização anterior às verificações deslocava JSON Pointers para índices diferentes do arquivo-fonte e não existia unidade versionada/rollback isolado sobre o fechamento documental preexistente de F0-06.
 - findings `F0-08-SCHEMA-01`, `F0-08-DIAG-01` e `F0-08-TRACE-01` corrigidos por TDD: lookup exclusivamente próprio, diagnósticos nos índices-fonte sem perder canonicalização e baseline F0-06 `a73c355`; item retornado para `In review`.
 - segunda revisão independente de `F0-08` aprovada sem findings: todos os 13 critérios e gates passaram, o rollback em `a73c355` preserva F0-06 e o item foi movido para `Done`; `ASSET-02` e `DET-02` permanecem `Planned`.
+- `F0-07` implementado localmente: manifest/ícones CC0, precache-only, base `/`/`/WWIIRun/`, coordinator de update entre runs, aviso acessível, inspector, E2E offline/A-B e workflow Pages exclusivamente manual; item movido para `In review` sem executar/publicar Pages.
+- revisão independente de `F0-07` retornou `Changes requested`: a unidade não está versionada/isolada do fechamento documental de F0-03, os três PNGs declarados opacos possuem pixels transparentes, a evidência standalone/safe-area/foco/cobertura do canvas está incompleta e a execução/inspeção real do Pages permanece sem autorização. Nenhum runtime, asset, teste, workflow ou publicação foi alterado pelo revisor.
+- findings locais de `F0-07` corrigidos: baseline documental F0-03 isolado em `42c5e66`, PNGs reexportados com alpha integral, prova UI ampliada para safe-area/foco/dismiss/canvas e smoke interno fixado em `8081`; item retornado para `In review`. Pages e standalone físico permanecem sem alegação de passe.
 
 ## Ainda não iniciado
 
-- PWA manifest;
 - protótipo jogável;
 - projeto Supabase e qualquer integração externa.
 
 ## Próximo passo exato
 
-Executar `$review-roadmap-item F0-03` sobre a correção de `F0-03-BOUNDARY-03`/`F0-03-DOC-01` e a evidência remota já aceita; não mover o item para `Done` sem essa revisão independente.
+Executar `$review-roadmap-item F0-07` sobre a unidade sucessora de `42c5e66`, verificando `F0-07-TRACE-01`, `F0-07-ASSET-01` e a evidência automatizável de `F0-07-UI-01`. Não executar/publicar Pages; `F0-07-PAGES-01` e standalone físico permanecem explicitamente sem evidência.
 
 ## Bloqueios
 
-F0-03 está em `In review`: os dois findings da quarta revisão foram corrigidos e todos os gates locais aplicáveis passaram; falta somente a revisão independente. F0-08 e F0-06 estão `Done`, com os riscos já documentados preservados. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase. Antes de monetização serão necessárias decisões legais e de fornecedor.
+F0-07 está em `In review`. O critério remoto exige autorização para habilitar/executar Pages e inspecionar URL/headers; nenhum deploy foi feito. Standalone físico também não é exercitável no ambiente headless atual. F0 não pode fechar antes da nova revisão independente e das evidências exigidas. F0-03, F0-06 e F0-08 estão `Done`. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase; antes de monetização serão necessárias decisões legais e de fornecedor.
 
 ## Validações, pendências e riscos da sessão
 
+- realizado nesta correção F0-07: `F0-07-ASSET-01` ganhou regressão de alpha e PNGs integralmente opacos; `F0-07-UI-01` ganhou safe-area CDP efetiva, foco visível e dismiss/canvas nos dois viewports; smoke interno usa `8081` sem alterar o padrão manual `8080`; `42c5e66` preserva F0-03 antes da unidade F0-07.
+- RED/GREEN: porta interna falhou em `8080` e passou em `8081`; os três PNGs falharam com alpha mínimo `0` e passaram com mínimo/máximo `255`; a primeira prova safe-area revelou o aviso em `x=6` para inset esquerdo `24` e passou após corrigir o cálculo de largura.
+- validações frescas: Node `v24.15.0`, npm `11.12.1`; `npm ci` 460 pacotes; árvore direta e audit offline com 0 vulnerabilidades; focados 36/36; coverage 256/256 com random/run 100%; `npm run check` com 256 unitários, 7 determinísticos, build/inspector/budget; build `/WWIIRun/`; E2E 6/6 + harness 1/1 em `8081`; PWA 10/10 nos dois viewports; nenhum workflow Pages foi executado.
+- pendências: revisão independente; instalação/abertura standalone física; e, somente mediante autorização futura separada, execução real do Pages com URL/run/job/SHA/HTTPS/MIME/headers. O item permanece `In review`, não `Done`.
+- realizado nesta revisão F0-07: precondições/lifecycle, spec/ADR, diff, assets, workflow, implementação e testes foram auditados; item movido para `Changes requested` com `F0-07-TRACE-01` (High), `F0-07-ASSET-01` (Medium), `F0-07-UI-01` (Medium) e `F0-07-PAGES-01` (High). Nenhuma ação externa foi executada.
+- validações independentes F0-07: Node `v24.15.0`, npm `11.12.1`; `npm ci` com 460 pacotes, árvore direta, audit offline sem vulnerabilidades, focados 40/40, `npm run check` com 255 unitários/7 determinísticos/build/inspector/budget, build `/WWIIRun/`, PWA 8/8 e E2E produto 6/6. O smoke do harness passou 1/1 em `8081` com troca temporária integralmente revertida; `8080` permaneceu reservada para `./scripts/run.sh`. `git diff --check` passou.
+- pendência exata F0-07: corrigir os pixels transparentes e alinhar hashes/ficha/testes; completar evidência standalone/safe-area/foco/cobertura do canvas; separar e versionar o fechamento F0-03 e a unidade F0-07; configurar o caminho interno em `8081`; depois obter autorização separada para Pages ou manter explicitamente o critério remoto aberto.
+- realizado nesta implementação F0-07: `vite-plugin-pwa@1.3.0`/Workbox precache-only, manifest/base/build ID, três PNGs CC0 catalogados, coordinator injetável, aviso DOM, inspector de build, regressão do budget para subpath, fixture A/B, gate PWA e workflow Pages manual. ADR-0009 aceito; spec/índices/roadmap em `In review`. Nenhuma ação externa foi executada.
+- RED/GREEN: 29 testes partiram de módulos ausentes; integração e auditoria final detectaram precache duplicado nas duas bases, agora bloqueado pelo inspector; o budget detectou resolução incorreta de `/WWIIRun/`. As falhas foram corrigidas sem relaxar testes ou budgets.
+- validações: `npm run check` verde com 255 unitários/7 determinísticos/build; coverage 255/255 com random/run 100%; build `/WWIIRun/` passou inspector e budget (JS 1.205.937 raw/320.844 gzip, inicial 333.748, core 1.315.300 bytes); E2E 6/6 + harness 1/1; PWA 8/8 nos dois viewports; árvore direta, audit offline, content, diff/check e preservação de simulation/goldens verdes.
+- pendência: revisão independente, teste headed/instalado em `display-mode: standalone` e, somente após autorização separada, execução real do workflow/inspeção HTTPS/MIME/headers/instalação. O item não pode virar `Done` sem essas evidências.
+- riscos: instalação real fora de Chromium e standalone físico permanecem futuros; headers Pages ainda não foram observados; hook de atividade real deve ser ligado por F1; PWA depende de Cache Storage sujeito a eviction e não inclui save/API/packs.
+- registro histórico da especificação F0-07: dependência F0-03 confirmada `Done`; contrato de manifest/ícones, base validada, precache, offline, update entre runs, preview Pages manual, rollback e evidência criado; ADR-0009 então proposto; roadmap/índices/memória atualizados. Naquela sessão nenhum runtime, teste, dependência, asset, lockfile, workflow, build ou deploy foi alterado/executado.
+- abordagem recomendada: `vite-plugin-pwa`/`generateSW` em versão exata compatível com Vite 8, cache somente do app shell, registro por prompt e coordinator `platform` que adia ativação enquanto uma run está ativa. Service worker próprio e Workbox direto foram rejeitados para F0 pelo maior custo/risco de integração e manutenção.
+- decisão da especificação resolvida em 2026-07-02: proprietário definiu `CC0-1.0`, aprovou spec/ADR e autorizou a implementação local; identidade visual final permanece fora de escopo.
+- riscos F0-07: headers do GitHub Pages são pouco configuráveis e precisam de evidência remota; scope/base/manifest ID viram contratos persistentes; `generateSW` não deve crescer para cache de APIs/packs; instalação real fora de Chromium permanece futura. Publicação Pages exige autorização externa separada.
+- realizado nesta quinta revisão F0-03: `F0-03-BOUNDARY-03` e `F0-03-DOC-01` confirmados resolvidos no commit `3a30841`; nenhum finding Critical/High/Medium/Low permaneceu. Spec, índice e roadmap movidos para `Done`; `F0-07` passou a `Ready`; `COST-01` permanece `Planned` com evidência parcial atualizada.
+- validações independentes finais: Node `v24.15.0`, npm `11.12.1`; `npm ci` instalou 154 pacotes; árvore direta verde; regressões ESLint 32/32; fixture real falhou com quatro diagnósticos de fronteira e um de `self`, foi removida e o lint final passou; coverage 220/220; `npm run check` passou com 220 unitários, 7 determinísticos, validator, build e budget; E2E CI passou 6/6 produto + 1/1 harness; run pública `28559326341` e job `84673521702` reconfirmados `success`; `git diff --check` verde.
+- escopo da revisão: somente documentação de lifecycle/rastreabilidade foi alterada pelo revisor; runtime, dependências, workflow, testes, `src/simulation`, goldens e baselines permaneceram intactos. Warning conhecido do chunk Phaser e baselines físicos `fail` de F0-06 permanecem riscos aceitos, não findings de F0-03.
+- próxima ação exata: executar `$specify-roadmap-item F0-07`; não iniciar F1-01 nem fechar a fase F0 antes de F0-07 chegar a `Done` e da auditoria de fase aplicável.
 - realizado nesta correção F0-03: `F0-03-BOUNDARY-03` fechado por resolução canônica de specifiers relativos e Vite `/src`, incluindo query/hash, percent-encoding e separadores; matriz cobre `app`, `game`, `platform` e `services` em import estático, dois reexports e import dinâmico. `F0-03-DOC-01` fechado pelo alinhamento do README com os scripts reais.
 - RED/GREEN: a matriz falhou 19/28 exatamente nos bypasses root-relative antes da correção; a suíte final passou 32/32 com raízes exatas e controles de `simulation`/`shared`. A fixture real temporária fez o lint falhar com três diagnósticos de fronteira e um de global proibido, foi removida e o lint seguinte passou.
 - validações frescas: Node `v24.15.0`, npm `11.12.1`; `npm ci` (154 pacotes), árvore direta e instalação Chromium passaram; coverage 220/220; `npm run check` passou com 220 unitários, 7 determinísticos, typechecks, content validation, build e budget; E2E CI 6/6 produto + 1/1 harness; `git diff --check` e scan de fixture passaram.
