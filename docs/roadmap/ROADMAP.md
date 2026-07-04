@@ -16,10 +16,12 @@ Objetivo: provar stack, determinismo, performance e deploy antes de criar volume
 | F0-04 | PRNG versionado, seed parser, streams e golden vectors | F0-02 | Done |
 | F0-05 | Loop fixo/headless, InputFrame, RunConfig/State e hash | F0-04 | Done |
 | F0-06 | Performance harness, matriz real e budgets de bundle/assets | F0-02 | Done |
-| F0-07 | PWA shell offline e preview GitHub Pages em subpath | F0-03 | In review |
+| F0-07 | PWA shell offline e preview GitHub Pages em subpath | F0-03 | Done |
 | F0-08 | Schemas de conteúdo/save e validadores de build | F0-02 | Done |
 
 Exit: app vazio instalável; core headless repete golden run; CI verde; baseline medido em pelo menos um celular e desktop; nenhuma API proibida no core.
+
+Fechamento: `Pass` em 2026-07-04; evidência em [`docs/audits/phases/2026-07-04-F0.md`](../audits/phases/2026-07-04-F0.md).
 
 ## F1 — Vertical slice jogável geométrico
 
@@ -27,7 +29,7 @@ Objetivo: uma run curta e divertida com placeholders, validando arquitetura comp
 
 | ID | Item | Dep. | Estado |
 |---|---|---|---|
-| F1-01 | Gameplay scene, viewport lógico e input teclado/touch | F0 | Backlog |
+| F1-01 | Gameplay scene, viewport lógico e input teclado/touch | F0 | Ready |
 | F1-02 | Aeronave, movimento, vida/dano e colisões primitivas/compostas | F1-01 | Backlog |
 | F1-03 | Pools de projéteis/inimigos/moedas e spatial broad phase | F1-02 | Backlog |
 | F1-04 | Arma metralhadora e dois inimigos com HP/comportamento | F1-03 | Backlog |

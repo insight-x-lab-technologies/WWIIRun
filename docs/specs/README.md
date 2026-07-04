@@ -8,10 +8,11 @@ Specs concluídas permanecem no repositório como ligação entre requisito, dec
 
 ## Índice
 
+- [`F0-01 — documentação base, requisitos, ADRs, templates e memória`](SPEC-F0-01-documentation-foundation.md) — `Done`.
 - [`F0-02 — scaffold Vite, TypeScript strict e Phaser`](SPEC-F0-02-project-scaffold.md) — `Done`.
 - [`F0-03 — toolchain de qualidade e CI`](SPEC-F0-03-quality-toolchain-and-ci.md) — `Done`.
 - [`F0-04 — PRNG versionado, seeds, streams e golden vectors`](SPEC-F0-04-versioned-prng-seeds-streams.md) — `Done`.
 - [`F0-05 — loop fixo/headless, contratos da run e hash`](SPEC-F0-05-fixed-headless-run-state-hash.md) — `Done`.
 - [`F0-06 — harness de performance, matriz real e budgets`](SPEC-F0-06-performance-harness-matrix-budgets.md) — `Done`.
-- [`F0-07 — shell PWA offline e preview GitHub Pages em subpath`](SPEC-F0-07-pwa-offline-pages-subpath.md) — `In review`.
+- [`F0-07 — shell PWA offline e preview GitHub Pages em subpath`](SPEC-F0-07-pwa-offline-pages-subpath.md) — `Done`.
 - [`F0-08 — schemas de conteúdo/save e validadores de build`](SPEC-F0-08-content-save-schemas-build-validators.md) — `Done`.
