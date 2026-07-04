@@ -29,7 +29,7 @@ Objetivo: uma run curta e divertida com placeholders, validando arquitetura comp
 
 | ID | Item | Dep. | Estado |
 |---|---|---|---|
-| F1-01 | Gameplay scene, viewport lógico e input teclado/touch | F0 | Ready |
+| F1-01 | Gameplay scene, viewport lógico e input teclado/touch | F0 | In review |
 | F1-02 | Aeronave, movimento, vida/dano e colisões primitivas/compostas | F1-01 | Backlog |
 | F1-03 | Pools de projéteis/inimigos/moedas e spatial broad phase | F1-02 | Backlog |
 | F1-04 | Arma metralhadora e dois inimigos com HP/comportamento | F1-03 | Backlog |

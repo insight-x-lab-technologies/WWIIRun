@@ -17,7 +17,7 @@ describe("bootstrapApplication", () => {
   });
 
   it("rejects a missing root without creating Phaser", () => {
-    expect(() => bootstrapApplication(null)).toThrow(
+    expect(() => bootstrapApplication(null, { setRunActive: vi.fn() })).toThrow(
       "WWIIRun bootstrap failed: #game-root element was not found.",
     );
     expect(createGame).not.toHaveBeenCalled();

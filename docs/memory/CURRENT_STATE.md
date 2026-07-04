@@ -69,6 +69,7 @@ F1 — Vertical slice jogável geométrico.
 - `SPEC-F0-01` retrospectiva aprovada e verificada documentalmente: 11/11 critérios atendidos, links/rastreabilidade/ADRs/templates/memória/histórico auditados e nenhum runtime alterado; item em `In review`.
 - revisão independente de `F0-01` aprovada sem findings: as evidências documentais foram reproduzidas, os 11 critérios passaram e o item foi movido para `Done`.
 - auditoria formal de encerramento F0 aprovada em 2026-07-04: oito itens `Done`, cinco exit criteria e gates agregados verdes; F0 encerrada e `F1-01` liberado como `Ready`.
+- `F1-01` implementado por TDD: `GameplayScene`, sessão fixed-tick, viewport lógico portrait/landscape, safe areas e input teclado/touch quantizado; item em `In review`.
 
 ## Ainda não iniciado
 
@@ -77,14 +78,18 @@ F1 — Vertical slice jogável geométrico.
 
 ## Próximo passo exato
 
-Executar `$specify-roadmap-item F1-01` para definir gameplay scene, viewport lógico e input teclado/touch, preservando o core determinístico e as fronteiras arquiteturais.
+Executar `$review-roadmap-item F1-01`; não marcar `Done` antes da revisão independente.
 
 ## Bloqueios
 
-Nenhum bloqueio para iniciar a especificação de F1-01. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase; antes de monetização serão necessárias decisões legais e de fornecedor.
+Nenhum bloqueio para aprovar ou implementar F1-01. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase; antes de monetização serão necessárias decisões legais e de fornecedor.
 
 ## Validações, pendências e riscos da sessão
 
+- implementação F1-01 concluída em 2026-07-04 após aprovação: cena Phaser geométrica, sessão 60 Hz com cap de backlog, input comum e viewport FIT com safe area integrados sem alterar `simulation`;
+- `GAME-01`, `UI-04`, `DET-01` e `PERF-01` permanecem `Planned`; `npm run check` passou com 269 unitários/7 determinísticos, E2E 10/10 + harness 1/1 e PWA 10/10; goldens/baselines/dependências/workflows permaneceram inalterados;
+- decisão técnica reversível registrada na spec: perfis `960×540` landscape e `540×960` portrait com janela de mundo portrait `540×540`, input comum inteiro e pausa segura. Não há ADR novo nem decisão humana reservada;
+- pendência exata: revisão independente com `$review-roadmap-item F1-01`. Risco residual: os controles são placeholders técnicos e a matriz física de performance não é reaplicável até existir gameplay representativo.
 - auditoria F0 em `docs/audits/phases/2026-07-04-F0.md`: veredito `Pass`; os oito itens possuem spec/revisão independente e os cinco exit criteria passaram;
 - gates frescos: `npm run check` com 256 unitários/7 determinísticos, coverage 256/256 com random/run 100%, três repetições determinísticas 7/7, build `/WWIIRun/`, E2E 6/6 + harness 1/1 e PWA 10/10; `npm audit --offline` e `git diff --check` passaram;
 - auditoria determinística `docs/audits/determinism/2026-07-04-current-implementation.md`: `Pass`, incluindo corpus Chromium fresco e nenhum finding;

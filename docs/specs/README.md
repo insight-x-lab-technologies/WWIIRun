@@ -16,3 +16,4 @@ Specs concluídas permanecem no repositório como ligação entre requisito, dec
 - [`F0-06 — harness de performance, matriz real e budgets`](SPEC-F0-06-performance-harness-matrix-budgets.md) — `Done`.
 - [`F0-07 — shell PWA offline e preview GitHub Pages em subpath`](SPEC-F0-07-pwa-offline-pages-subpath.md) — `Done`.
 - [`F0-08 — schemas de conteúdo/save e validadores de build`](SPEC-F0-08-content-save-schemas-build-validators.md) — `Done`.
+- [`F1-01 — gameplay scene, viewport lógico e input teclado/touch`](SPEC-F1-01-gameplay-scene-viewport-input.md) — `In review`.

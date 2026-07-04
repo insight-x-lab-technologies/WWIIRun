@@ -24,7 +24,10 @@ body {
 }
 
 #game-root {
+  position: relative;
   display: block;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
   background: #101820;
 }
 
@@ -32,6 +35,46 @@ body {
   display: block;
   max-width: 100%;
   max-height: 100%;
+}
+
+.gameplay-instructions {
+  position: absolute;
+  z-index: 3;
+  right: max(8px, env(safe-area-inset-right));
+  bottom: max(8px, env(safe-area-inset-bottom));
+  left: max(8px, env(safe-area-inset-left));
+  pointer-events: none;
+  color: #f4f0e6;
+  font-size: clamp(11px, 2vw, 14px);
+  text-shadow: 0 1px 3px #000;
+}
+.gameplay-instructions p {
+  margin: 2px 0;
+}
+.gameplay-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.gameplay-actions button {
+  width: 56px;
+  height: 56px;
+  border: 2px solid #65b5ff;
+  border-radius: 50%;
+  color: #f4f0e6;
+  background: rgb(16 24 32 / 72%);
+  pointer-events: auto;
+  touch-action: none;
+  font:
+    700 18px system-ui,
+    sans-serif;
+}
+.gameplay-actions button[aria-pressed="true"] {
+  background: #285b78;
+}
+.gameplay-actions button:focus-visible {
+  outline: 3px solid #f4f0e6;
+  outline-offset: 2px;
 }
 
 .pwa-notice {
