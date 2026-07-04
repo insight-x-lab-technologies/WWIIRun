@@ -1,8 +1,13 @@
 import { InputActionBits, type InputFrame } from "../simulation/run";
 import type { Rect } from "../platform/viewport/layout";
 
+export type MutableInputFrame = {
+  -readonly [Key in keyof InputFrame]: InputFrame[Key];
+};
+
 export interface InputSource {
   sample(): InputFrame;
+  sampleInto?(target: MutableInputFrame): InputFrame;
   reset?(): void;
 }
 
@@ -37,6 +42,9 @@ export class KeyboardInput implements InputSource {
     this.pressed.clear();
   }
   sample(): InputFrame {
+    return this.sampleInto({ moveX: 0, moveY: 0, actions: 0 });
+  }
+  sampleInto(target: MutableInputFrame): InputFrame {
     let x = 0,
       y = 0,
       actions = 0;
@@ -46,11 +54,13 @@ export class KeyboardInput implements InputSource {
       else if (mapping?.[0] === "y") y += mapping[1];
       else if (mapping !== undefined) actions |= mapping[1];
     }
-    return { moveX: Math.sign(x) * 127, moveY: Math.sign(y) * 127, actions };
+    target.moveX = Math.sign(x) * 127;
+    target.moveY = Math.sign(y) * 127;
+    target.actions = actions;
+    return target;
   }
 }
 
-type ActionCapture = { bit: number; pointerId: number };
 export class PointerInput implements InputSource {
   private world?: Rect;
   private radius = 1;
@@ -64,7 +74,7 @@ export class PointerInput implements InputSource {
       }
     | undefined;
   private readonly actionZones = new Map<number, Rect>();
-  private readonly actions = new Map<number, ActionCapture>();
+  private readonly actions = new Map<number, number>();
   configure(world: Rect, radius: number): void {
     this.world = world;
     this.radius = radius;
@@ -77,8 +87,7 @@ export class PointerInput implements InputSource {
     if (this.world === undefined) return false;
     for (const [bit, zone] of this.actionZones) {
       if (contains(zone, x, y) && !this.actions.has(bit)) {
-        this.actions.set(bit, { bit, pointerId });
-        return true;
+        return this.actionDown(pointerId, bit);
       }
     }
     const movementZone = { ...this.world, width: this.world.width * 0.6 };
@@ -87,6 +96,11 @@ export class PointerInput implements InputSource {
       return true;
     }
     return false;
+  }
+  actionDown(pointerId: number, bit: number): boolean {
+    if (this.actions.has(bit)) return false;
+    this.actions.set(bit, pointerId);
+    return true;
   }
   pointerMove(pointerId: number, x: number, y: number): boolean {
     if (this.movement?.pointerId !== pointerId) return false;
@@ -100,8 +114,8 @@ export class PointerInput implements InputSource {
       this.movement = undefined;
       released = true;
     }
-    for (const [bit, capture] of this.actions)
-      if (capture.pointerId === pointerId) {
+    for (const [bit, ownerPointerId] of this.actions)
+      if (ownerPointerId === pointerId) {
         this.actions.delete(bit);
         released = true;
       }
@@ -115,6 +129,9 @@ export class PointerInput implements InputSource {
     this.cancelAll();
   }
   sample(): InputFrame {
+    return this.sampleInto({ moveX: 0, moveY: 0, actions: 0 });
+  }
+  sampleInto(target: MutableInputFrame): InputFrame {
     let moveX = 0,
       moveY = 0,
       actions = 0;
@@ -122,24 +139,39 @@ export class PointerInput implements InputSource {
       moveX = quantize(this.movement.x - this.movement.originX, this.radius);
       moveY = quantize(this.movement.y - this.movement.originY, this.radius);
     }
-    for (const capture of this.actions.values()) actions |= capture.bit;
-    return { moveX, moveY, actions };
+    for (const bit of this.actions.keys()) actions |= bit;
+    target.moveX = moveX;
+    target.moveY = moveY;
+    target.actions = actions;
+    return target;
   }
 }
 
 export class CombinedInput implements InputSource {
+  private readonly keyboardFrame: MutableInputFrame = {
+    moveX: 0,
+    moveY: 0,
+    actions: 0,
+  };
+  private readonly pointerFrame: MutableInputFrame = {
+    moveX: 0,
+    moveY: 0,
+    actions: 0,
+  };
   public constructor(
     private readonly keyboard: KeyboardInput,
     private readonly pointer: PointerInput,
   ) {}
   sample(): InputFrame {
-    const keyboard = this.keyboard.sample();
-    const pointer = this.pointer.sample();
-    return {
-      moveX: chooseAxis(keyboard.moveX, pointer.moveX),
-      moveY: chooseAxis(keyboard.moveY, pointer.moveY),
-      actions: keyboard.actions | pointer.actions,
-    };
+    return this.sampleInto({ moveX: 0, moveY: 0, actions: 0 });
+  }
+  sampleInto(target: MutableInputFrame): InputFrame {
+    const keyboard = this.keyboard.sampleInto(this.keyboardFrame);
+    const pointer = this.pointer.sampleInto(this.pointerFrame);
+    target.moveX = chooseAxis(keyboard.moveX, pointer.moveX);
+    target.moveY = chooseAxis(keyboard.moveY, pointer.moveY);
+    target.actions = keyboard.actions | pointer.actions;
+    return target;
   }
   reset(): void {
     this.keyboard.reset();

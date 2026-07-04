@@ -18,6 +18,7 @@ const DEMO_CONFIG = Object.freeze({
 
 export class GameplaySession {
   private readonly state: RunState = createRunState(DEMO_CONFIG);
+  private readonly inputFrame = { moveX: 0, moveY: 0, actions: 0 };
   private readonly paused = new Set<PauseReason>();
   private accumulator = 0;
   private started = false;
@@ -43,8 +44,11 @@ export class GameplaySession {
       (this.accumulator + Number.EPSILON * 100) / STEP_MS,
     );
     const ticks = Math.min(available, MAX_TICKS_PER_UPDATE);
-    for (let index = 0; index < ticks; index += 1)
-      stepRun(this.state, this.input.sample());
+    for (let index = 0; index < ticks; index += 1) {
+      const frame =
+        this.input.sampleInto?.(this.inputFrame) ?? this.input.sample();
+      stepRun(this.state, frame);
+    }
     const dropped = available > MAX_TICKS_PER_UPDATE;
     this.accumulator = dropped ? 0 : this.accumulator - ticks * STEP_MS;
     return { ticks, dropped };

@@ -20,7 +20,7 @@ export function bootstrapApplication(
   const pointer = new PointerInput();
   const combined = new CombinedInput(keyboard, pointer);
   const session = new GameplaySession(combined, lifecycle);
-  const instructions = createInstructions(root, keyboard);
+  const instructions = createInstructions(root, pointer);
   const game = createGame(root, { session, keyboard, pointer, combined });
   let destroyed = false;
 
@@ -41,7 +41,7 @@ export function bootstrapApplication(
 
 function createInstructions(
   root: HTMLElement,
-  keyboard: KeyboardInput,
+  pointer: PointerInput,
 ): HTMLElement {
   const instructions = root.ownerDocument.createElement("section");
   instructions.className = "gameplay-instructions";
@@ -57,23 +57,33 @@ function createInstructions(
   const actions = root.ownerDocument.createElement("div");
   actions.className = "gameplay-actions";
   const actionSpecs = [
-    ["Primary action", "Space"],
-    ["Secondary action", "ShiftLeft"],
-    ["Special action", "KeyE"],
+    ["Primary action", 1],
+    ["Secondary action", 2],
+    ["Special action", 4],
   ] as const;
-  for (const [label, code] of actionSpecs) {
+  for (const [label, bit] of actionSpecs) {
     const button = root.ownerDocument.createElement("button");
     button.type = "button";
     button.textContent = label.slice(0, 1);
     button.setAttribute("aria-label", label);
     button.setAttribute("aria-pressed", "false");
+    let capturedPointerId: number | undefined;
     const press = (event: PointerEvent): void => {
       event.preventDefault();
-      keyboard.keyDown(code);
+      if (!pointer.actionDown(event.pointerId, bit)) return;
+      capturedPointerId = event.pointerId;
+      try {
+        button.setPointerCapture?.(event.pointerId);
+      } catch (error) {
+        if (!(error instanceof DOMException && error.name === "NotFoundError"))
+          throw error;
+      }
       button.setAttribute("aria-pressed", "true");
     };
-    const release = (): void => {
-      keyboard.keyUp(code);
+    const release = (event: PointerEvent): void => {
+      if (capturedPointerId !== event.pointerId) return;
+      pointer.pointerUp(event.pointerId);
+      capturedPointerId = undefined;
       button.setAttribute("aria-pressed", "false");
     };
     button.addEventListener("pointerdown", press);

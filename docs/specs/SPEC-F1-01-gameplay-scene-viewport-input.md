@@ -1,6 +1,6 @@
 # SPEC-F1-01: gameplay scene, viewport lógico e input teclado/touch
 
-Status: In review  
+Status: In review
 Owner: Codex  
 Requisitos: `GAME-01` (parcial), `UI-04` (parcial), `DET-01` (preservado), `PERF-01` (baseline)  
 Dependências: fase F0 (`Done`); ADR-0001, ADR-0002, ADR-0005, ADR-0006 e ADR-0009 aceitos
@@ -161,8 +161,21 @@ Não há ADR novo. A separação core/Phaser, tick fixo, input quantizado, lifec
 | `1024×768` | landscape | `960×540` | `1,0667` | `1024×576` | `56×56` |
 | `1920×1080` | landscape | `960×540` | `2` | `1920×1080` | `56×56` |
 
+### Evidência das correções em 2026-07-04
+
+- `F1-01-INPUT-01`: botões DOM agora usam captura por `pointerId` no `PointerInput`, separada do `KeyboardInput`; ponteiro estranho não libera a ação, `pointerup` fora libera a captura real e `keyup` só é prevenido com foco da cena. Regressões unitárias e Chromium cobrem ownership, liberação externa e tecla física durante touch.
+- `F1-01-VIEWPORT-01`: o mesmo `Graphics` é limpo e redesenhado após cada layout; E2E confirma que a orientação renderizada das zonas acompanha `landscape → portrait`.
+- `F1-01-PERF-01`: `KeyboardInput`, `PointerInput`, `CombinedInput`, `GameplaySession` e `stepRun` reutilizam armazenamento após inicialização. Testes confirmam identidade estável do frame da sessão e de `RunState.input` por cinco ticks.
+- RED: testes focados falharam por `actionDown`/`sampleInto` ausentes e troca de `RunState.input`; GREEN: 70/70 testes focados passaram.
+- `npm run check`: 19 arquivos/273 testes unitários, 7 determinísticos, format, lint, typecheck, build, inspeção PWA e budget verdes.
+- `npm run test:unit:coverage`: 273/273; `simulation/run` 100% statements/branches/functions/lines, input 92,70% statements e sessão 97,95% statements/100% lines.
+- `npm run test:e2e`: 10/10 produto e 1/1 harness; `npm run test:pwa`: 10/10.
+- Goldens preservados: SHA-256 `7d45e812fa33d866afd2d62d022d8e2d504fad6598d763d5c993ec200e7cd5da` (random) e `46e3fa54c5ded1fd07e6a9bd9562ab16e923d552d843237b025a67586a5aab2b` (run). Baselines físicos, dependências e workflows não foram alterados.
+
 ## Histórico de revisão
 
 - 2026-07-04 — especificação inicial criada por Codex; dependência F0 confirmada `Done`; nenhum código runtime/teste, asset, golden, baseline, dependência ou workflow alterado; aguardando aprovação do proprietário.
 - 2026-07-04 — proprietário aprovou a especificação; implementação iniciada por `$implement-roadmap-item F1-01`.
 - 2026-07-04 — implementação e gates concluídos; item movido para `In review`, aguardando revisão independente.
+- 2026-07-04 — revisão independente: `Changes requested`. Finding `F1-01-INPUT-01` (`High`): os botões touch DOM escrevem no mesmo `KeyboardInput` do teclado físico sem captura própria; soltar o ponteiro fora deixa ação presa (`aria-pressed=true`, input `0,0,1`) e um `keyup` físico libera uma ação touch ainda pressionada (`aria-pressed=true`, input passa de `0,0,1` para `0,0,0`). Isso viola ownership/liberação e independência teclado+touch de AC-06/AC-07; `keyup` também chama `preventDefault()` sem foco da cena. Finding `F1-01-VIEWPORT-01` (`Medium`): `applyLayout()` recalcula as zonas funcionais no resize, mas os gráficos criados uma vez por `drawZones()` não são limpos/redesenhados, deixando a indicação visual nas coordenadas/tamanhos anteriores após rotação. Finding `F1-01-PERF-01` (`Medium`): o contrato exige zero alocação obrigatória por tick após warm-up, porém cada amostragem aloca frames em `KeyboardInput`, `PointerInput` e `CombinedInput`, sem medição ou teste que demonstre o gate. Gates frescos: `npm run check` passou com 269 unitários/7 determinísticos e build; `npm run test:e2e` passou 10/10 + harness 1/1; `npm run test:pwa` passou 10/10 após repetição fora do sandbox (a primeira tentativa falhou apenas ao abrir `127.0.0.1:4174` com `EPERM`); `git diff --check` passou. Commit `234bc42` tem autoria/committer Codex e range isolado sobre `f066e6f`; simulation, goldens, baselines, dependências e workflows não mudaram. Nenhum runtime/teste foi alterado pelo revisor.
+- 2026-07-04 — findings `F1-01-INPUT-01`, `F1-01-VIEWPORT-01` e `F1-01-PERF-01` corrigidos por TDD; AC-06/AC-07 revalidados, gates completos verdes e item retornado para `In review`.

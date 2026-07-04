@@ -199,6 +199,17 @@ describe("fixed-tick transition", () => {
     expect(state.input).not.toBe(input);
   });
 
+  test("reuses state input storage across ticks", () => {
+    const state = createRunState(validConfig());
+    const storage = state.input;
+
+    stepRun(state, { moveX: 1, moveY: 2, actions: 1 });
+    stepRun(state, { moveX: 3, moveY: 4, actions: 2 });
+
+    expect(state.input).toBe(storage);
+    expect(state.input).toEqual({ moveX: 3, moveY: 4, actions: 2 });
+  });
+
   test.each([-127, 0, 127])("accepts moveY boundary %s", (moveY) => {
     const state = createRunState(validConfig());
     stepRun(state, { moveX: 0, moveY, actions: 0 });

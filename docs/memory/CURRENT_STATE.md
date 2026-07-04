@@ -69,7 +69,9 @@ F1 — Vertical slice jogável geométrico.
 - `SPEC-F0-01` retrospectiva aprovada e verificada documentalmente: 11/11 critérios atendidos, links/rastreabilidade/ADRs/templates/memória/histórico auditados e nenhum runtime alterado; item em `In review`.
 - revisão independente de `F0-01` aprovada sem findings: as evidências documentais foram reproduzidas, os 11 critérios passaram e o item foi movido para `Done`.
 - auditoria formal de encerramento F0 aprovada em 2026-07-04: oito itens `Done`, cinco exit criteria e gates agregados verdes; F0 encerrada e `F1-01` liberado como `Ready`.
-- `F1-01` implementado por TDD: `GameplayScene`, sessão fixed-tick, viewport lógico portrait/landscape, safe areas e input teclado/touch quantizado; item em `In review`.
+- `F1-01` implementado por TDD: `GameplayScene`, sessão fixed-tick, viewport lógico portrait/landscape, safe areas e input teclado/touch quantizado; implementação enviada originalmente para `In review`.
+- revisão independente de `F1-01` retornou `Changes requested`: botões touch DOM compartilham estado com o teclado físico e não capturam/liberam o ponteiro corretamente, os gráficos das zonas não acompanham resize e o gate de zero alocação por tick não foi demonstrado.
+- findings de `F1-01` corrigidos por TDD: touch/teclado possuem ownership independente, pointer capture libera fora do alvo, zonas gráficas redesenham no resize e o caminho de tick reutiliza frames/estado; item retornado para `In review`.
 
 ## Ainda não iniciado
 
@@ -78,14 +80,20 @@ F1 — Vertical slice jogável geométrico.
 
 ## Próximo passo exato
 
-Executar `$review-roadmap-item F1-01`; não marcar `Done` antes da revisão independente.
+Executar `$review-roadmap-item F1-01` para revisar independentemente as correções de `F1-01-INPUT-01`, `F1-01-VIEWPORT-01` e `F1-01-PERF-01`; não marcar `Done` antes da revisão.
 
 ## Bloqueios
 
-Nenhum bloqueio para aprovar ou implementar F1-01. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase; antes de monetização serão necessárias decisões legais e de fornecedor.
+Nenhum bloqueio para revisar F1-01. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase; antes de monetização serão necessárias decisões legais e de fornecedor.
 
 ## Validações, pendências e riscos da sessão
 
+- revisão independente F1-01 em 2026-07-04: `F1-01-INPUT-01` (`High`), `F1-01-VIEWPORT-01` (`Medium`) e `F1-01-PERF-01` (`Medium`); AC-06/AC-07 reabertos e item movido para `Changes requested` sem alterar runtime ou testes;
+- reproduções Chromium: pointerdown no botão seguido de pointerup fora manteve `aria-pressed=true`/input `0,0,1`; `keyup Space` físico durante touch ainda pressionado mudou input para `0,0,0`; inspeção confirmou `keyup` prevenido com foco em botão DOM;
+- gates independentes: `npm run check` verde com 269 unitários/7 determinísticos/build; E2E 10/10 + harness 1/1; PWA 10/10 fora do sandbox após `EPERM` local inicial; `git diff --check` verde; commit `234bc42` isolado sobre `f066e6f`, com autoria/committer Codex e sem mudança em simulation/goldens/baselines/dependências/workflows;
+- correção F1-01 em 2026-07-04: `PointerInput` passou a possuir as ações DOM por `pointerId`, os botões usam pointer capture e o teclado mantém estado independente; o overlay Phaser reutiliza/limpa `Graphics` e redesenha depois de cada layout; adapters, sessão e `stepRun` reutilizam armazenamento no tick.
+- validações frescas: 70/70 focados; `npm run check` verde com 273 unitários, 7 determinísticos e build; coverage 273/273 com `simulation/run` 100%; E2E 10/10 + harness 1/1; PWA 10/10; goldens mantêm SHA-256 `7d45e812…` e `46e3fa54…`; baselines físicos, dependências e workflows não mudaram.
+- pendência exata atual: executar `$review-roadmap-item F1-01`; revisar os três findings fechados e a mudança interna de alocação em `stepRun`, preservando goldens.
 - implementação F1-01 concluída em 2026-07-04 após aprovação: cena Phaser geométrica, sessão 60 Hz com cap de backlog, input comum e viewport FIT com safe area integrados sem alterar `simulation`;
 - `GAME-01`, `UI-04`, `DET-01` e `PERF-01` permanecem `Planned`; `npm run check` passou com 269 unitários/7 determinísticos, E2E 10/10 + harness 1/1 e PWA 10/10; goldens/baselines/dependências/workflows permaneceram inalterados;
 - decisão técnica reversível registrada na spec: perfis `960×540` landscape e `540×960` portrait com janela de mundo portrait `540×540`, input comum inteiro e pausa segura. Não há ADR novo nem decisão humana reservada;

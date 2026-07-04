@@ -49,7 +49,14 @@ export function stepRun(state: RunState, input: InputFrame): void {
   validateInputFrame(input);
   validateTickCapacity(state.tick, 1);
 
-  state.input = copyInput(input);
+  const stateInput = state.input as {
+    moveX: number;
+    moveY: number;
+    actions: number;
+  };
+  stateInput.moveX = input.moveX;
+  stateInput.moveY = input.moveY;
+  stateInput.actions = input.actions;
   state.tick += 1;
 }
 
@@ -137,12 +144,4 @@ function validateTickCapacity(tick: number, additionalTicks: number): void {
   if (additionalTicks > MAX_TICK - tick) {
     throw new RangeError("state.tick cannot advance beyond 4294967295.");
   }
-}
-
-function copyInput(input: InputFrame): InputFrame {
-  return {
-    moveX: input.moveX,
-    moveY: input.moveY,
-    actions: input.actions,
-  };
 }

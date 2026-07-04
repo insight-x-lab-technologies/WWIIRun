@@ -77,4 +77,28 @@ describe("GameplaySession", () => {
       lifecycle.setRunActive.mock.calls.filter(([active]) => !active),
     ).toHaveLength(5);
   });
+
+  it("reuses one input frame allocation across production ticks", () => {
+    const targets = new Set<object>();
+    const session = new GameplaySession(
+      {
+        sample: () => {
+          throw new Error("allocating sample path must not be used");
+        },
+        sampleInto: (target) => {
+          targets.add(target);
+          target.moveX = 0;
+          target.moveY = 0;
+          target.actions = 0;
+          return target;
+        },
+      },
+      { setRunActive: vi.fn() },
+    );
+    session.start();
+    session.update(5 * (1000 / 60));
+
+    expect(targets.size).toBe(1);
+    expect(session.snapshot().state.tick).toBe(5);
+  });
 });

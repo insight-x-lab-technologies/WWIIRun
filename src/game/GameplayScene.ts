@@ -19,6 +19,7 @@ export type GameplaySceneDependencies = {
 export class GameplayScene extends Phaser.Scene {
   private marker?: Phaser.GameObjects.Arc;
   private diagnostic?: Phaser.GameObjects.Text;
+  private zones?: Phaser.GameObjects.Graphics;
   private layout?: ViewportLayout;
   private cleanup: Array<() => void> = [];
   private resizeFrame: number | undefined;
@@ -88,7 +89,13 @@ export class GameplayScene extends Phaser.Scene {
           event.preventDefault();
     };
     const onKeyUp = (event: KeyboardEvent): void => {
-      if (this.dependencies.keyboard.keyUp(event.code)) event.preventDefault();
+      const handled = this.dependencies.keyboard.keyUp(event.code);
+      if (
+        handled &&
+        (document.activeElement === canvas ||
+          document.activeElement === document.body)
+      )
+        event.preventDefault();
     };
     const onPointerDown = (event: PointerEvent): void => {
       const point = this.toLogical(event);
@@ -201,11 +208,13 @@ export class GameplayScene extends Phaser.Scene {
       height: size,
     });
     root.dataset.orientation = this.layout.orientation;
+    if (this.zones !== undefined) this.drawZones();
   }
 
   private drawZones(): void {
     if (this.layout === undefined) return;
-    const graphics = this.add.graphics().setDepth(2);
+    const graphics = (this.zones ??= this.add.graphics().setDepth(2));
+    graphics.clear();
     graphics.lineStyle(2, 0x65b5ff, 0.55);
     const size = 56 / this.layout.scale,
       gap = 12 / this.layout.scale;
@@ -215,6 +224,8 @@ export class GameplayScene extends Phaser.Scene {
       .strokeRect(right, bottom, size, size)
       .strokeRect(right - size - gap, bottom, size, size)
       .strokeRect(right, bottom - size - gap, size, size);
+    this.dependencies.root.dataset.zoneRenderOrientation =
+      this.layout.orientation;
   }
 
   private scheduleResize(): void {

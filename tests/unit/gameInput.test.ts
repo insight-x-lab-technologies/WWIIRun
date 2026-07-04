@@ -56,4 +56,30 @@ describe("game input", () => {
     pointer.cancelAll();
     expect(combined.sample()).not.toBe(frame);
   });
+
+  it("keeps direct touch actions independent by pointer ownership", () => {
+    const pointer = new PointerInput();
+    pointer.configure({ x: 0, y: 0, width: 1000, height: 500 }, 100);
+
+    expect(pointer.actionDown(10, InputActionBits.firePrimary)).toBe(true);
+    expect(pointer.actionDown(11, InputActionBits.firePrimary)).toBe(false);
+    expect(pointer.pointerUp(11)).toBe(false);
+    expect(pointer.sample().actions).toBe(InputActionBits.firePrimary);
+    expect(pointer.pointerUp(10)).toBe(true);
+    expect(pointer.sample().actions).toBe(0);
+  });
+
+  it("samples combined input into caller-owned storage without replacing it", () => {
+    const keyboard = new KeyboardInput();
+    const pointer = new PointerInput();
+    const combined = new CombinedInput(keyboard, pointer);
+    const target = { moveX: 99, moveY: 99, actions: 99 };
+    keyboard.keyDown("ArrowRight");
+    pointer.configure({ x: 0, y: 0, width: 1000, height: 500 }, 100);
+    pointer.actionDown(10, InputActionBits.firePrimary);
+
+    expect(combined.sampleInto(target)).toBe(target);
+    expect(target).toEqual({ moveX: 127, moveY: 0, actions: 1 });
+    expect(combined.sampleInto(target)).toBe(target);
+  });
 });
