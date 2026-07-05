@@ -1,4 +1,4 @@
-name = "roadmap-implementer"
+name = "roadmap_implementer"
 description = "Implementa ou corrige exatamente um item aprovado do roadmap WWIIRun."
 model = "gpt-5.4-mini"
 model_reasoning_effort = "medium"

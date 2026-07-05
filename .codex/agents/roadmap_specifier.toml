@@ -1,4 +1,4 @@
-name = "roadmap-specifier"
+name = "roadmap_specifier"
 description = "Especifica exatamente um item do roadmap WWIIRun e pode autoaprovar uma especificação técnica completa."
 model = "gpt-5.5"
 model_reasoning_effort = "high"

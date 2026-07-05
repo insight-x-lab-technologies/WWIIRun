@@ -14,9 +14,9 @@
 
 - Create `.agents/skills/next-roadmap-item/SKILL.md`: orchestration state machine and stop conditions.
 - Create `.agents/skills/next-roadmap-item/agents/openai.yaml`: skill UI metadata.
-- Create `.codex/agents/roadmap-specifier.toml`: high-reasoning specification role.
-- Create `.codex/agents/roadmap-implementer.toml`: economical implementation/correction role.
-- Create `.codex/agents/roadmap-reviewer.toml`: economical but high-reasoning independent review role.
+- Create `.codex/agents/roadmap_specifier.toml`: high-reasoning specification role.
+- Create `.codex/agents/roadmap_implementer.toml`: economical implementation/correction role.
+- Create `.codex/agents/roadmap_reviewer.toml`: economical but high-reasoning independent review role.
 - Modify `.agents/skills/specify-roadmap-item/SKILL.md`: permit scoped automatic approval under the orchestrator.
 - Modify `.agents/skills/implement-roadmap-item/SKILL.md`: accept structured, incremental correction handoffs.
 - Modify `.agents/skills/review-roadmap-item/SKILL.md`: classify finding ownership and support incremental re-review.
@@ -105,7 +105,7 @@ Require one exact roadmap ID. Do not infer permission to start neighboring items
 
 ## Required roles
 
-Spawn these project agents sequentially: `roadmap-specifier`, `roadmap-implementer`, then `roadmap-reviewer`. Never allow concurrent writes. Verify the active surface honored the named role/model configuration; disclose and stop on an unapproved fallback.
+Spawn these project agents sequentially: `roadmap_specifier`, `roadmap_implementer`, then `roadmap_reviewer`. Never allow concurrent writes. Verify the active surface honored the named role/model configuration; disclose and stop on an unapproved fallback.
 
 Each role MUST use its matching lifecycle skill:
 
@@ -167,16 +167,16 @@ Expected: commit contains only the new skill files.
 
 **Files:**
 
-- Create: `.codex/agents/roadmap-specifier.toml`
-- Create: `.codex/agents/roadmap-implementer.toml`
-- Create: `.codex/agents/roadmap-reviewer.toml`
+- Create: `.codex/agents/roadmap_specifier.toml`
+- Create: `.codex/agents/roadmap_implementer.toml`
+- Create: `.codex/agents/roadmap_reviewer.toml`
 
 - [ ] **Step 1: Create the specification agent**
 
-Write `.codex/agents/roadmap-specifier.toml`:
+Write `.codex/agents/roadmap_specifier.toml`:
 
 ```toml
-name = "roadmap-specifier"
+name = "roadmap_specifier"
 description = "Specifies exactly one WWIIRun roadmap item and may automatically approve a complete technical spec."
 model = "gpt-5.5"
 model_reasoning_effort = "high"
@@ -188,10 +188,10 @@ Use $specify-roadmap-item for exactly the ID supplied by the parent. Read only r
 
 - [ ] **Step 2: Create the implementation agent**
 
-Write `.codex/agents/roadmap-implementer.toml`:
+Write `.codex/agents/roadmap_implementer.toml`:
 
 ```toml
-name = "roadmap-implementer"
+name = "roadmap_implementer"
 description = "Implements or corrects exactly one approved WWIIRun roadmap item."
 model = "gpt-5.4-mini"
 model_reasoning_effort = "medium"
@@ -203,10 +203,10 @@ Use $implement-roadmap-item for exactly the ID supplied by the parent. On correc
 
 - [ ] **Step 3: Create the review agent**
 
-Write `.codex/agents/roadmap-reviewer.toml`:
+Write `.codex/agents/roadmap_reviewer.toml`:
 
 ```toml
-name = "roadmap-reviewer"
+name = "roadmap_reviewer"
 description = "Independently reviews exactly one implemented WWIIRun roadmap item and rechecks bounded corrections."
 model = "gpt-5.4-mini"
 model_reasoning_effort = "high"
@@ -221,8 +221,8 @@ Use $review-roadmap-item for exactly the ID supplied by the parent. Remain disti
 Run:
 
 ```bash
-python3 -c 'import pathlib,tomllib; [tomllib.loads(p.read_text()) for p in pathlib.Path(".codex/agents").glob("roadmap-*.toml")]'
-rg -n '^(name|model|model_reasoning_effort|sandbox_mode) =' .codex/agents/roadmap-*.toml
+python3 -c 'import pathlib,tomllib; [tomllib.loads(p.read_text()) for p in pathlib.Path(".codex/agents").glob("roadmap_*.toml")]'
+rg -n '^(name|model|model_reasoning_effort|sandbox_mode) =' .codex/agents/roadmap_*.toml
 ```
 
 Expected: Python exits 0; output shows one unique role name, the intended model, reasoning effort, and `workspace-write` for each file.
@@ -232,7 +232,7 @@ Expected: Python exits 0; output shows one unique role name, the intended model,
 Run:
 
 ```bash
-git add .codex/agents/roadmap-specifier.toml .codex/agents/roadmap-implementer.toml .codex/agents/roadmap-reviewer.toml
+git add .codex/agents/roadmap_specifier.toml .codex/agents/roadmap_implementer.toml .codex/agents/roadmap_reviewer.toml
 git -c user.name=Codex -c user.email=codex@openai.com -c committer.name=Codex -c committer.email=codex@openai.com commit -m "feat(workflow): add roadmap lifecycle agents"
 ```
 
@@ -357,7 +357,7 @@ Expected: only the orchestration instruction, durable decision, and appended han
 **Files:**
 
 - Verify: `.agents/skills/next-roadmap-item/SKILL.md`
-- Verify: `.codex/agents/roadmap-*.toml`
+- Verify: `.codex/agents/roadmap_*.toml`
 - Verify: `.agents/skills/{specify,implement,review}-roadmap-item/SKILL.md`
 - Modify: `docs/memory/CURRENT_STATE.md` only to replace planned evidence with actual evidence.
 - Temporary: `/tmp/wwiirun-roadmap-orchestration-green/`
@@ -375,7 +375,7 @@ Expected GREEN:
 
 - [ ] **Step 2: Verify role/model discovery in a fresh Codex thread**
 
-Start a fresh non-mutating Codex invocation that lists or selects `roadmap-specifier`, `roadmap-implementer`, and `roadmap-reviewer` through the available subagent surface.
+Start a fresh non-mutating Codex invocation that lists or selects `roadmap_specifier`, `roadmap_implementer`, and `roadmap_reviewer` through the available subagent surface.
 
 Expected: all three named roles are discoverable with configured models. If the surface cannot expose or honor named roles, record that exact limitation and keep `$next-roadmap-item` fail-closed rather than claiming model selection.
 
@@ -385,7 +385,7 @@ Run:
 
 ```bash
 for skill in specify-roadmap-item implement-roadmap-item review-roadmap-item next-roadmap-item; do python3 /home/codexbot/.codex/skills/.system/skill-creator/scripts/quick_validate.py ".agents/skills/$skill"; done
-python3 -c 'import pathlib,tomllib; files=list(pathlib.Path(".codex/agents").glob("roadmap-*.toml")); assert len(files)==3; data=[tomllib.loads(p.read_text()) for p in files]; assert len({d["name"] for d in data})==3'
+python3 -c 'import pathlib,tomllib; files=list(pathlib.Path(".codex/agents").glob("roadmap_*.toml")); assert len(files)==3; data=[tomllib.loads(p.read_text()) for p in files]; expected={"roadmap_specifier": ("gpt-5.5", "high"), "roadmap_implementer": ("gpt-5.4-mini", "medium"), "roadmap_reviewer": ("gpt-5.4-mini", "high")}; assert {d["name"]: (d["model"], d["model_reasoning_effort"]) for d in data} == expected'
 git diff --check
 ```
 

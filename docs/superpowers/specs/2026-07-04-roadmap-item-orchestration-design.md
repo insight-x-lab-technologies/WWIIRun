@@ -37,7 +37,7 @@ Use one thin parent orchestrator and three sequential, persistent child roles pe
 | Implementer | `gpt-5.4-mini`, medium reasoning | Implement the approved spec, test it, and prepare review evidence. |
 | Reviewer | `gpt-5.4-mini`, high reasoning | Independently inspect and validate the implementation, then approve or emit bounded findings. |
 
-Define the roles in `.codex/agents/`. The orchestrator requests those roles explicitly and keeps their full logs outside its own context. Model settings are preferences enforced by Codex custom-agent configuration when the active Codex surface supports named custom agents. On a surface that cannot select the configured role/model, the orchestrator must disclose the fallback; it must not claim model isolation it cannot verify.
+Define the roles as `.codex/agents/roadmap_specifier.toml`, `.codex/agents/roadmap_implementer.toml`, and `.codex/agents/roadmap_reviewer.toml`, with matching identifiers `roadmap_specifier`, `roadmap_implementer`, and `roadmap_reviewer`. The orchestrator requests those roles explicitly and keeps their full logs outside its own context. Model settings are preferences enforced by Codex custom-agent configuration when the active Codex surface supports named custom agents. On a surface that cannot select the configured role/model, the orchestrator must disclose the fallback; it must not claim model isolation it cannot verify.
 
 Only one child may write at a time. Parallelism is intentionally excluded because all three stages depend on the preceding filesystem state and share one worktree.
 

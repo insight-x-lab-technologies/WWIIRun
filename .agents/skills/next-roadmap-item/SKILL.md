@@ -19,9 +19,9 @@ Before spawning, read `AGENTS.md`, required memory, the roadmap entry, and `git 
 
 Allow no concurrent writes; the parent never performs specialist work. Verify the orchestration surface honored each requested role/model; stop and disclose any unapproved fallback.
 
-1. Spawn `roadmap-specifier`; it MUST use `$specify-roadmap-item`. It may approve only a complete technical spec with no reserved human matter. For an internal, reversible technical ADR covered by D-007/D-008, it MUST create/register the ADR, apply the delegated recommendation, and approve without another owner turn.
-2. Spawn `roadmap-implementer`; it MUST use `$implement-roadmap-item`, run complete applicable initial gates, move the item to `In review`, and return lifecycle, implementation range, summary, evidence, risks, and overlap notes.
-3. Spawn a distinct `roadmap-reviewer`; it MUST use `$review-roadmap-item` and receive the ID, approved spec, implementation range, and summary. It independently verifies evidence and returns normalized findings or approval.
+1. Spawn `roadmap_specifier`; it MUST use `$specify-roadmap-item`. It may approve only a complete technical spec with no reserved human matter. For an internal, reversible technical ADR covered by D-007/D-008, it MUST create/register the ADR, apply the delegated recommendation, and approve without another owner turn.
+2. Spawn `roadmap_implementer`; it MUST use `$implement-roadmap-item`, run complete applicable initial gates, move the item to `In review`, and return lifecycle, implementation range, summary, evidence, risks, and overlap notes.
+3. Spawn a distinct `roadmap_reviewer`; it MUST use `$review-roadmap-item` and receive the ID, approved spec, implementation range, and summary. It independently verifies evidence and returns normalized findings or approval.
 
 Each finding MUST have stable ID, severity, criterion, evidence, impact, owner, correction, and recheck. Owners and routing:
 
