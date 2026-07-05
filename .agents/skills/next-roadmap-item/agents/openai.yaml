@@ -1,0 +1,4 @@
+interface:
+  display_name: "Next Roadmap Item"
+  short_description: "Orchestrate one roadmap item end to end"
+  default_prompt: "Use $next-roadmap-item F1-02 to complete the next approved roadmap workflow."
