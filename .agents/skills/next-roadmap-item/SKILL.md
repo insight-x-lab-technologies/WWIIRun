@@ -11,8 +11,9 @@ Coordinate one item without doing specialist work in the parent context. Treat r
 
 1. Require one exact roadmap ID. Reject ranges, phases, batches, and implicit or neighboring items.
 2. Read the repository `AGENTS.md`, required memory files, the item's roadmap entry, and `git status` before routing work. Then load only the documents required by `AGENTS.md` and the active specialist skill.
-3. Stop if a dependency is incomplete or the worktree has overlapping changes whose ownership or safe preservation is unclear. Do not silently absorb adjacent work.
-4. Use the repository lifecycle and documents as the source of truth. Never infer completion from a role's prose alone.
+3. Before spawning any role, require the authoritative roadmap state to be exactly `Ready`, the entry point for this complete end-to-end workflow. Stop and report `Backlog`, `Specified`, `In progress`, `In review`, `Changes requested`, `Done`, `Blocked`, or any unknown/incompatible state; never start, reopen, resume, or repeat work silently. A future resume requires an explicit owner request and must follow the then-authoritative lifecycle rather than an invented transition in this skill.
+4. Stop if a dependency is incomplete or the worktree has overlapping changes whose ownership or safe preservation is unclear. Do not silently absorb adjacent work.
+5. Use the repository lifecycle and documents as the source of truth. Never infer completion from a role's prose alone.
 
 ## Enforce specialist roles
 
@@ -32,7 +33,7 @@ The parent MUST NOT replace a specialist. Every role MUST load and follow its ma
 
 ### 1. Specify
 
-Give `roadmap-specifier` only the exact ID and repository context needed by its skill. It may mark a spec `Approved` only when the technical spec is complete and no reserved human matter remains. If acceptance behavior must change later because of a `spec-ambiguity` finding, return it to this same specifier; otherwise do not reopen specification.
+Give `roadmap-specifier` only the exact ID and repository context needed by its skill. It may mark a spec `Approved` only when the technical spec is complete and no reserved human matter remains. When architecture needs an ADR for an internal, reversible technical decision covered by D-007/D-008, the specifier must create and register it, apply the delegated recommendation, and approve it without another owner turn. If acceptance behavior must change later because of a `spec-ambiguity` finding, return it to this same specifier; otherwise do not reopen specification.
 
 ### 2. Implement
 
@@ -74,7 +75,7 @@ Return a compact result with the exact ID, terminal lifecycle state, role/model 
 
 Stop and request owner direction for:
 
-- reserved decisions or a required/new ADR;
+- an ADR or decision involving a reserved human matter or authority not delegated by D-007/D-008;
 - secrets, missing authority, or production mutation;
 - money, privacy, terms, licenses, or final visual identity;
 - destructive migration or invalidation of saves or scores;
