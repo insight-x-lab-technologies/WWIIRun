@@ -15,5 +15,6 @@
 | D-005 | Aceita | O jogo funciona offline; recursos sociais sincronizam quando há rede. |
 | D-006 | Aceita | Leaderboard central trata o cliente como não confiável e valida submissões. |
 | D-007 | Aceita | Decisões técnicas internas e reversíveis seguem a recomendação do agente sem confirmação; matérias humanas reservadas e ações externas continuam exigindo autorização. |
+| D-008 | Aceita | `$next-roadmap-item` pode aprovar specs técnicas completas e orquestrar até duas correções; decisões humanas reservadas continuam exigindo confirmação. |
 
 Detalhes e consequências duráveis pertencem aos ADRs. Decisões propostas precisam de validação humana antes de congelar conteúdo ou contrato externo.

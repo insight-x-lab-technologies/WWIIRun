@@ -44,6 +44,7 @@ Atualize `docs/memory/CURRENT_STATE.md` com: realizado, validações, pendência
 
 ## Skills do lifecycle
 
+- `$next-roadmap-item`: orquestrar exatamente um item elegível por especificação, implementação, revisão independente e no máximo duas correções, em contextos separados com configurações de modelo por papel quando suportadas. Pode aprovar automaticamente specs técnicas completas; matérias humanas reservadas bloqueiam o fluxo.
 - `$specify-roadmap-item`: produzir a spec sem implementar.
 - `$implement-roadmap-item`: implementar uma spec aprovada e enviar para revisão.
 - `$review-roadmap-item`: revisar independentemente e aprovar ou solicitar mudanças.

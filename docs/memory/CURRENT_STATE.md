@@ -8,6 +8,10 @@ F1 — Vertical slice jogável geométrico.
 
 ## Concluído
 
+- realizado em 2026-07-04: workflow `$next-roadmap-item` criado com agentes separados para especificação, implementação e revisão, aprovação técnica automática e limite de duas correções; o trabalho ativo de F1-01 no checkout original foi preservado.
+- validações do workflow nesta etapa: as quatro skills do lifecycle passaram em `quick_validate`; a estrutura declarada dos três TOMLs de papéis e seus campos de nome/modelo foi inspecionada; os cenários pressure anteriores permaneceram RED como baseline; `git diff --check` foi executado. Os cenários forward verdes e a descoberta final dos papéis/modelos pela superfície Codex pertencem à validação controlada da Tarefa 6 e seguem pendentes, sem alegação de passe.
+- risco do workflow: o carregamento de papéis/modelos customizados depende de uma superfície Codex nova que leia `.codex/agents`; o orquestrador deve falhar fechado enquanto isso não for verificado.
+- próximo passo exato do workflow: executar a validação controlada da Tarefa 6 e, depois, usar `$next-roadmap-item <ID>` somente quando o trabalho ativo de F1-01 estiver resolvido.
 - escopo inicial capturado e organizado;
 - arquitetura alvo, determinismo, assets, backend, UX e distribuição definidos;
 - roadmap faseado e matriz de rastreabilidade criados;
