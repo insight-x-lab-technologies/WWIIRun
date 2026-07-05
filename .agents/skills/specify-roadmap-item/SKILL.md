@@ -21,14 +21,20 @@ Require one exact roadmap ID. If it is absent or ambiguous, identify the next el
 6. Create `docs/specs/SPEC-<ID>-<slug>.md` from `docs/templates/SPEC-TEMPLATE.md`, or refine the existing file.
 7. Define included and excluded scope, contracts, invariants, error behavior, acceptance criteria, tests, migration, rollback and evidence required.
 8. Address determinism, performance, responsive UI, assets, i18n, save compatibility, security and offline behavior only when applicable; state `not applicable` where ambiguity would remain.
-9. Record structural choices as a proposed ADR. Do not silently decide product, legal, payment, privacy, published ruleset or destructive migration questions.
-10. Set the spec to `Draft` when human decisions remain, otherwise `Awaiting approval`. Set the roadmap item to `Specified` and update `CURRENT_STATE.md`.
+9. Record structural choices as a proposed ADR. Do not silently decide reserved human matters.
+10. Set the spec to `Draft` when unresolved design work remains, otherwise `Awaiting approval`. Set the roadmap item to `Specified` and update `CURRENT_STATE.md`.
+
+## Orchestrated approval
+
+Only when invoked under `$next-roadmap-item` and D-008, a complete technical spec may move directly to `Approved` without another user turn. An internal, reversible technical ADR covered by D-007/D-008 may be created, registered, recommended and approved in that run.
+
+Before implementation, stop with `Awaiting approval` and name the exact human decision if the item, spec or ADR touches money, privacy, terms, licenses, final identity, destructive migration, save/score invalidation, published rules or `AGENTS.md`. Outside that orchestrator, use the normal approval contract.
 
 ## Boundaries
 
 - Do not install dependencies, generate application scaffolding, edit runtime/test code or implement the item.
 - Do not expand the item to neighboring roadmap entries.
-- Do not approve the spec on the user's behalf.
+- Do not approve the spec on the user's behalf except under the delegated orchestrated approval above.
 - Do not describe a test as evidence before it has run.
 
 ## Completion report

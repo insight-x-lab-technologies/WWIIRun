@@ -29,7 +29,9 @@ Implement one approved spec as a reviewable increment. Keep architecture and evi
 
 ## Handling review findings
 
-When status is `Changes requested`, implement only documented findings and required regressions. Preserve review history, rerun affected gates, and return the item to `In review`.
+When status is `Changes requested`, require each finding to have stable ID, severity, criterion, evidence, impact, owner, correction and recheck commands. Implement only findings owned by `implementation` and their required regressions; review probes, environment failures and spec ambiguity are not implementation work.
+
+Preserve review history. In an orchestrated intermediate correction, run focused checks and affected gates; the final reviewer owns the complete closing gate. Return the item to `In review` with a compact correction range and result keyed by finding ID. Standalone corrections still run every applicable final gate before handoff.
 
 ## Stop conditions
 
