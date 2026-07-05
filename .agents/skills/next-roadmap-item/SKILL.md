@@ -1,87 +1,41 @@
 ---
 name: next-roadmap-item
-description: Orchestrate exactly one WWIIRun roadmap item end to end through specification, implementation, independent review, and bounded correction rounds. Use when the owner asks to advance one exact item through the complete approved roadmap workflow.
+description: Use when the owner asks to advance exactly one WWIIRun roadmap item end to end with isolated lifecycle roles and bounded automatic corrections.
 ---
 
 # Next Roadmap Item
 
-Coordinate one item without doing specialist work in the parent context. Treat repository documents as authoritative; keep only routing state, lifecycle state, and compact results in the parent.
+Orchestrate one exact ID. The parent retains only routing, state, and compact results; repository documents remain authoritative.
 
-## Establish scope and authority
+## Preconditions
 
-1. Require one exact roadmap ID. Reject ranges, phases, batches, and implicit or neighboring items.
-2. Read the repository `AGENTS.md`, required memory files, the item's roadmap entry, and `git status` before routing work. Then load only the documents required by `AGENTS.md` and the active specialist skill.
-3. Before spawning any role, require the authoritative roadmap state to be exactly `Ready`, the entry point for this complete end-to-end workflow. Stop and report `Backlog`, `Specified`, `In progress`, `In review`, `Changes requested`, `Done`, `Blocked`, or any unknown/incompatible state; never start, reopen, resume, or repeat work silently. A future resume requires an explicit owner request and must follow the then-authoritative lifecycle rather than an invented transition in this skill.
-4. Stop if a dependency is incomplete or the worktree has overlapping changes whose ownership or safe preservation is unclear. Do not silently absorb adjacent work.
-5. Use the repository lifecycle and documents as the source of truth. Never infer completion from a role's prose alone.
+Before spawning, read `AGENTS.md`, required memory, the roadmap entry, and `git status`.
 
-## Enforce specialist roles
+- Require roadmap state exactly `Ready` and complete dependencies.
+- Stop/report `Backlog`, `Specified`, `In progress`, `In review`, `Changes requested`, `Done`, `Blocked`, unknown states, or overlapping work. Never silently start, reopen, resume, or include neighboring items.
+- Future resumption requires an explicit owner request and the then-authoritative lifecycle.
 
-Run these named roles sequentially, with no concurrent writes:
+## Sequential routing
 
-| Role | Required skill | Responsibility |
-| --- | --- | --- |
-| `roadmap-specifier` | `$specify-roadmap-item` | Specify the exact item and obtain the permitted approval state. |
-| `roadmap-implementer` | `$implement-roadmap-item` | Implement the approved spec, validate it, provide a compact handoff, and move the item to `In review`. |
-| `roadmap-reviewer` | `$review-roadmap-item` | Independently review the implementation and either close it or report normalized findings. |
+Allow no concurrent writes; the parent never performs specialist work. Verify the orchestration surface honored each requested role/model; stop and disclose any unapproved fallback.
 
-Before accepting output from any role, verify that the orchestration surface actually honored the requested role and model. If it did not, stop and disclose the fallback; do not continue unless the owner explicitly approves that fallback.
+1. Spawn `roadmap-specifier`; it MUST use `$specify-roadmap-item`. It may approve only a complete technical spec with no reserved human matter. For an internal, reversible technical ADR covered by D-007/D-008, it MUST create/register the ADR, apply the delegated recommendation, and approve without another owner turn.
+2. Spawn `roadmap-implementer`; it MUST use `$implement-roadmap-item`, run complete applicable initial gates, move the item to `In review`, and return lifecycle, implementation range, summary, evidence, risks, and overlap notes.
+3. Spawn a distinct `roadmap-reviewer`; it MUST use `$review-roadmap-item` and receive the ID, approved spec, implementation range, and summary. It independently verifies evidence and returns normalized findings or approval.
 
-The parent MUST NOT replace a specialist. Every role MUST load and follow its matching skill. Preserve role identity across corrections: route implementation findings to the same `roadmap-implementer`, then route the correction range to the same `roadmap-reviewer`.
+Each finding MUST have stable ID, severity, criterion, evidence, impact, owner, correction, and recheck. Owners and routing:
 
-## Run the lifecycle
+- `implementation`: only this owner causes `Changes requested`; send to the same implementer.
+- `review-probe`: the reviewer corrects/discards its temporary probe and reruns it without lifecycle change.
+- `environment`: report the blocker/evidence gap; never convert it to implementation.
+- `spec-ambiguity`: return to the same specifier only if acceptance changes; otherwise the reviewer clarifies without reopening.
 
-### 1. Specify
+After implementation correction, send its range/summary to the same reviewer. Permit at most two implementation correction rounds; then stop with unresolved IDs and exact resume action. Correction runs focused tests plus affected gates. Final approval requires complete applicable gates and authoritative state `Done`; prose approval is insufficient.
 
-Give `roadmap-specifier` only the exact ID and repository context needed by its skill. It may mark a spec `Approved` only when the technical spec is complete and no reserved human matter remains. When architecture needs an ADR for an internal, reversible technical decision covered by D-007/D-008, the specifier must create and register it, apply the delegated recommendation, and approve it without another owner turn. If acceptance behavior must change later because of a `spec-ambiguity` finding, return it to this same specifier; otherwise do not reopen specification.
+Do not repeat physical measurement without changed inputs, implementation, environment, or spec; cite valid evidence.
 
-### 2. Implement
+## Stop and return
 
-Give `roadmap-implementer` the exact ID and approved spec. Require a compact handoff containing lifecycle state, implementation range, summary, validation evidence, remaining risks, and overlap notes. Continue only when repository state shows `In review`.
+Stop for reserved decisions; non-delegated ADR/authority; secrets; production mutation; money; privacy; terms; licenses; final identity; destructive migration; save/score invalidation; published-rule changes; model fallback; unsafe overlap; or exhausted retries. Never deploy, publish, push, or mutate production without explicit authorization.
 
-Run the complete applicable repository gates for the initial implementation. During a correction, run focused tests plus all affected gates. Before final approval, run the complete applicable gates again. Do not repeat a physical measurement unless its inputs, implementation, environment, or governing spec changed; preserve and cite valid evidence instead.
-
-### 3. Review independently
-
-Give a distinct `roadmap-reviewer` the exact ID, approved spec, implementation range, and compact implementation summary. The reviewer must inspect evidence independently rather than accept the handoff as proof.
-
-Normalize every finding with:
-
-- stable ID;
-- severity;
-- violated acceptance criterion;
-- evidence;
-- impact;
-- owner: `implementation`, `review-probe`, `environment`, or `spec-ambiguity`;
-- required correction;
-- recheck procedure.
-
-Route findings by owner:
-
-- `implementation`: the only class that moves the item to `Changes requested`; send it to the same implementer.
-- `review-probe`: the reviewer must correct or discard its own temporary probe and rerun it without changing lifecycle state.
-- `environment`: report the environmental blocker or missing evidence; never relabel it as an implementation defect.
-- `spec-ambiguity`: return to the same specifier only if resolving it changes acceptance behavior. Otherwise clarify within review without reopening the spec.
-
-After corrections, give the same reviewer the correction range and updated compact summary. Permit at most two implementation correction rounds. If unresolved findings remain after round two, stop with their stable IDs and the exact action needed to resume.
-
-### 4. Confirm closure
-
-Accept approval only after the reviewer completes the final full gates and repository documents show the item as `Done`. If the review prose says approved but authoritative lifecycle state is not `Done`, stop and report the mismatch.
-
-Return a compact result with the exact ID, terminal lifecycle state, role/model verification, ranges, validation evidence, unresolved findings, risks, and next resume action. Do not advance a neighboring item.
-
-## Mandatory stop conditions
-
-Stop and request owner direction for:
-
-- an ADR or decision involving a reserved human matter or authority not delegated by D-007/D-008;
-- secrets, missing authority, or production mutation;
-- money, privacy, terms, licenses, or final visual identity;
-- destructive migration or invalidation of saves or scores;
-- changes to published rules;
-- unapproved role/model fallback;
-- overlapping work that cannot be preserved safely;
-- exhausted correction rounds.
-
-Never deploy, publish, push, mutate production, or perform another external release action without explicit authorization. A request to orchestrate the item does not grant that authority.
+Return ID, terminal state, role/model verification, ranges, validations, unresolved findings, risks, and resume action. Never advance another item.
