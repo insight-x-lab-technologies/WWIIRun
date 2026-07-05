@@ -20,6 +20,8 @@ export default defineConfig({
         "src/shared/validation/**/*.ts",
         "src/simulation/random/**/*.ts",
         "src/simulation/run/**/*.ts",
+        "src/simulation/aircraft/**/*.ts",
+        "src/simulation/collision/**/*.ts",
         "scripts/validateContent.ts",
         "scripts/inspectPwaBuild.ts",
       ],

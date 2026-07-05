@@ -3,7 +3,7 @@ import type { RunState, StateHash, StateHashAlgorithm } from "./types";
 
 export const STATE_HASH_ALGORITHM: StateHashAlgorithm = "fnv1a64-v1";
 
-const LAYOUT_TAG = "wwiirun.run-state.v1";
+const LAYOUT_TAG = "wwiirun.run-state.v2";
 const FNV_OFFSET_BASIS = 0xcbf29ce484222325n;
 const FNV_PRIME = 0x00000100000001b3n;
 const UINT64_MASK = 0xffffffffffffffffn;
@@ -33,6 +33,15 @@ export function hashRunState(state: RunState): StateHash {
   hasher.writeByte(state.input.moveX & 0xff);
   hasher.writeByte(state.input.moveY & 0xff);
   hasher.writeUint16(state.input.actions);
+  hasher.writeAscii(state.player.definitionId);
+  hasher.writeUint32(state.player.position.x);
+  hasher.writeUint32(state.player.position.y);
+  hasher.writeUint32(state.player.velocity.x);
+  hasher.writeUint32(state.player.velocity.y);
+  hasher.writeUint32(state.player.health.current);
+  hasher.writeUint32(state.player.health.max);
+  hasher.writeUint32(state.player.invulnerabilityTicks);
+  hasher.writeAscii(state.player.status);
   hasher.writeUint32(STREAM_IDS.length);
   for (const streamId of STREAM_IDS) {
     const rng = state.rng[streamId];

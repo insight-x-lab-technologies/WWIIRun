@@ -1,0 +1,42 @@
+export const runV2GoldenVectors = {
+  config: {
+    mode: "weekly",
+    seed: "8000000000000001ffffffff7fffffff",
+    rulesetVersion: "rules.f1-02.v2",
+    contentVersion: "content.base.v1",
+    aircraftId: "aircraft.placeholder.v1",
+    loadoutId: "loadout.challenge.v1",
+    modifierIds: ["weather.snow.v1", "difficulty.hard.v1"],
+  },
+  canonicalModifierIds: ["difficulty.hard.v1", "weather.snow.v1"],
+  inputs: [
+    { moveX: -127, moveY: 127, actions: 1 },
+    { moveX: 64, moveY: -64, actions: 2 },
+    { moveX: 0, moveY: 0, actions: 4 },
+    { moveX: 127, moveY: -127, actions: 7 },
+    { moveX: -1, moveY: 1, actions: 3 },
+    { moveX: 1, moveY: -1, actions: 5 },
+    { moveX: 42, moveY: -42, actions: 6 },
+    { moveX: 0, moveY: 0, actions: 0 },
+  ],
+  checkpoints: [
+    { tick: 0, hash: "d2aa15660476460f" },
+    { tick: 1, hash: "3346b3adb058bcf9" },
+    { tick: 3, hash: "cf0f87f6c598b437" },
+    { tick: 8, hash: "74b5f2a6541938a7" },
+  ],
+  finalPlayer: {
+    definitionId: "aircraft.placeholder.v1",
+    position: { x: 41294, y: 68786 },
+    velocity: { x: 63, y: -63 },
+    health: { current: 100, max: 100 },
+    invulnerabilityTicks: 0,
+    status: "active",
+  },
+  finalRng: {
+    spawn: ["80000000", "00000001", "ffffffff", "7fffffff"],
+    loot: ["0659ea41", "78ac8eb2", "e5c9d1a3", "5389fc89"],
+    weather: ["381f0728", "5267f0ff", "f1d144a2", "e5e39d64"],
+    patterns: ["414616c7", "73f210de", "f7913e3d", "ac894116"],
+  },
+} as const;

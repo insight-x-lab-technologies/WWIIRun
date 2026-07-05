@@ -6,6 +6,10 @@ import {
   type ViewportLayout,
 } from "../platform/viewport/layout";
 import { InputActionBits } from "../simulation/run";
+import {
+  PLACEHOLDER_AIRCRAFT,
+  SIMULATION_UNITS_PER_LOGICAL_PIXEL,
+} from "../simulation/aircraft";
 import { CombinedInput, KeyboardInput, PointerInput } from "./input";
 
 export type GameplaySceneDependencies = {
@@ -17,7 +21,8 @@ export type GameplaySceneDependencies = {
 };
 
 export class GameplayScene extends Phaser.Scene {
-  private marker?: Phaser.GameObjects.Arc;
+  private aircraft?: Phaser.GameObjects.Graphics;
+  private hitboxOverlay?: Phaser.GameObjects.Graphics;
   private diagnostic?: Phaser.GameObjects.Text;
   private zones?: Phaser.GameObjects.Graphics;
   private layout?: ViewportLayout;
@@ -33,13 +38,8 @@ export class GameplayScene extends Phaser.Scene {
     if (world === undefined)
       throw new Error("Gameplay viewport was not initialized.");
     this.cameras.main.setBackgroundColor("#101820");
-    this.marker = this.add.circle(
-      world.x + world.width / 2,
-      world.y + world.height / 2,
-      18,
-      0xd5a94e,
-    );
-    this.marker.setStrokeStyle(3, 0xf4f0e6);
+    this.aircraft = this.drawAircraft();
+    this.hitboxOverlay = this.drawHitboxes();
     this.diagnostic = this.add
       .text(12, 12, "Gameplay tick 0 | input 0,0,0", {
         color: "#f4f0e6",
@@ -58,17 +58,21 @@ export class GameplayScene extends Phaser.Scene {
     const result = this.dependencies.session.update(delta);
     const snapshot = this.dependencies.session.snapshot();
     const input = snapshot.state.input;
-    if (this.marker !== undefined && this.layout !== undefined) {
-      const centerX = this.layout.world.x + this.layout.world.width / 2;
-      const centerY = this.layout.world.y + this.layout.world.height / 2;
-      this.marker.setPosition(
-        centerX + input.moveX * 0.35,
-        centerY + input.moveY * 0.35,
-      );
-      this.marker.setFillStyle(input.actions === 0 ? 0xd5a94e : 0x65b5ff);
+    const player = snapshot.state.player;
+    if (this.aircraft !== undefined && this.layout !== undefined) {
+      const x =
+        this.layout.world.x +
+        player.position.x / SIMULATION_UNITS_PER_LOGICAL_PIXEL;
+      const y =
+        this.layout.world.y +
+        player.position.y / SIMULATION_UNITS_PER_LOGICAL_PIXEL;
+      this.aircraft
+        .setPosition(x, y)
+        .setAlpha(player.status === "active" ? 1 : 0.35);
+      this.hitboxOverlay?.setPosition(x, y);
     }
     this.diagnostic?.setText(
-      `Gameplay tick ${snapshot.state.tick} | input ${input.moveX},${input.moveY},${input.actions}${result.dropped ? " | backlog dropped" : ""}`,
+      `Gameplay tick ${snapshot.state.tick} | input ${input.moveX},${input.moveY},${input.actions} | HP ${player.health.current}/${player.health.max} | ${player.status}${result.dropped ? " | backlog dropped" : ""}`,
     );
     const status = this.dependencies.root.querySelector<HTMLElement>(
       "[data-gameplay-status]",
@@ -76,6 +80,7 @@ export class GameplayScene extends Phaser.Scene {
     if (status !== null)
       status.textContent = `${snapshot.paused ? "Paused" : "Active"}; ${this.layout?.orientation ?? "unknown"}; tick ${snapshot.state.tick}`;
     this.dependencies.root.dataset.input = `${input.moveX},${input.moveY},${input.actions}`;
+    this.dependencies.root.dataset.player = `${player.position.x},${player.position.y},${player.health.current},${player.status}`;
   }
 
   private bindEvents(): void {
@@ -226,6 +231,37 @@ export class GameplayScene extends Phaser.Scene {
       .strokeRect(right, bottom - size - gap, size, size);
     this.dependencies.root.dataset.zoneRenderOrientation =
       this.layout.orientation;
+  }
+
+  private drawAircraft(): Phaser.GameObjects.Graphics {
+    const graphics = this.add.graphics().setDepth(3);
+    graphics.fillStyle(0xd5a94e).fillRect(-22, -8, 44, 16);
+    graphics.fillStyle(0x65b5ff).fillRect(-12, -20, 16, 40);
+    graphics.fillStyle(0xf4f0e6).fillCircle(22, 0, 6);
+    return graphics;
+  }
+
+  private drawHitboxes(): Phaser.GameObjects.Graphics {
+    const graphics = this.add.graphics().setDepth(4);
+    graphics.lineStyle(1, 0xff5a5f, 0.75);
+    for (const shape of PLACEHOLDER_AIRCRAFT.hitboxes) {
+      if (shape.kind === "aabb")
+        graphics.strokeRect(
+          (shape.offsetX - shape.halfWidth) /
+            SIMULATION_UNITS_PER_LOGICAL_PIXEL,
+          (shape.offsetY - shape.halfHeight) /
+            SIMULATION_UNITS_PER_LOGICAL_PIXEL,
+          (shape.halfWidth * 2) / SIMULATION_UNITS_PER_LOGICAL_PIXEL,
+          (shape.halfHeight * 2) / SIMULATION_UNITS_PER_LOGICAL_PIXEL,
+        );
+      else
+        graphics.strokeCircle(
+          shape.offsetX / SIMULATION_UNITS_PER_LOGICAL_PIXEL,
+          shape.offsetY / SIMULATION_UNITS_PER_LOGICAL_PIXEL,
+          shape.radius / SIMULATION_UNITS_PER_LOGICAL_PIXEL,
+        );
+    }
+    return graphics;
   }
 
   private scheduleResize(): void {

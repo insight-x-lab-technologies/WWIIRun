@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { parseSeedHex, type RngState } from "../../src/simulation/random";
+import { parseSeedHex } from "../../src/simulation/random";
 import {
   advanceRun,
   createRunState,
@@ -10,25 +10,24 @@ import {
   type RunState,
 } from "../../src/simulation/run";
 import { runGoldenVectors } from "./runGoldenVectors";
-
-const streamIds = ["spawn", "loot", "weather", "patterns"] as const;
+import { runV2GoldenVectors } from "./runV2GoldenVectors";
 
 describe("headless run golden corpus", () => {
   test("matches literal hashes at every checkpoint", () => {
     const state = createGoldenState();
     const actual = [{ tick: state.tick, hash: hashRunState(state) }];
 
-    for (const input of runGoldenVectors.inputs) {
+    for (const input of runV2GoldenVectors.inputs) {
       stepRun(state, input);
       if (
-        runGoldenVectors.checkpoints.some(({ tick }) => tick === state.tick)
+        runV2GoldenVectors.checkpoints.some(({ tick }) => tick === state.tick)
       ) {
         actual.push({ tick: state.tick, hash: hashRunState(state) });
       }
     }
 
-    expect(actual).toEqual(runGoldenVectors.checkpoints);
-    expect(rngToHex(state)).toEqual(runGoldenVectors.finalRng);
+    expect(actual).toEqual(runV2GoldenVectors.checkpoints);
+    expect(state.player).toEqual(runV2GoldenVectors.finalPlayer);
   });
 
   test("matches frame, batch, partition, empty-batch, and repeated runs", () => {
@@ -38,44 +37,41 @@ describe("headless run golden corpus", () => {
     const repeated = createGoldenState();
 
     for (const input of runGoldenVectors.inputs) stepRun(stepped, input);
-    advanceRun(batched, runGoldenVectors.inputs);
-    advanceRun(partitioned, runGoldenVectors.inputs.slice(0, 1));
+    advanceRun(batched, runV2GoldenVectors.inputs);
+    advanceRun(partitioned, runV2GoldenVectors.inputs.slice(0, 1));
     advanceRun(partitioned, []);
-    advanceRun(partitioned, runGoldenVectors.inputs.slice(1, 3));
-    advanceRun(partitioned, runGoldenVectors.inputs.slice(3));
-    advanceRun(repeated, runGoldenVectors.inputs);
+    advanceRun(partitioned, runV2GoldenVectors.inputs.slice(1, 3));
+    advanceRun(partitioned, runV2GoldenVectors.inputs.slice(3));
+    advanceRun(repeated, runV2GoldenVectors.inputs);
 
     expect(batched).toEqual(stepped);
     expect(partitioned).toEqual(stepped);
     expect(repeated).toEqual(stepped);
     expect(hashRunState(stepped)).toBe(
-      runGoldenVectors.checkpoints.at(-1)?.hash,
+      runV2GoldenVectors.checkpoints.at(-1)?.hash,
     );
   });
 });
 
 function createGoldenState(): RunState {
-  const parsed = parseSeedHex(runGoldenVectors.config.seed);
+  const parsed = parseSeedHex(runV2GoldenVectors.config.seed);
   if (!parsed.ok) throw new Error(`Invalid golden seed: ${parsed.code}`);
   const config: RunConfig = {
-    ...runGoldenVectors.config,
+    ...runV2GoldenVectors.config,
     seed: parsed.value,
   };
   const state = createRunState(config);
   expect(state.config.modifierIds).toEqual(
-    runGoldenVectors.canonicalModifierIds,
+    runV2GoldenVectors.canonicalModifierIds,
   );
   return state;
 }
 
-function rngToHex(state: RunState) {
-  return Object.fromEntries(
-    streamIds.map((streamId) => [streamId, stateToHex(state.rng[streamId])]),
-  );
-}
-
-function stateToHex(state: RngState): readonly string[] {
-  return [state.s0, state.s1, state.s2, state.s3].map((word) =>
-    word.toString(16).padStart(8, "0"),
-  );
-}
+test("preserves the complete v1 golden vector fixture byte-for-byte", () => {
+  expect(runGoldenVectors.checkpoints).toEqual([
+    { tick: 0, hash: "0c8d1a30d7b17210" },
+    { tick: 1, hash: "0de18a8817e3a594" },
+    { tick: 3, hash: "6c361b31acf23fb3" },
+    { tick: 8, hash: "8915f7da45a2a608" },
+  ]);
+});

@@ -1,8 +1,9 @@
 import { createRngStreams, parseSeedHex } from "../random";
+import { createPlayerState, stepPlayer } from "../aircraft";
 import type { InputFrame, RunConfig, RunMode, RunState } from "./types";
 
 export const TICKS_PER_SECOND = 60 as const;
-export const RUN_STATE_SCHEMA_VERSION = 1 as const;
+export const RUN_STATE_SCHEMA_VERSION = 2 as const;
 
 export const InputActionBits = {
   firePrimary: 0x0001,
@@ -41,6 +42,7 @@ export function createRunState(config: RunConfig): RunState {
     config: canonicalConfig,
     tick: 0,
     input: { moveX: 0, moveY: 0, actions: 0 },
+    player: createPlayerState(),
     rng: createRngStreams(canonicalConfig.seed),
   };
 }
@@ -57,6 +59,7 @@ export function stepRun(state: RunState, input: InputFrame): void {
   stateInput.moveX = input.moveX;
   stateInput.moveY = input.moveY;
   stateInput.actions = input.actions;
+  stepPlayer(state.player, input);
   state.tick += 1;
 }
 

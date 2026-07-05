@@ -12,6 +12,10 @@ test("boots gameplay, accepts keyboard input, and exposes accessible touch actio
     "data-input",
     /^127,0,0$/,
   );
+  await expect(page.locator("#game-root")).toHaveAttribute(
+    "data-player",
+    /^\d+,\d+,100,active$/,
+  );
   await page.keyboard.up("ArrowRight");
   const actions = page.locator(".gameplay-actions button");
   await expect(actions).toHaveCount(3);
@@ -52,6 +56,9 @@ test("reprojects the logical profile across orientation changes without duplicat
 }) => {
   await page.goto("/");
   await page.setViewportSize({ width: 1024, height: 768 });
+  const playerBeforeResize = await page
+    .locator("#game-root")
+    .getAttribute("data-player");
   await expect(page.locator("#game-root")).toHaveAttribute(
     "data-orientation",
     "landscape",
@@ -70,6 +77,9 @@ test("reprojects the logical profile across orientation changes without duplicat
     "portrait",
   );
   await expect(page.locator("#game-root canvas")).toHaveCount(1);
+  expect(await page.locator("#game-root").getAttribute("data-player")).toBe(
+    playerBeforeResize,
+  );
   await expect(page.locator("[data-gameplay-status]")).toContainText(
     "Active; portrait",
   );

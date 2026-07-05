@@ -46,20 +46,28 @@ describe("createRunState", () => {
     const state = createRunState(config);
 
     expect(TICKS_PER_SECOND).toBe(60);
-    expect(RUN_STATE_SCHEMA_VERSION).toBe(1);
+    expect(RUN_STATE_SCHEMA_VERSION).toBe(2);
     expect(InputActionBits).toEqual({
       firePrimary: 0x0001,
       fireSecondary: 0x0002,
       special: 0x0004,
     });
     expect(state).toEqual({
-      schemaVersion: 1,
+      schemaVersion: 2,
       config: {
         ...config,
         modifierIds: ["difficulty.hard.v1", "weather.snow.v1"],
       },
       tick: 0,
       input: { moveX: 0, moveY: 0, actions: 0 },
+      player: {
+        definitionId: "aircraft.placeholder.v1",
+        position: { x: 40960, y: 69120 },
+        velocity: { x: 0, y: 0 },
+        health: { current: 100, max: 100 },
+        invulnerabilityTicks: 0,
+        status: "active",
+      },
       rng: {
         spawn: {
           algorithm: "xoshiro128ss-v1",
@@ -208,6 +216,14 @@ describe("fixed-tick transition", () => {
 
     expect(state.input).toBe(storage);
     expect(state.input).toEqual({ moveX: 3, moveY: 4, actions: 2 });
+  });
+
+  test("steps the canonical aircraft before incrementing the tick", () => {
+    const state = createRunState(validConfig());
+    stepRun(state, { moveX: 127, moveY: -127, actions: 0 });
+    expect(state.player.position).toEqual({ x: 41056, y: 69024 });
+    expect(state.player.velocity).toEqual({ x: 96, y: -96 });
+    expect(state.tick).toBe(1);
   });
 
   test.each([-127, 0, 127])("accepts moveY boundary %s", (moveY) => {
@@ -389,6 +405,23 @@ describe("hashRunState", () => {
         moveY: baseline.input.moveY,
         moveX: baseline.input.moveX,
       },
+      player: {
+        status: baseline.player.status,
+        invulnerabilityTicks: baseline.player.invulnerabilityTicks,
+        health: {
+          max: baseline.player.health.max,
+          current: baseline.player.health.current,
+        },
+        velocity: {
+          y: baseline.player.velocity.y,
+          x: baseline.player.velocity.x,
+        },
+        position: {
+          y: baseline.player.position.y,
+          x: baseline.player.position.x,
+        },
+        definitionId: baseline.player.definitionId,
+      },
       tick: baseline.tick,
       config: {
         modifierIds: baseline.config.modifierIds,
@@ -441,7 +474,7 @@ describe("hashRunState", () => {
     const baseline = createRunState(validConfig());
     const changedSchema = createRunState(validConfig());
     const mutableSchema = changedSchema as unknown as { schemaVersion: number };
-    mutableSchema.schemaVersion = 2;
+    mutableSchema.schemaVersion = 3;
     const changedAlgorithm = createRunState(validConfig());
     const mutableAlgorithm = changedAlgorithm.rng.spawn as unknown as {
       algorithm: string;
@@ -450,6 +483,33 @@ describe("hashRunState", () => {
 
     expect(hashRunState(changedSchema)).not.toBe(hashRunState(baseline));
     expect(hashRunState(changedAlgorithm)).not.toBe(hashRunState(baseline));
+  });
+
+  test("changes for every canonical player field", () => {
+    const baseline = createRunState(validConfig());
+    const baselineHash = hashRunState(baseline);
+    const mutate = (change: (state: RunState) => void): string => {
+      const state = createRunState(validConfig());
+      change(state);
+      return hashRunState(state);
+    };
+    const hashes = [
+      mutate(
+        (state) =>
+          ((state.player as { definitionId: string }).definitionId =
+            "aircraft.other.v1"),
+      ),
+      mutate((state) => (state.player.position.x += 1)),
+      mutate((state) => (state.player.position.y += 1)),
+      mutate((state) => (state.player.velocity.x += 1)),
+      mutate((state) => (state.player.velocity.y -= 1)),
+      mutate((state) => (state.player.health.current -= 1)),
+      mutate((state) => ((state.player.health as { max: number }).max += 1)),
+      mutate((state) => (state.player.invulnerabilityTicks += 1)),
+      mutate((state) => (state.player.status = "destroyed")),
+    ];
+    expect(new Set(hashes).size).toBe(hashes.length);
+    expect(hashes).not.toContain(baselineHash);
   });
 
   test("changes for every word in every RNG stream", () => {

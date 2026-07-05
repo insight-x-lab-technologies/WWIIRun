@@ -1,4 +1,5 @@
 import type { RngState, RngStreamId, Seed128 } from "../random";
+import type { PlayerState } from "../aircraft";
 
 export type RunMode = "endless" | "daily" | "weekly";
 
@@ -19,10 +20,11 @@ export type InputFrame = {
 };
 
 export type RunState = {
-  readonly schemaVersion: 1;
+  readonly schemaVersion: 2;
   readonly config: RunConfig;
   tick: number;
   input: InputFrame;
+  readonly player: PlayerState;
   readonly rng: Record<RngStreamId, RngState>;
 };
 

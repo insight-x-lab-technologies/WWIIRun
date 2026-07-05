@@ -52,6 +52,7 @@ Esta pasta é a fonte de verdade do projeto. Em conflito, prevalecem: ADR aceito
 - [ADR-0007: exceção de cobertura para baselines físicos F0](adr/0007-f0-performance-coverage-exception.md)
 - [ADR-0008: contratos executáveis de conteúdo e save](adr/0008-executable-content-and-save-contracts.md)
 - [ADR-0009: cache PWA, atualização segura e preview Pages](adr/0009-pwa-cache-update-and-pages-preview.md)
+- [ADR-0010: estado de entidade versionado e colisões compostas inteiras](adr/0010-versioned-entity-state-and-compound-collisions.md)
 
 ## ADRs propostos
 

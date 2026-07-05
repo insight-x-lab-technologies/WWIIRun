@@ -85,6 +85,8 @@ F1 — Vertical slice jogável geométrico.
 - quarta revisão independente de `F1-01` fechou funcionalmente `F1-01-PERF-03`, mas retornou `Changes requested` por `F1-01-TRACE-01`: a correção final permanece sem commit sobre `882bb17`, portanto não existe unidade isolada/versionada nem rollback reproduzível do patch final.
 - `F1-01-TRACE-01` corrigido: a unidade final foi revalidada e materializada como sucessor direto de `882bb17`, com autoria e committer Codex; item retornado para `In review`.
 - quinta revisão independente de `F1-01` aprovada sem findings: `F1-01-TRACE-01`, os 16 critérios e todos os gates aplicáveis passaram; item movido para `Done` e `F1-02` liberado como `Ready`.
+- `F1-02` especificado e aprovado tecnicamente sob D-007/D-008: estado/hash v2, aeronave placeholder, movimento inteiro, vida/dano, invulnerabilidade e colisões compostas AABB/círculo definidos; ADR-0010 aceito e item movido para `Specified` sem alteração de runtime.
+- `F1-02` implementado e movido para `In review`: core puro v2 inclui aeronave, movimento, HP/dano/invulnerabilidade/destruição, narrow phase AABB/círculo composto e hash canônico; a cena projeta snapshot, hitboxes e diagnóstico. Corpus v2 foi adicionado sem alterar o fixture v1.
 
 ## Ainda não iniciado
 
@@ -93,13 +95,20 @@ F1 — Vertical slice jogável geométrico.
 
 ## Próximo passo exato
 
-Executar `$specify-roadmap-item F1-02` para definir aeronave, movimento, vida/dano e colisões primitivas/compostas antes de qualquer implementação.
+Executar `$review-roadmap-item F1-02` sobre o commit/range da implementação; somente a revisão independente pode mover o item para `Done`.
 
 ## Bloqueios
 
-Nenhum bloqueio para especificar F1-02. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase; antes de monetização serão necessárias decisões legais e de fornecedor.
+Nenhum bloqueio para revisar F1-02. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase; antes de monetização serão necessárias decisões legais e de fornecedor.
 
 ## Validações, pendências e riscos da sessão
+
+- implementação F1-02 em 2026-07-05: TDD confirmou RED por módulos ausentes e GREEN em 72 testes focados; depois typecheck, 78 focados e 8 determinísticos passaram. `npm run check` passou após corrigir um cast de lint; coverage passou com 288 testes; E2E passou 10/10 produto e 1/1 harness fora do sandbox após bind local bloqueado; PWA passou 10/10 fora do sandbox.
+- preservação F1-02: `tests/determinism/runGoldenVectors.ts`, dependências, workflows, assets raster e baselines físicos não foram alterados. O microprobe executa 10.000 compostos e confirma 8.000 contatos/identidades estáveis sem threshold temporal; não constitui evidência de FPS físico.
+- pendência exata F1-02: revisão independente da spec e do range. Riscos: colisões são axis-aligned sem CCD/rotação; v2 é incompatível com o layout v1 por decisão versionada; profiling representativo aguarda a slice completa.
+
+- especificação F1-02 em 2026-07-05: lifecycle/dependência reconfirmados (`Ready`, F1-01 `Done`) e worktree inicialmente limpo; spec aprovada e ADR-0010 aceito por delegação técnica D-007/D-008. Inspeção confrontou requisitos, F1-01, arquitetura, determinismo, asset pipeline, game design e contratos reais de run/cena. Nenhum teste/gate de implementação foi executado ou alegado.
+- pendência exata: implementar somente F1-02 e mover para `In review`; revisão independente é obrigatória para `Done`. Riscos: v2 altera layout/hash deliberadamente, portanto corpus v1 deve permanecer imutável; bounds comuns deixam espaço landscape para conteúdo futuro; AABB/círculo sem rotação são aproximação consciente; benchmark unitário não comprova FPS físico.
 
 - quinta revisão independente de `F1-01` em 2026-07-04: `Approved`, sem findings. `a5b2ee4` é sucessor direto de `882bb17`, inclui a correção final e suas regressões, e possui autoria/committer Codex; `F1-01-TRACE-01` foi fechado.
 - gates frescos: focados 79/79; `npm run check` verde com 275 unitários, 7 determinísticos, typecheck, build, inspeção PWA e budget; coverage 275/275, `simulation/run` 100% e `GameplaySession` 100% de linhas; E2E 10/10 produto + harness 1/1; PWA 10/10 fora do sandbox após `listen EPERM` local; worktree e `git diff --check` verdes.
