@@ -19,6 +19,7 @@ const DEMO_CONFIG = Object.freeze({
 export class GameplaySession {
   private readonly state: RunState = createRunState(DEMO_CONFIG);
   private readonly inputFrame = { moveX: 0, moveY: 0, actions: 0 };
+  private readonly updateResult = { ticks: 0, dropped: false };
   private readonly paused = new Set<PauseReason>();
   private accumulator = 0;
   private started = false;
@@ -37,8 +38,11 @@ export class GameplaySession {
     this.assertAlive();
     if (!Number.isFinite(renderDeltaMs) || renderDeltaMs < 0)
       throw new RangeError("renderDeltaMs must be finite and non-negative.");
-    if (!this.started || this.paused.size > 0)
-      return { ticks: 0, dropped: false };
+    if (!this.started || this.paused.size > 0) {
+      this.updateResult.ticks = 0;
+      this.updateResult.dropped = false;
+      return this.updateResult;
+    }
     this.accumulator += renderDeltaMs;
     const available = Math.floor(
       (this.accumulator + Number.EPSILON * 100) / STEP_MS,
@@ -51,7 +55,9 @@ export class GameplaySession {
     }
     const dropped = available > MAX_TICKS_PER_UPDATE;
     this.accumulator = dropped ? 0 : this.accumulator - ticks * STEP_MS;
-    return { ticks, dropped };
+    this.updateResult.ticks = ticks;
+    this.updateResult.dropped = dropped;
+    return this.updateResult;
   }
   pause(reason: PauseReason): void {
     this.assertAlive();

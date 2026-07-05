@@ -5,7 +5,7 @@ Núcleo headless versionado da run. O módulo depende somente de `simulation/ran
 ## API
 
 - `createRunState(config)`: valida e copia uma `RunConfig`, ordena os `modifierIds`, congela configuração/array e cria os quatro streams RNG independentes;
-- `stepRun(state, input)`: valida e consome exatamente um `InputFrame`, copia o frame e incrementa `tick` por último;
+- `stepRun(state, input)`: valida e consome exatamente um `InputFrame`, atualiza o armazenamento de `state.input` in place e incrementa `tick` por último;
 - `advanceRun(state, inputs)`: valida o lote e a capacidade inteira antes de mutar, depois aplica a mesma transição em ordem;
 - `hashRunState(state)`: calcula sob demanda o hash canônico `fnv1a64-v1`; não é chamado automaticamente por tick.
 

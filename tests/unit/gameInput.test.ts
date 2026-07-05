@@ -14,8 +14,12 @@ describe("game input", () => {
     keyboard.keyDown("KeyD");
     keyboard.keyDown("Space");
     keyboard.keyDown("ShiftRight");
+    keyboard.keyDown("ShiftLeft");
+    keyboard.keyDown("ShiftLeft");
     keyboard.keyDown("KeyE");
     expect(keyboard.sample()).toEqual({ moveX: 0, moveY: 0, actions: 7 });
+    keyboard.keyUp("ShiftLeft");
+    expect(keyboard.sample().actions).toBe(7);
     keyboard.keyUp("KeyD");
     expect(keyboard.sample().moveX).toBe(-127);
     expect(keyboard.keyDown("Escape")).toBe(false);
@@ -81,5 +85,39 @@ describe("game input", () => {
     expect(combined.sampleInto(target)).toBe(target);
     expect(target).toEqual({ moveX: 127, moveY: 0, actions: 1 });
     expect(combined.sampleInto(target)).toBe(target);
+  });
+
+  it("samples the production tick path without creating collection iterators", () => {
+    const keyboard = new KeyboardInput();
+    const pointer = new PointerInput();
+    const combined = new CombinedInput(keyboard, pointer);
+    const target = { moveX: 0, moveY: 0, actions: 0 };
+    keyboard.keyDown("ArrowRight");
+    pointer.actionDown(10, InputActionBits.firePrimary);
+
+    // Native methods are deliberately saved and restored around instrumentation.
+    const originalSetIterator = Set.prototype[Symbol.iterator];
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const originalMapKeys = Map.prototype.keys;
+    let iteratorCalls = 0;
+    Set.prototype[Symbol.iterator] = function () {
+      iteratorCalls += 1;
+      return originalSetIterator.call(this);
+    };
+    Map.prototype.keys = function () {
+      iteratorCalls += 1;
+      return originalMapKeys.call(this);
+    };
+    let sampled: typeof target | undefined;
+    try {
+      sampled = combined.sampleInto(target);
+    } finally {
+      Set.prototype[Symbol.iterator] = originalSetIterator;
+      Map.prototype.keys = originalMapKeys;
+    }
+
+    expect(sampled).toBe(target);
+    expect(target).toEqual({ moveX: 127, moveY: 0, actions: 1 });
+    expect(iteratorCalls).toBe(0);
   });
 });

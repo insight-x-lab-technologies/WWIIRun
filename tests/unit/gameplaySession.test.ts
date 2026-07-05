@@ -2,6 +2,11 @@ import { describe, expect, it, vi } from "vitest";
 
 import { hashRunState } from "../../src/simulation/run";
 import { GameplaySession } from "../../src/app/GameplaySession";
+import {
+  CombinedInput,
+  KeyboardInput,
+  PointerInput,
+} from "../../src/game/input";
 
 const neutral = { moveX: 0, moveY: 0, actions: 0 } as const;
 
@@ -100,5 +105,27 @@ describe("GameplaySession", () => {
 
     expect(targets.size).toBe(1);
     expect(session.snapshot().state.tick).toBe(5);
+  });
+
+  it("reuses hot-path storage after warm-up across the complete production tick", () => {
+    const keyboard = new KeyboardInput();
+    const pointer = new PointerInput();
+    const input = new CombinedInput(keyboard, pointer);
+    const session = new GameplaySession(input, { setRunActive: vi.fn() });
+    session.start();
+    keyboard.keyDown("ArrowRight");
+
+    const warmResult = session.update(1000 / 60);
+    const measuredResults = new Set<object>();
+    for (let frame = 0; frame < 120; frame += 1)
+      measuredResults.add(session.update(1000 / 60));
+
+    expect(measuredResults.size).toBe(1);
+    expect(measuredResults.has(warmResult)).toBe(true);
+    expect(warmResult).toEqual({ ticks: 1, dropped: false });
+    expect(session.snapshot().state).toMatchObject({
+      tick: 121,
+      input: { moveX: 127, moveY: 0, actions: 0 },
+    });
   });
 });

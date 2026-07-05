@@ -28,36 +28,59 @@ const KEY_MAP = new Map<string, readonly ["x" | "y" | "action", number]>([
 
 export class KeyboardInput implements InputSource {
   private readonly pressed = new Set<string>();
+  private x = 0;
+  private y = 0;
+  private firePrimary = 0;
+  private fireSecondary = 0;
+  private special = 0;
   keyDown(code: string): boolean {
-    if (!KEY_MAP.has(code)) return false;
+    const mapping = KEY_MAP.get(code);
+    if (mapping === undefined) return false;
+    if (this.pressed.has(code)) return true;
     this.pressed.add(code);
+    this.applyMapping(mapping, 1);
     return true;
   }
   keyUp(code: string): boolean {
-    if (!KEY_MAP.has(code)) return false;
+    const mapping = KEY_MAP.get(code);
+    if (mapping === undefined) return false;
+    if (!this.pressed.has(code)) return true;
     this.pressed.delete(code);
+    this.applyMapping(mapping, -1);
     return true;
   }
   reset(): void {
     this.pressed.clear();
+    this.x = 0;
+    this.y = 0;
+    this.firePrimary = 0;
+    this.fireSecondary = 0;
+    this.special = 0;
   }
   sample(): InputFrame {
     return this.sampleInto({ moveX: 0, moveY: 0, actions: 0 });
   }
   sampleInto(target: MutableInputFrame): InputFrame {
-    let x = 0,
-      y = 0,
-      actions = 0;
-    for (const code of this.pressed) {
-      const mapping = KEY_MAP.get(code);
-      if (mapping?.[0] === "x") x += mapping[1];
-      else if (mapping?.[0] === "y") y += mapping[1];
-      else if (mapping !== undefined) actions |= mapping[1];
-    }
-    target.moveX = Math.sign(x) * 127;
-    target.moveY = Math.sign(y) * 127;
-    target.actions = actions;
+    target.moveX = Math.sign(this.x) * 127;
+    target.moveY = Math.sign(this.y) * 127;
+    target.actions =
+      (this.firePrimary > 0 ? InputActionBits.firePrimary : 0) |
+      (this.fireSecondary > 0 ? InputActionBits.fireSecondary : 0) |
+      (this.special > 0 ? InputActionBits.special : 0);
     return target;
+  }
+  private applyMapping(
+    mapping: readonly ["x" | "y" | "action", number],
+    direction: 1 | -1,
+  ): void {
+    const [kind, value] = mapping;
+    if (kind === "x") this.x += value * direction;
+    else if (kind === "y") this.y += value * direction;
+    else if (value === InputActionBits.firePrimary)
+      this.firePrimary += direction;
+    else if (value === InputActionBits.fireSecondary)
+      this.fireSecondary += direction;
+    else this.special += direction;
   }
 }
 
@@ -75,6 +98,7 @@ export class PointerInput implements InputSource {
     | undefined;
   private readonly actionZones = new Map<number, Rect>();
   private readonly actions = new Map<number, number>();
+  private actionMask = 0;
   configure(world: Rect, radius: number): void {
     this.world = world;
     this.radius = radius;
@@ -100,6 +124,7 @@ export class PointerInput implements InputSource {
   actionDown(pointerId: number, bit: number): boolean {
     if (this.actions.has(bit)) return false;
     this.actions.set(bit, pointerId);
+    this.actionMask |= bit;
     return true;
   }
   pointerMove(pointerId: number, x: number, y: number): boolean {
@@ -117,6 +142,7 @@ export class PointerInput implements InputSource {
     for (const [bit, ownerPointerId] of this.actions)
       if (ownerPointerId === pointerId) {
         this.actions.delete(bit);
+        this.actionMask &= ~bit;
         released = true;
       }
     return released;
@@ -124,6 +150,7 @@ export class PointerInput implements InputSource {
   cancelAll(): void {
     this.movement = undefined;
     this.actions.clear();
+    this.actionMask = 0;
   }
   reset(): void {
     this.cancelAll();
@@ -133,16 +160,14 @@ export class PointerInput implements InputSource {
   }
   sampleInto(target: MutableInputFrame): InputFrame {
     let moveX = 0,
-      moveY = 0,
-      actions = 0;
+      moveY = 0;
     if (this.movement !== undefined) {
       moveX = quantize(this.movement.x - this.movement.originX, this.radius);
       moveY = quantize(this.movement.y - this.movement.originY, this.radius);
     }
-    for (const bit of this.actions.keys()) actions |= bit;
     target.moveX = moveX;
     target.moveY = moveY;
-    target.actions = actions;
+    target.actions = this.actionMask;
     return target;
   }
 }

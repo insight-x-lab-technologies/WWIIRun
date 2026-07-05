@@ -72,6 +72,12 @@ F1 — Vertical slice jogável geométrico.
 - `F1-01` implementado por TDD: `GameplayScene`, sessão fixed-tick, viewport lógico portrait/landscape, safe areas e input teclado/touch quantizado; implementação enviada originalmente para `In review`.
 - revisão independente de `F1-01` retornou `Changes requested`: botões touch DOM compartilham estado com o teclado físico e não capturam/liberam o ponteiro corretamente, os gráficos das zonas não acompanham resize e o gate de zero alocação por tick não foi demonstrado.
 - findings de `F1-01` corrigidos por TDD: touch/teclado possuem ownership independente, pointer capture libera fora do alvo, zonas gráficas redesenham no resize e o caminho de tick reutiliza frames/estado; item retornado para `In review`.
+- segunda revisão independente de `F1-01` fechou os findings de input e viewport, mas retornou `Changes requested`: a reutilização de identidade não demonstra zero alocação obrigatória no hot path e o README do módulo run descreve a semântica anterior de cópia do frame.
+- findings da segunda revisão de `F1-01` corrigidos por TDD: input mantém agregados fora do tick, o gate instrumentado confirma zero iteradores de coleção na amostragem e o README descreve atualização in-place; item retornado para `In review`.
+- terceira revisão independente de `F1-01` fechou `F1-01-DOC-01`, mas retornou `Changes requested` por `F1-01-PERF-03`: o teste observa apenas iteradores de `Set`/`Map`, não alocação no hot path completo, e `GameplaySession.update()` ainda cria um objeto de resultado por chamada.
+- `F1-01-PERF-03` corrigido por TDD: gate reproduzível percorre 120 ticks completos após warm-up e o resultado de `GameplaySession.update()` reutiliza armazenamento; item retornado para `In review` sem alterar regras ou goldens.
+- quarta revisão independente de `F1-01` fechou funcionalmente `F1-01-PERF-03`, mas retornou `Changes requested` por `F1-01-TRACE-01`: a correção final permanece sem commit sobre `882bb17`, portanto não existe unidade isolada/versionada nem rollback reproduzível do patch final.
+- `F1-01-TRACE-01` corrigido: a unidade final foi revalidada e materializada como sucessor direto de `882bb17`, com autoria e committer Codex; item retornado para `In review`.
 
 ## Ainda não iniciado
 
@@ -80,13 +86,33 @@ F1 — Vertical slice jogável geométrico.
 
 ## Próximo passo exato
 
-Executar `$review-roadmap-item F1-01` para revisar independentemente as correções de `F1-01-INPUT-01`, `F1-01-VIEWPORT-01` e `F1-01-PERF-01`; não marcar `Done` antes da revisão.
+Executar `$review-roadmap-item F1-01` para revisar independentemente a unidade final e fechar `F1-01-TRACE-01`; não marcar `Done` antes dessa revisão.
 
 ## Bloqueios
 
 Nenhum bloqueio para revisar F1-01. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase; antes de monetização serão necessárias decisões legais e de fornecedor.
 
 ## Validações, pendências e riscos da sessão
+
+- correção `F1-01-TRACE-01` em 2026-07-04: unidade final validada e preparada como sucessor direto de `882bb17`, preservando regras, goldens, baselines, dependências e workflows.
+- gates frescos: 72/72 focados; `npm run check` verde com 275 unitários, 7 determinísticos, typecheck, build, inspeção PWA e budget; coverage 275/275, `simulation/run` 100% e `GameplaySession` 100% de linhas; E2E 10/10 produto + harness 1/1; PWA 10/10 fora do sandbox após `listen EPERM` local; `git diff --check` verde.
+- pendência exata: revisão independente com `$review-roadmap-item F1-01`. Risco residual: o gate de alocação cobre o hot path atual; profiling da slice completa permanece dependente de gameplay representativo futuro.
+
+- correção `F1-01-PERF-03` em 2026-07-04: RED mediu 120 objetos de resultado distintos em 120 ticks após warm-up; GREEN mediu uma identidade atravessando `CombinedInput → GameplaySession.update → stepRun`, com tick/input final preservados.
+- gates frescos: focados 72/72; `npm run check` verde com 275 unitários, 7 determinísticos, build/inspector/budget; coverage 275/275, `simulation/run` 100% e sessão 100% de linhas; E2E 10/10 + harness 1/1; PWA 10/10 fora do sandbox após `listen EPERM` local; `git diff --check` verde.
+- preservação: sem diff em `tests/determinism`, baselines físicos, dependências ou workflows no range F1-01; regras, hashes e goldens não foram alterados. Pendência exata: `$review-roadmap-item F1-01`.
+
+- terceira revisão independente F1-01 em 2026-07-04: `F1-01-DOC-01` fechado e `F1-01-PERF-03` (`Medium`) aberto. `tests/unit/gameInput.test.ts` instrumenta somente dois mecanismos de iteração, enquanto `GameplaySession.update()` retorna novo `{ ticks, dropped }` em cada chamada; zero alocação no hot path completo permanece sem evidência reproduzível.
+- gates frescos da terceira revisão: focados 77/77; `npm run check` verde com 274 unitários, 7 determinísticos e build/budget; coverage 274/274 com `simulation/run` 100%; E2E 10/10 produto + 1/1 harness; PWA 10/10 fora do sandbox após `listen EPERM` local; `git diff --check` verde; determinismo, dependências, workflows e baselines físicos sem diff no range F1-01.
+- pendência exata: executar `$implement-roadmap-item F1-01` para medir e zerar alocações obrigatórias do hot path completo após warm-up; preservar regras, hashes/goldens e escopo do item, então retornar para revisão independente.
+
+- correção F1-01 em 2026-07-04: RED observou três iteradores por amostragem; GREEN eliminou as iterações de `Set`/`Map` do tick por agregação nos eventos e atualizou a documentação de `stepRun`.
+- gates frescos: 71/71 focados; `npm run check` com 274 unitários, 7 determinísticos e build; coverage 274/274, run 100% e input 92% branches; E2E 10/10 + harness 1/1 após reprodução focada de um timeout inicial; PWA 10/10; `git diff --check` verde; goldens `7d45e812…`/`46e3fa54…`, baselines, dependências e workflows preservados.
+- pendência exata atual: revisão independente com `$review-roadmap-item F1-01`. Risco residual: o gate prova ausência das fontes obrigatórias conhecidas de alocação no caminho exercitado; profiling da slice completa continua pertencendo ao gameplay representativo futuro.
+
+- segunda revisão independente F1-01 em 2026-07-04: `F1-01-INPUT-01` e `F1-01-VIEWPORT-01` fechados; `F1-01-PERF-02` (`Medium`) e `F1-01-DOC-01` (`Low`) abertos. O teste de identidade cobre reutilização de objetos, mas não observa alocações dos iteradores de `Set`/`Map` no caminho por tick; o README de run ainda afirma que `stepRun` copia o frame.
+- gates frescos da segunda revisão: `npm run check` verde com 273 unitários/7 determinísticos/build; coverage 273/273 e `simulation/run` 100%; E2E 10/10 + harness 1/1; PWA 10/10 fora do sandbox após `listen EPERM` local; `git diff --check` verde; goldens SHA-256 `7d45e812…`/`46e3fa54…`, baselines, dependências e workflows preservados; commits `234bc42`/`882bb17` isolados e assinados por Codex.
+- pendência exata: medir alocação do hot path após warm-up com um gate reproduzível, eliminar qualquer alocação obrigatória revelada, atualizar o README de run e retornar F1-01 para revisão independente sem alterar goldens.
 
 - revisão independente F1-01 em 2026-07-04: `F1-01-INPUT-01` (`High`), `F1-01-VIEWPORT-01` (`Medium`) e `F1-01-PERF-01` (`Medium`); AC-06/AC-07 reabertos e item movido para `Changes requested` sem alterar runtime ou testes;
 - reproduções Chromium: pointerdown no botão seguido de pointerup fora manteve `aria-pressed=true`/input `0,0,1`; `keyup Space` físico durante touch ainda pressionado mudou input para `0,0,0`; inspeção confirmou `keyup` prevenido com foco em botão DOM;
