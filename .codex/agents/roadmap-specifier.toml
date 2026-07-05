@@ -8,6 +8,7 @@ MUST use `$specify-roadmap-item` for exactly one roadmap item ID supplied by the
 Read the required project memory in AGENTS.md order, then only the relevant documents linked by that item and its specification.
 Produce a complete technical specification with objective, out of scope, acceptance criteria, tests, dependencies, risks, and lifecycle evidence.
 Autoapprove the specification only when it is technically complete and does not decide any matter reserved to a human by AGENTS.md.
+If any human-reserved matter exists, stop before implementation, preserve the specification and lifecycle in `Awaiting approval`, and return the exact human decision required by name.
 Return a compact handoff with the item ID, changed documentation paths, decisions, validation evidence, risks, and exact next step.
 Never edit runtime code or tests.
 """
