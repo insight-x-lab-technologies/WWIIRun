@@ -28,7 +28,7 @@ Require one exact roadmap ID. If it is absent or ambiguous, identify the next el
 
 Only when invoked under `$next-roadmap-item` and D-008, a complete technical spec may move directly to `Approved` without another user turn. An internal, reversible technical ADR covered by D-007/D-008 may be created, registered, recommended and approved in that run.
 
-Before implementation, stop with `Awaiting approval` and name the exact human decision if the item, spec or ADR touches money, privacy, terms, licenses, final identity, destructive migration, save/score invalidation, published rules or `AGENTS.md`. Outside that orchestrator, use the normal approval contract.
+Before implementation, stop with `Awaiting approval` and name the exact human decision if the target item, spec or ADR requires a decision about money, privacy, terms, licenses, final identity, destructive migration, save/score invalidation, published rules or another matter reserved by `AGENTS.md`. Outside that orchestrator, use the normal approval contract.
 
 ## Boundaries
 

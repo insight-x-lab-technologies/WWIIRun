@@ -18,7 +18,7 @@ Require an exact roadmap ID, matching spec, and status `In review`. If implement
 3. Trace each acceptance criterion to code and a test, measurement or manual verification.
 4. Review correctness, regression risk, architecture, failure paths, determinism, performance, security, accessibility, responsive behavior, save compatibility and documentation as applicable.
 5. Run the relevant checks independently. Treat missing, skipped or unverifiable evidence as not passing.
-6. Report findings first, ordered `Critical`, `High`, `Medium`, `Low`, with file/line references and concrete impact.
+6. Report findings first, ordered `Critical`, `High`, `Medium`, `Low`. Every emitted finding must contain exactly: stable ID, severity, criterion, evidence, impact, owner, correction and recheck commands. Include file/line references when applicable.
 7. Append a dated review entry to the spec with checks run and findings.
 
 ## Finding ownership before verdict
@@ -48,4 +48,4 @@ Record environment and specification blockers with their accurate state and next
 
 ## Completion report
 
-Return findings, checks/results, criterion coverage, verdict and the exact next prompt. State explicitly when no findings exist.
+Return structured findings, checks/results, criterion coverage, verdict and the exact next prompt. For standalone `Changes requested`, provide a complete handoff consumable by `$implement-roadmap-item`, using the required finding fields unchanged. State explicitly when no findings exist.
