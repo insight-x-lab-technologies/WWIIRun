@@ -4,11 +4,12 @@ Este arquivo é obrigatório para qualquer sessão autônoma no WWIIRun.
 
 ## Ordem de leitura
 
-1. `docs/memory/PROJECT.md`
-2. `docs/memory/CURRENT_STATE.md`
-3. `docs/memory/DECISIONS.md`
-4. especificação do item em execução
-5. documentos arquiteturais apontados pela especificação
+1. RTK.md
+2. `docs/memory/PROJECT.md`
+3. `docs/memory/CURRENT_STATE.md`
+4. `docs/memory/DECISIONS.md`
+5. especificação do item em execução
+6. documentos arquiteturais apontados pela especificação
 
 Não carregue toda a documentação por padrão. Use `docs/README.md` para localizar apenas o contexto necessário.
 
@@ -64,5 +65,3 @@ Atualize `docs/memory/CURRENT_STATE.md` com: realizado, validações, pendência
 Todos os commits produzidos por agentes devem usar autor e committer `Codex <codex@openai.com>`.
 
 Formato sugerido: `tipo(roadmap-id): resumo`, por exemplo `feat(F1-03): add seeded spawn scheduler`. Um commit deve representar uma unidade coerente e testada.
-
-@RTK.md

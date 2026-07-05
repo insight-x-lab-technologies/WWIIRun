@@ -84,6 +84,7 @@ F1 — Vertical slice jogável geométrico.
 - `F1-01-PERF-03` corrigido por TDD: gate reproduzível percorre 120 ticks completos após warm-up e o resultado de `GameplaySession.update()` reutiliza armazenamento; item retornado para `In review` sem alterar regras ou goldens.
 - quarta revisão independente de `F1-01` fechou funcionalmente `F1-01-PERF-03`, mas retornou `Changes requested` por `F1-01-TRACE-01`: a correção final permanece sem commit sobre `882bb17`, portanto não existe unidade isolada/versionada nem rollback reproduzível do patch final.
 - `F1-01-TRACE-01` corrigido: a unidade final foi revalidada e materializada como sucessor direto de `882bb17`, com autoria e committer Codex; item retornado para `In review`.
+- quinta revisão independente de `F1-01` aprovada sem findings: `F1-01-TRACE-01`, os 16 critérios e todos os gates aplicáveis passaram; item movido para `Done` e `F1-02` liberado como `Ready`.
 
 ## Ainda não iniciado
 
@@ -92,13 +93,17 @@ F1 — Vertical slice jogável geométrico.
 
 ## Próximo passo exato
 
-Executar `$review-roadmap-item F1-01` para revisar independentemente a unidade final e fechar `F1-01-TRACE-01`; não marcar `Done` antes dessa revisão.
+Executar `$specify-roadmap-item F1-02` para definir aeronave, movimento, vida/dano e colisões primitivas/compostas antes de qualquer implementação.
 
 ## Bloqueios
 
-Nenhum bloqueio para revisar F1-01. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase; antes de monetização serão necessárias decisões legais e de fornecedor.
+Nenhum bloqueio para especificar F1-02. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase; antes de monetização serão necessárias decisões legais e de fornecedor.
 
 ## Validações, pendências e riscos da sessão
+
+- quinta revisão independente de `F1-01` em 2026-07-04: `Approved`, sem findings. `a5b2ee4` é sucessor direto de `882bb17`, inclui a correção final e suas regressões, e possui autoria/committer Codex; `F1-01-TRACE-01` foi fechado.
+- gates frescos: focados 79/79; `npm run check` verde com 275 unitários, 7 determinísticos, typecheck, build, inspeção PWA e budget; coverage 275/275, `simulation/run` 100% e `GameplaySession` 100% de linhas; E2E 10/10 produto + harness 1/1; PWA 10/10 fora do sandbox após `listen EPERM` local; worktree e `git diff --check` verdes.
+- preservação: sem diff em testes determinísticos, baselines físicos, dependências ou workflows no range F1-01. Próximo passo exato: `$specify-roadmap-item F1-02`. Risco residual: o gate de alocação cobre o hot path atual; profiling representativo permanece para a slice completa.
 
 - correção `F1-01-TRACE-01` em 2026-07-04: unidade final validada e preparada como sucessor direto de `882bb17`, preservando regras, goldens, baselines, dependências e workflows.
 - gates frescos: 72/72 focados; `npm run check` verde com 275 unitários, 7 determinísticos, typecheck, build, inspeção PWA e budget; coverage 275/275, `simulation/run` 100% e `GameplaySession` 100% de linhas; E2E 10/10 produto + harness 1/1; PWA 10/10 fora do sandbox após `listen EPERM` local; `git diff --check` verde.

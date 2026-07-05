@@ -14,7 +14,6 @@
 | Plano gratuito Supabase pausa/limita | Média | Médio | Offline-first, fila, degradação clara e exportabilidade. |
 | PWA perde save por eviction | Média | Alto | persist storage, export/backup e sync opcional. |
 | Service worker mistura versões | Média | Crítico | ativar entre runs, manifests versionados e compatibilidade. |
-| IA gera arte inconsistente/sem direitos | Alta | Alto | fichas, provenance/licença e revisão humana. |
 | Símbolos históricos violam políticas | Média | Alto | direção editorial e revisão por loja/região. |
 | Escopo de 20 naves/10 idiomas atrasa core | Alta | Alto | vertical slice antes de volume, conteúdo faseado. |
 | Pagamentos externos sem validação segura | Alta | Alto | webhook/redemption backend; lançar doação/free packs se ausente. |

@@ -21,11 +21,10 @@ Implement one approved spec as a reviewable increment. Keep architecture and evi
 2. Restate implementation scope and set the roadmap/spec status to `In progress`.
 3. Implement in small vertical steps. Keep `simulation` pure and observe every boundary in `AGENTS.md`.
 4. Add or update tests named by the spec. For deterministic behavior, add vectors/replays before accepting snapshot changes.
-5. Run focused checks while working, then every applicable gate in `docs/quality/QUALITY.md`.
-6. Review the final diff against every acceptance criterion and remove accidental scope.
-7. Record commands and factual results in the spec's evidence section. Never claim an unexecuted check passed.
-8. Update requirements, decisions, asset specs and memory only where the implementation changes their truth.
-9. Set spec and roadmap item to `In review`; do not mark `Done`. Point the next session to `$review-roadmap-item`.
+5. Run focused every applicable gate in `docs/quality/QUALITY.md` after all implementation done.
+6. Record commands and factual results in the spec's evidence section. Never claim an unexecuted check passed.
+7. Update requirements, decisions, asset specs and memory only where the implementation changes their truth.
+8. Set spec and roadmap item to `In review`; do not mark `Done`. Point the next session to `$review-roadmap-item`.
 
 ## Handling review findings
 

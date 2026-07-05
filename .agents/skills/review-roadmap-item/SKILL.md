@@ -13,13 +13,12 @@ Require an exact roadmap ID, matching spec, and status `In review`. If implement
 
 ## Workflow
 
-1. Read `AGENTS.md`, project memory, the complete spec, linked ADRs and applicable quality gates.
-2. Inspect repository status and the implementation diff. Identify unrelated or unexplained changes.
-3. Trace each acceptance criterion to code and a test, measurement or manual verification.
-4. Review correctness, regression risk, architecture, failure paths, determinism, performance, security, accessibility, responsive behavior, save compatibility and documentation as applicable.
-5. Run the relevant checks independently. Treat missing, skipped or unverifiable evidence as not passing.
-6. Report findings first, ordered `Critical`, `High`, `Medium`, `Low`. Every emitted finding must contain exactly: stable ID, severity, criterion, evidence, impact, owner, correction and recheck commands. Include file/line references when applicable.
-7. Append a dated review entry to the spec with checks run and findings.
+1. Read `AGENTS.md`, project memory, the item spec, linked ADRs and applicable quality gates.
+2. Trace each acceptance criterion to code and a test, measurement or manual verification.
+3. Review correctness, regression risk, failure paths, determinism, performance, security, responsive behavior, save compatibility and documentation as applicable.
+4. Run the relevant checks independently. Treat missing, skipped or unverifiable evidence as not passing.
+5. Report findings first, ordered `Critical`, `High`, `Medium`, `Low`. Every emitted finding must contain exactly: stable ID, severity, criterion, evidence, impact, owner, correction and recheck commands. Include file/line references when applicable.
+6. Append a dated review entry to the spec with checks run and findings.
 
 ## Finding ownership before verdict
 

@@ -9,7 +9,7 @@ Orchestrate one exact ID. The parent retains only routing, state, and compact re
 
 ## Preconditions
 
-Before spawning, read `AGENTS.md`, required memory, the roadmap entry, and `git status`.
+Before spawning, read `AGENTS.md`, required memory, the roadmap entry.
 
 - Require roadmap state exactly `Ready` and complete dependencies.
 - Stop/report `Backlog`, `Specified`, `In progress`, `In review`, `Changes requested`, `Done`, `Blocked`, unknown states, or overlapping work. Never silently start, reopen, resume, or include neighboring items.
