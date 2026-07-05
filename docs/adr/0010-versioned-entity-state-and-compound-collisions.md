@@ -1,7 +1,7 @@
 # ADR-0010: estado de entidade versionado e colisões compostas inteiras
 
-Status: Accepted  
-Data: 2026-07-05  
+Status: Accepted
+Data: 2026-07-05
 Decisores: proprietário do projeto, por delegação D-007/D-008, e agente técnico
 
 ## Contexto

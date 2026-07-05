@@ -16,6 +16,7 @@ export type CircleHitbox = {
 };
 export type Hitbox = AabbHitbox | CircleHitbox;
 export type CompoundHitbox = readonly Hitbox[];
+export type CollisionMetrics = { primitiveComparisons: number };
 
 export function createCompoundHitbox(
   shapes: readonly Hitbox[],
@@ -63,11 +64,14 @@ export function intersectsCompound(
   aShapes: CompoundHitbox,
   bTransform: Transform,
   bShapes: CompoundHitbox,
+  metrics?: CollisionMetrics,
 ): boolean {
   for (const aShape of aShapes)
-    for (const bShape of bShapes)
+    for (const bShape of bShapes) {
+      if (metrics !== undefined) metrics.primitiveComparisons += 1;
       if (intersectsPrimitive(aTransform, aShape, bTransform, bShape))
         return true;
+    }
   return false;
 }
 

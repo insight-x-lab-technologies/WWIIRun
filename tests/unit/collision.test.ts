@@ -55,14 +55,22 @@ describe("integer narrow phase", () => {
     const first = createCompoundHitbox([aabb, circle]);
     const second = createCompoundHitbox([circle]);
     const identities = [...first, ...second];
+    const moving = { x: 0, y: 0 };
+    const metrics = { primitiveComparisons: 0 };
     const started = performance.now();
     let intersections = 0;
-    for (let index = 0; index < 10_000; index += 1)
-      if (intersectsCompound(origin, first, { x: index % 20, y: 0 }, second))
+    for (let index = 0; index < 10_000; index += 1) {
+      moving.x = index % 20;
+      if (intersectsCompound(origin, first, moving, second, metrics))
         intersections += 1;
+    }
     const elapsedMs = performance.now() - started;
     expect(intersections).toBe(8_000);
+    expect(metrics.primitiveComparisons).toBe(12_000);
     expect([...first, ...second]).toEqual(identities);
+    expect(first[0]).toBe(identities[0]);
+    expect(first[1]).toBe(identities[1]);
+    expect(second[0]).toBe(identities[2]);
     expect({ probes: 10_000, elapsedMs: Number.isFinite(elapsedMs) }).toEqual({
       probes: 10_000,
       elapsedMs: true,

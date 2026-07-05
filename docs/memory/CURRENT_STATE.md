@@ -87,6 +87,8 @@ F1 — Vertical slice jogável geométrico.
 - quinta revisão independente de `F1-01` aprovada sem findings: `F1-01-TRACE-01`, os 16 critérios e todos os gates aplicáveis passaram; item movido para `Done` e `F1-02` liberado como `Ready`.
 - `F1-02` especificado e aprovado tecnicamente sob D-007/D-008: estado/hash v2, aeronave placeholder, movimento inteiro, vida/dano, invulnerabilidade e colisões compostas AABB/círculo definidos; ADR-0010 aceito e item movido para `Specified` sem alteração de runtime.
 - `F1-02` implementado e movido para `In review`: core puro v2 inclui aeronave, movimento, HP/dano/invulnerabilidade/destruição, narrow phase AABB/círculo composto e hash canônico; a cena projeta snapshot, hitboxes e diagnóstico. Corpus v2 foi adicionado sem alterar o fixture v1.
+- revisão independente de `F1-02` retornou `Changes requested`: o overlay de hitboxes não possui a chave de diagnóstico especificada; AC-14 não prova cinco ciclos da cena/recursos Phaser; o probe de AC-13 não mede a contagem exata de comparações nem alocações; e `git diff --check` falha no range. E2E/PWA não puderam ser repetidos por bloqueio de bind no sandbox e rejeição externa por limite de uso, classificada como lacuna de ambiente.
+- correção 1/2 de `F1-02` fechou os quatro findings de implementação: toggle de overlay explícito/desligado por padrão; teardown idempotente e probe de cinco ciclos da cena; 12.000 comparações primitivas observáveis em 10.000 probes sem identidades por iteração; e whitespace terminal removido. Item retornado para `In review`.
 
 ## Ainda não iniciado
 
@@ -95,13 +97,16 @@ F1 — Vertical slice jogável geométrico.
 
 ## Próximo passo exato
 
-Executar `$review-roadmap-item F1-02` sobre o commit/range da implementação; somente a revisão independente pode mover o item para `Done`.
+Executar `$review-roadmap-item F1-02` no range da correção 1/2 e revalidar `F1-02-UI-01`, `F1-02-LIFECYCLE-01`, `F1-02-PERF-01` e `F1-02-DIFF-01`.
 
 ## Bloqueios
 
-Nenhum bloqueio para revisar F1-02. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase; antes de monetização serão necessárias decisões legais e de fornecedor.
+Nenhum bloqueio de implementação para revisar F1-02. E2E e PWA da correção passaram fora do sandbox, fechando a lacuna de evidência do reviewer. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase; antes de monetização serão necessárias decisões legais e de fornecedor.
 
 ## Validações, pendências e riscos da sessão
+
+- correção F1-02 em 2026-07-05: RED reproduziu toggle ausente, zero comparações observadas e zero recursos destruídos; GREEN passou 78 testes focados. Coverage passou 290/290; `npm run check` passou; E2E passou 10/10 produto + 1/1 harness e PWA passou 10/10 fora do sandbox; `git diff --check 688b4fb..HEAD` deve ser reexecutado após materializar o commit.
+- preservação da correção: regras, hash/goldens v1/v2, dependências, workflows, assets e baselines não mudaram. Riscos residuais permanecem axis-aligned/sem CCD e benchmark informativo sem threshold temporal.
 
 - implementação F1-02 em 2026-07-05: TDD confirmou RED por módulos ausentes e GREEN em 72 testes focados; depois typecheck, 78 focados e 8 determinísticos passaram. `npm run check` passou após corrigir um cast de lint; coverage passou com 288 testes; E2E passou 10/10 produto e 1/1 harness fora do sandbox após bind local bloqueado; PWA passou 10/10 fora do sandbox.
 - preservação F1-02: `tests/determinism/runGoldenVectors.ts`, dependências, workflows, assets raster e baselines físicos não foram alterados. O microprobe executa 10.000 compostos e confirma 8.000 contatos/identidades estáveis sem threshold temporal; não constitui evidência de FPS físico.

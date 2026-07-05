@@ -18,28 +18,42 @@ export type GameplaySceneDependencies = {
   keyboard: KeyboardInput;
   pointer: PointerInput;
   combined: CombinedInput;
+  diagnostics?: GameplaySceneDiagnostics;
 };
 
+export type GameplaySceneDiagnostics = {
+  readonly showHitboxes: boolean;
+};
+
+export const DEFAULT_GAMEPLAY_DIAGNOSTICS: GameplaySceneDiagnostics =
+  Object.freeze({ showHitboxes: false });
+
 export class GameplayScene extends Phaser.Scene {
-  private aircraft?: Phaser.GameObjects.Graphics;
-  private hitboxOverlay?: Phaser.GameObjects.Graphics;
-  private diagnostic?: Phaser.GameObjects.Text;
-  private zones?: Phaser.GameObjects.Graphics;
+  private aircraft: Phaser.GameObjects.Graphics | undefined;
+  private hitboxOverlay: Phaser.GameObjects.Graphics | undefined;
+  private diagnostic: Phaser.GameObjects.Text | undefined;
+  private zones: Phaser.GameObjects.Graphics | undefined;
   private layout?: ViewportLayout;
   private cleanup: Array<() => void> = [];
   private resizeFrame: number | undefined;
+  private active = false;
   public constructor(private readonly dependencies: GameplaySceneDependencies) {
     super("gameplay");
   }
 
   public create(): void {
+    this.active = true;
     this.applyLayout();
     const world = this.layout?.world;
     if (world === undefined)
       throw new Error("Gameplay viewport was not initialized.");
     this.cameras.main.setBackgroundColor("#101820");
     this.aircraft = this.drawAircraft();
-    this.hitboxOverlay = this.drawHitboxes();
+    if (
+      (this.dependencies.diagnostics ?? DEFAULT_GAMEPLAY_DIAGNOSTICS)
+        .showHitboxes
+    )
+      this.hitboxOverlay = this.drawHitboxes();
     this.diagnostic = this.add
       .text(12, 12, "Gameplay tick 0 | input 0,0,0", {
         color: "#f4f0e6",
@@ -55,6 +69,7 @@ export class GameplayScene extends Phaser.Scene {
   }
 
   public override update(_time: number, delta: number): void {
+    if (!this.active) return;
     const result = this.dependencies.session.update(delta);
     const snapshot = this.dependencies.session.snapshot();
     const input = snapshot.state.input;
@@ -283,8 +298,19 @@ export class GameplayScene extends Phaser.Scene {
     };
   }
   private shutdown(): void {
+    if (!this.active) return;
+    this.active = false;
     if (this.resizeFrame !== undefined) cancelAnimationFrame(this.resizeFrame);
+    this.resizeFrame = undefined;
     for (const cleanup of this.cleanup.splice(0)) cleanup();
+    this.aircraft?.destroy();
+    this.aircraft = undefined;
+    this.hitboxOverlay?.destroy();
+    this.hitboxOverlay = undefined;
+    this.zones?.destroy();
+    this.zones = undefined;
+    this.diagnostic?.destroy();
+    this.diagnostic = undefined;
     this.dependencies.session.destroy();
   }
 }
