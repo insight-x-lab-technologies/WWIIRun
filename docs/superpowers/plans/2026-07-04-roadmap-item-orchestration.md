@@ -221,7 +221,7 @@ Use $review-roadmap-item for exactly the ID supplied by the parent. Remain disti
 Run:
 
 ```bash
-python3 -c 'import pathlib,tomllib; [tomllib.loads(p.read_text()) for p in pathlib.Path(".codex/agents").glob("roadmap_*.toml")]'
+python3 -c 'import pathlib; from pip._vendor import tomli; [tomli.loads(p.read_text()) for p in pathlib.Path(".codex/agents").glob("roadmap_*.toml")]'
 rg -n '^(name|model|model_reasoning_effort|sandbox_mode) =' .codex/agents/roadmap_*.toml
 ```
 
@@ -385,7 +385,7 @@ Run:
 
 ```bash
 for skill in specify-roadmap-item implement-roadmap-item review-roadmap-item next-roadmap-item; do python3 /home/codexbot/.codex/skills/.system/skill-creator/scripts/quick_validate.py ".agents/skills/$skill"; done
-python3 -c 'import pathlib,tomllib; files=list(pathlib.Path(".codex/agents").glob("roadmap_*.toml")); assert len(files)==3; data=[tomllib.loads(p.read_text()) for p in files]; expected={"roadmap_specifier": ("gpt-5.5", "high"), "roadmap_implementer": ("gpt-5.4-mini", "medium"), "roadmap_reviewer": ("gpt-5.4-mini", "high")}; assert {d["name"]: (d["model"], d["model_reasoning_effort"]) for d in data} == expected'
+python3 -c 'import pathlib; from pip._vendor import tomli; files=list(pathlib.Path(".codex/agents").glob("roadmap_*.toml")); assert len(files)==3; data=[tomli.loads(p.read_text()) for p in files]; expected={"roadmap_specifier": ("gpt-5.5", "high"), "roadmap_implementer": ("gpt-5.4-mini", "medium"), "roadmap_reviewer": ("gpt-5.4-mini", "high")}; assert {d["name"]: (d["model"], d["model_reasoning_effort"]) for d in data} == expected'
 git diff --check
 ```
 
