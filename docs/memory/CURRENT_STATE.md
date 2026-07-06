@@ -89,6 +89,8 @@ F1 — Vertical slice jogável geométrico.
 - `F1-02` implementado e movido para `In review`: core puro v2 inclui aeronave, movimento, HP/dano/invulnerabilidade/destruição, narrow phase AABB/círculo composto e hash canônico; a cena projeta snapshot, hitboxes e diagnóstico. Corpus v2 foi adicionado sem alterar o fixture v1.
 - revisão independente de `F1-02` retornou `Changes requested`: o overlay de hitboxes não possui a chave de diagnóstico especificada; AC-14 não prova cinco ciclos da cena/recursos Phaser; o probe de AC-13 não mede a contagem exata de comparações nem alocações; e `git diff --check` falha no range. E2E/PWA não puderam ser repetidos por bloqueio de bind no sandbox e rejeição externa por limite de uso, classificada como lacuna de ambiente.
 - correção 1/2 de `F1-02` fechou os quatro findings de implementação: toggle de overlay explícito/desligado por padrão; teardown idempotente e probe de cinco ciclos da cena; 12.000 comparações primitivas observáveis em 10.000 probes sem identidades por iteração; e whitespace terminal removido. Item retornado para `In review`.
+- recheck independente da correção 1/2 confirmou os quatro findings resolvidos e não encontrou novo defeito de implementação. Focados 78/78, determinismo 8/8, coverage 290/290, `npm run check` e `git diff --check` total passaram. O fechamento permanece em `In review` somente porque E2E/PWA não puderam ser repetidos independentemente: bind bloqueado no sandbox e execução externa recusada por limite de uso até 12:32.
+- retomada ambiental da revisão de `F1-02` aprovada sem findings: E2E passou 10/10 produto + 1/1 harness e PWA passou 10/10 fora do sandbox após `listen EPERM` local. Todos os 16 critérios e gates aplicáveis passaram; F1-02 foi movido para `Done` e somente F1-03 foi liberado para `Ready`.
 
 ## Ainda não iniciado
 
@@ -97,11 +99,11 @@ F1 — Vertical slice jogável geométrico.
 
 ## Próximo passo exato
 
-Executar `$review-roadmap-item F1-02` no range da correção 1/2 e revalidar `F1-02-UI-01`, `F1-02-LIFECYCLE-01`, `F1-02-PERF-01` e `F1-02-DIFF-01`.
+Executar `$next-roadmap-item F1-03`; não iniciar F1-04 ou itens vizinhos.
 
 ## Bloqueios
 
-Nenhum bloqueio de implementação para revisar F1-02. E2E e PWA da correção passaram fora do sandbox, fechando a lacuna de evidência do reviewer. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase; antes de monetização serão necessárias decisões legais e de fornecedor.
+Nenhum bloqueio para iniciar a especificação de F1-03. Antes do backend será necessário o usuário criar/selecionar um projeto Supabase; antes de monetização serão necessárias decisões legais e de fornecedor.
 
 ## Validações, pendências e riscos da sessão
 
