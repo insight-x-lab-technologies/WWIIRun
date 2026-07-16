@@ -1,9 +1,12 @@
 import { createRngStreams, parseSeedHex } from "../random";
 import { createPlayerState, stepPlayer } from "../aircraft";
+import { createEntityPools, stepEntityPools } from "../entities";
+import { createBroadPhaseScratch, collectContacts } from "../broadPhase";
+import { PLACEHOLDER_AIRCRAFT } from "../aircraft";
 import type { InputFrame, RunConfig, RunMode, RunState } from "./types";
 
 export const TICKS_PER_SECOND = 60 as const;
-export const RUN_STATE_SCHEMA_VERSION = 2 as const;
+export const RUN_STATE_SCHEMA_VERSION = 3 as const;
 
 export const InputActionBits = {
   firePrimary: 0x0001,
@@ -44,6 +47,8 @@ export function createRunState(config: RunConfig): RunState {
     input: { moveX: 0, moveY: 0, actions: 0 },
     player: createPlayerState(),
     rng: createRngStreams(canonicalConfig.seed),
+    pools: createEntityPools(),
+    broadPhase: createBroadPhaseScratch(),
   };
 }
 
@@ -60,6 +65,13 @@ export function stepRun(state: RunState, input: InputFrame): void {
   stateInput.moveY = input.moveY;
   stateInput.actions = input.actions;
   stepPlayer(state.player, input);
+  stepEntityPools(state.pools);
+  collectContacts(
+    state.pools,
+    state.player,
+    PLACEHOLDER_AIRCRAFT.hitboxes,
+    state.broadPhase,
+  );
   state.tick += 1;
 }
 

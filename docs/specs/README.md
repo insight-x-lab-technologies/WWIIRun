@@ -18,3 +18,4 @@ Specs concluídas permanecem no repositório como ligação entre requisito, dec
 - [`F0-08 — schemas de conteúdo/save e validadores de build`](SPEC-F0-08-content-save-schemas-build-validators.md) — `Done`.
 - [`F1-01 — gameplay scene, viewport lógico e input teclado/touch`](SPEC-F1-01-gameplay-scene-viewport-input.md) — `Done`.
 - [`F1-02 — aeronave, movimento, vida/dano e colisões primitivas/compostas`](SPEC-F1-02-aircraft-movement-health-damage-collisions.md) — `Done`.
+- [`F1-03 — pools limitados de entidades e broad phase espacial`](SPEC-F1-03-bounded-pools-spatial-broad-phase.md) — `Done`.

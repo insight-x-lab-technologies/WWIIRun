@@ -3,7 +3,7 @@ import type { RunState, StateHash, StateHashAlgorithm } from "./types";
 
 export const STATE_HASH_ALGORITHM: StateHashAlgorithm = "fnv1a64-v1";
 
-const LAYOUT_TAG = "wwiirun.run-state.v2";
+const LAYOUT_TAG = "wwiirun.run-state.v3";
 const FNV_OFFSET_BASIS = 0xcbf29ce484222325n;
 const FNV_PRIME = 0x00000100000001b3n;
 const UINT64_MASK = 0xffffffffffffffffn;
@@ -52,8 +52,40 @@ export function hashRunState(state: RunState): StateHash {
     hasher.writeUint32(rng.s2);
     hasher.writeUint32(rng.s3);
   }
+  writePool(
+    hasher,
+    "projectile",
+    state.pools.projectiles,
+    state.pools.cursors.projectile,
+  );
+  writePool(hasher, "enemy", state.pools.enemies, state.pools.cursors.enemy);
+  writePool(hasher, "coin", state.pools.coins, state.pools.cursors.coin);
 
   return hasher.digest();
+}
+
+function writePool(
+  hasher: FnvWriter,
+  kind: string,
+  slots: readonly {
+    active: boolean;
+    definitionId: string;
+    position: { x: number; y: number };
+    velocity: { x: number; y: number };
+  }[],
+  cursor: number,
+): void {
+  hasher.writeAscii(kind);
+  hasher.writeUint32(slots.length);
+  hasher.writeUint32(cursor);
+  for (const slot of slots) {
+    hasher.writeByte(slot.active ? 1 : 0);
+    hasher.writeAscii(slot.definitionId);
+    hasher.writeUint32(slot.position.x);
+    hasher.writeUint32(slot.position.y);
+    hasher.writeUint32(slot.velocity.x);
+    hasher.writeUint32(slot.velocity.y);
+  }
 }
 
 type FnvWriter = {

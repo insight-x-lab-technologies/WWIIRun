@@ -1,5 +1,7 @@
 import type { RngState, RngStreamId, Seed128 } from "../random";
 import type { PlayerState } from "../aircraft";
+import type { EntityPools } from "../entities";
+import type { BroadPhaseScratch } from "../broadPhase";
 
 export type RunMode = "endless" | "daily" | "weekly";
 
@@ -20,12 +22,14 @@ export type InputFrame = {
 };
 
 export type RunState = {
-  readonly schemaVersion: 2;
+  readonly schemaVersion: 3;
   readonly config: RunConfig;
   tick: number;
   input: InputFrame;
   readonly player: PlayerState;
   readonly rng: Record<RngStreamId, RngState>;
+  readonly pools: EntityPools;
+  readonly broadPhase: BroadPhaseScratch;
 };
 
 export type StateHashAlgorithm = "fnv1a64-v1";

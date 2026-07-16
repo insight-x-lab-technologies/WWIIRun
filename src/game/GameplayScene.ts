@@ -11,6 +11,7 @@ import {
   SIMULATION_UNITS_PER_LOGICAL_PIXEL,
 } from "../simulation/aircraft";
 import { CombinedInput, KeyboardInput, PointerInput } from "./input";
+import { MAX_COINS, MAX_ENEMIES, MAX_PROJECTILES } from "../simulation/run";
 
 export type GameplaySceneDependencies = {
   root: HTMLElement;
@@ -33,6 +34,10 @@ export class GameplayScene extends Phaser.Scene {
   private hitboxOverlay: Phaser.GameObjects.Graphics | undefined;
   private diagnostic: Phaser.GameObjects.Text | undefined;
   private zones: Phaser.GameObjects.Graphics | undefined;
+  private readonly entityGraphics: Phaser.GameObjects.Graphics[] = [];
+  private readonly entityPools: Array<
+    readonly { active: boolean; position: { x: number; y: number } }[]
+  > = [];
   private layout?: ViewportLayout;
   private cleanup: Array<() => void> = [];
   private resizeFrame: number | undefined;
@@ -49,6 +54,7 @@ export class GameplayScene extends Phaser.Scene {
       throw new Error("Gameplay viewport was not initialized.");
     this.cameras.main.setBackgroundColor("#101820");
     this.aircraft = this.drawAircraft();
+    this.createEntityPool();
     if (
       (this.dependencies.diagnostics ?? DEFAULT_GAMEPLAY_DIAGNOSTICS)
         .showHitboxes
@@ -74,6 +80,7 @@ export class GameplayScene extends Phaser.Scene {
     const snapshot = this.dependencies.session.snapshot();
     const input = snapshot.state.input;
     const player = snapshot.state.player;
+    this.projectEntityPool(snapshot.state);
     if (this.aircraft !== undefined && this.layout !== undefined) {
       const x =
         this.layout.world.x +
@@ -256,6 +263,54 @@ export class GameplayScene extends Phaser.Scene {
     return graphics;
   }
 
+  private createEntityPool(): void {
+    const total = MAX_PROJECTILES + MAX_ENEMIES + MAX_COINS;
+    for (let index = 0; index < total; index += 1) {
+      const graphics = this.add.graphics().setDepth(3).setVisible(false);
+      graphics.fillStyle(0x65b5ff).fillCircle(0, 0, 3);
+      this.entityGraphics.push(graphics);
+    }
+  }
+
+  private projectEntityPool(
+    state: ReturnType<GameplaySession["snapshot"]>["state"],
+  ): void {
+    if (state.pools === undefined || state.broadPhase === undefined) return;
+    let graphicsIndex = 0;
+    this.entityPools[0] = state.pools.projectiles;
+    this.entityPools[1] = state.pools.enemies;
+    this.entityPools[2] = state.pools.coins;
+    let activeEntities = 0;
+    for (const slots of this.entityPools)
+      for (const slot of slots) {
+        const graphics = this.entityGraphics[graphicsIndex++];
+        if (graphics === undefined) continue;
+        if (!slot.active || this.layout === undefined) {
+          graphics.setVisible(false);
+          continue;
+        }
+        activeEntities += 1;
+        graphics
+          .setPosition(
+            this.layout.world.x +
+              slot.position.x / SIMULATION_UNITS_PER_LOGICAL_PIXEL,
+            this.layout.world.y +
+              slot.position.y / SIMULATION_UNITS_PER_LOGICAL_PIXEL,
+          )
+          .setVisible(true);
+      }
+    this.dependencies.root.dataset.poolCapacity = String(
+      this.entityGraphics.length,
+    );
+    this.dependencies.root.dataset.activeEntities = String(activeEntities);
+    this.dependencies.root.dataset.broadPhaseCandidates = String(
+      state.broadPhase.candidateCount,
+    );
+    this.dependencies.root.dataset.broadPhaseContacts = String(
+      state.broadPhase.contactCount,
+    );
+  }
+
   private drawHitboxes(): Phaser.GameObjects.Graphics {
     const graphics = this.add.graphics().setDepth(4);
     graphics.lineStyle(1, 0xff5a5f, 0.75);
@@ -309,6 +364,7 @@ export class GameplayScene extends Phaser.Scene {
     this.hitboxOverlay = undefined;
     this.zones?.destroy();
     this.zones = undefined;
+    for (const graphics of this.entityGraphics.splice(0)) graphics.destroy();
     this.diagnostic?.destroy();
     this.diagnostic = undefined;
     this.dependencies.session.destroy();

@@ -12,6 +12,7 @@
 | ADR-0008 | Aceita | Conteúdo/save usam decoders TypeScript puros, estritos e versionados; o build reutiliza os decoders e acrescenta verificações de filesystem/integridade. |
 | ADR-0009 | Aceita | PWA usa precache Workbox gerado pelo Vite, atualização manual adiada durante runs, base única validada e preview Pages manual. |
 | ADR-0010 | Aceita | Estado v2 inclui aeronave inteira; colisões puras usam união de AABBs/círculos axis-aligned e hash canônico versionado. |
+| ADR-0011 | Aceita | Pools canônicos de slots limitados, cursores circulares e grade uniforme scratch reduzem pares sem afetar ordem, determinismo ou hash fora do estado de gameplay. |
 | D-004 | Aceita | “Indiano” significa Hindi (`hi`) e espanhol significa `es-ES`; há 9 locales confirmados e o décimo segue aberto. |
 | D-005 | Aceita | O jogo funciona offline; recursos sociais sincronizam quando há rede. |
 | D-006 | Aceita | Leaderboard central trata o cliente como não confiável e valida submissões. |

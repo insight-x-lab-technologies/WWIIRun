@@ -53,6 +53,7 @@ Esta pasta é a fonte de verdade do projeto. Em conflito, prevalecem: ADR aceito
 - [ADR-0008: contratos executáveis de conteúdo e save](adr/0008-executable-content-and-save-contracts.md)
 - [ADR-0009: cache PWA, atualização segura e preview Pages](adr/0009-pwa-cache-update-and-pages-preview.md)
 - [ADR-0010: estado de entidade versionado e colisões compostas inteiras](adr/0010-versioned-entity-state-and-compound-collisions.md)
+- [ADR-0011: pools limitados determinísticos e grade espacial canônica](adr/0011-deterministic-bounded-pools-spatial-grid.md)
 
 ## ADRs propostos
 

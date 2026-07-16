@@ -16,6 +16,22 @@ test("boots gameplay, accepts keyboard input, and exposes accessible touch actio
     "data-player",
     /^\d+,\d+,100,active$/,
   );
+  await expect(page.locator("#game-root")).toHaveAttribute(
+    "data-pool-capacity",
+    "448",
+  );
+  await expect(page.locator("#game-root")).toHaveAttribute(
+    "data-active-entities",
+    "0",
+  );
+  await expect(page.locator("#game-root")).toHaveAttribute(
+    "data-broad-phase-candidates",
+    "0",
+  );
+  await expect(page.locator("#game-root")).toHaveAttribute(
+    "data-broad-phase-contacts",
+    "0",
+  );
   await page.keyboard.up("ArrowRight");
   const actions = page.locator(".gameplay-actions button");
   await expect(actions).toHaveCount(3);

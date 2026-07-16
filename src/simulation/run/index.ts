@@ -15,3 +15,19 @@ export type {
   StateHash,
   StateHashAlgorithm,
 } from "./types";
+export {
+  activateEntity,
+  deactivateEntity,
+  COIN_PLACEHOLDER,
+  ENEMY_PLACEHOLDER,
+  MAX_COINS,
+  MAX_ENEMIES,
+  MAX_PROJECTILES,
+  PROJECTILE_PLACEHOLDER,
+} from "../entities";
+export {
+  candidateAt,
+  collectContacts,
+  createBroadPhaseScratch,
+  GRID_CELL_SIZE,
+} from "../broadPhase";

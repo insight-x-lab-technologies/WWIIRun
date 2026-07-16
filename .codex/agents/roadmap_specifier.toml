@@ -1,6 +1,6 @@
 name = "roadmap_specifier"
-description = "Especifica exatamente um item do roadmap WWIIRun e pode autoaprovar uma especificação técnica completa."
-model = "gpt-5.5"
+description = "Perfil Arquiteto: especifica exatamente um item do roadmap WWIIRun e pode autoaprovar uma especificação técnica completa."
+model = "gpt-5.6-sol"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """

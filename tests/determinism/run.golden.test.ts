@@ -12,6 +12,13 @@ import {
 import { runGoldenVectors } from "./runGoldenVectors";
 import { runV2GoldenVectors } from "./runV2GoldenVectors";
 
+const runV3Checkpoints = [
+  { tick: 0, hash: "ed1cf31232d871b7" },
+  { tick: 1, hash: "591a387cc0accd65" },
+  { tick: 3, hash: "4bd178e4ff851577" },
+  { tick: 8, hash: "fad2ea090cd25723" },
+] as const;
+
 describe("headless run golden corpus", () => {
   test("matches literal hashes at every checkpoint", () => {
     const state = createGoldenState();
@@ -26,7 +33,7 @@ describe("headless run golden corpus", () => {
       }
     }
 
-    expect(actual).toEqual(runV2GoldenVectors.checkpoints);
+    expect(actual).toEqual(runV3Checkpoints);
     expect(state.player).toEqual(runV2GoldenVectors.finalPlayer);
   });
 
@@ -47,9 +54,7 @@ describe("headless run golden corpus", () => {
     expect(batched).toEqual(stepped);
     expect(partitioned).toEqual(stepped);
     expect(repeated).toEqual(stepped);
-    expect(hashRunState(stepped)).toBe(
-      runV2GoldenVectors.checkpoints.at(-1)?.hash,
-    );
+    expect(hashRunState(stepped)).toBe(runV3Checkpoints.at(-1)?.hash);
   });
 });
 
