@@ -22,7 +22,7 @@ export type InputFrame = {
 };
 
 export type RunState = {
-  readonly schemaVersion: 4;
+  readonly schemaVersion: 5;
   readonly config: RunConfig;
   tick: number;
   input: InputFrame;

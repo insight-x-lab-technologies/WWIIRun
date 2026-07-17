@@ -32,6 +32,13 @@ export {
   PROJECTILE_PLACEHOLDER,
 } from "../entities";
 export {
+  activateStructure,
+  applyStructureModuleDamage,
+  MODULAR_BLOCK_STRUCTURE,
+  MAX_STRUCTURES,
+  MAX_STRUCTURE_MODULES,
+} from "../structures";
+export {
   candidateAt,
   collectContacts,
   createBroadPhaseScratch,

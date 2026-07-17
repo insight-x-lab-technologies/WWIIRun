@@ -55,6 +55,7 @@ Esta pasta é a fonte de verdade do projeto. Em conflito, prevalecem: ADR aceito
 - [ADR-0010: estado de entidade versionado e colisões compostas inteiras](adr/0010-versioned-entity-state-and-compound-collisions.md)
 - [ADR-0011: pools limitados determinísticos e grade espacial canônica](adr/0011-deterministic-bounded-pools-spatial-grid.md)
 - [ADR-0012: combate dirigido por input e estado de inimigos versionado](adr/0012-input-driven-combat-state-and-enemy-behaviors.md)
+- [ADR-0013: estrutura modular fixa e estado de run v5](adr/0013-modular-destructible-structures.md)
 
 ## ADRs propostos
 

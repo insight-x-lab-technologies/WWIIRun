@@ -41,7 +41,7 @@ test("boots gameplay, accepts keyboard input, and exposes accessible touch actio
   );
   await expect(page.locator("#game-root")).toHaveAttribute(
     "data-pool-capacity",
-    "448",
+    "512",
   );
   await expect(page.locator("#game-root")).toHaveAttribute(
     "data-active-entities",
@@ -62,6 +62,10 @@ test("boots gameplay, accepts keyboard input, and exposes accessible touch actio
   await expect(page.locator("#game-root")).toHaveAttribute(
     "data-enemy-health",
     "3/3",
+  );
+  await expect(page.locator("#game-root")).toHaveAttribute(
+    "data-active-structure-modules",
+    "3",
   );
   await page.keyboard.up("ArrowRight");
   const actions = page.locator(".gameplay-actions button");

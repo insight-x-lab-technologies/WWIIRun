@@ -33,7 +33,7 @@ Objetivo: uma run curta e divertida com placeholders, validando arquitetura comp
 | F1-02 | Aeronave, movimento, vida/dano e colisões primitivas/compostas | F1-01 | Done |
 | F1-03 | Pools de projéteis/inimigos/moedas e spatial broad phase | F1-02 | Done |
 | F1-04 | Arma metralhadora e dois inimigos com HP/comportamento | F1-03 | Done |
-| F1-05 | Obstáculo/estrutura destrutível modular | F1-03 | Ready |
+| F1-05 | Obstáculo/estrutura destrutível modular | F1-03 | In review |
 | F1-06 | Drops de moeda, coleta e estatísticas da run | F1-04 | Ready |
 | F1-07 | Parallax de 3+ camadas e placeholders substituíveis | F1-01 | Backlog |
 | F1-08 | HUD: vida, distância, moedas, FPS, nível, velocidade e seed | F1-06 | Backlog |

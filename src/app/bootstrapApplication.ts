@@ -24,8 +24,10 @@ export function bootstrapApplication(
     new URLSearchParams(root.ownerDocument.defaultView?.location.search).get(
       "combat-diagnostics",
     ) === "1"
-  )
+  ) {
     session.activateDiagnosticEnemy("enemy.scout.v1", 60_000, 69_120);
+    session.activateDiagnosticStructure(90_000, 69_120);
+  }
   const instructions = createInstructions(root, pointer);
   const game = createGame(root, { session, keyboard, pointer, combined });
   let destroyed = false;

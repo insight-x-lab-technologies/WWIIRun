@@ -1,5 +1,6 @@
 import {
   activateEnemy,
+  activateStructure,
   createRunState,
   stepRun,
   type RunState,
@@ -87,6 +88,17 @@ export class GameplaySession {
   ): void {
     this.assertAlive();
     activateEnemy(this.state.pools, definitionId, x, y);
+  }
+  activateDiagnosticStructure(x: number, y: number): void {
+    this.assertAlive();
+    activateStructure(
+      this.state.pools,
+      "structure.modular-block.v1",
+      x,
+      y,
+      0,
+      0,
+    );
   }
   destroy(): void {
     if (this.destroyed) return;

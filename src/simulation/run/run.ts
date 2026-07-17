@@ -13,11 +13,12 @@ import {
   stepEntityPools,
   tryActivateProjectile,
 } from "../entities";
+import { applyStructureModuleDamage, stepStructures } from "../structures";
 import { createBroadPhaseScratch, collectContacts } from "../broadPhase";
 import type { InputFrame, RunConfig, RunMode, RunState } from "./types";
 
 export const TICKS_PER_SECOND = 60 as const;
-export const RUN_STATE_SCHEMA_VERSION = 4 as const;
+export const RUN_STATE_SCHEMA_VERSION = 5 as const;
 
 export const InputActionBits = {
   firePrimary: 0x0001,
@@ -94,6 +95,7 @@ export function stepRun(state: RunState, input: InputFrame): void {
   }
   stepEnemyBehaviors(state.pools, state.player.position.y);
   stepEntityPools(state.pools);
+  stepStructures(state.pools);
   collectContacts(
     state.pools,
     state.player,
@@ -104,6 +106,7 @@ export function stepRun(state: RunState, input: InputFrame): void {
   state.tick += 1;
 }
 function resolveCombat(state: RunState): void {
+  const damagedStructures = state.broadPhase.playerStructureDamage;
   for (let i = 0; i < state.broadPhase.contactCount; i += 1) {
     const code = state.broadPhase.contactCodes[i]!;
     if (code < 64) {
@@ -112,21 +115,61 @@ function resolveCombat(state: RunState): void {
       continue;
     }
     if (code < 192) continue;
-    const pair = code - 192;
+    if (code < 256) {
+      const structureIndex = Math.floor((code - 192) / 4);
+      if (damagedStructures[structureIndex] === 0) {
+        const structure = state.pools.structures[structureIndex]!;
+        if (structure.active) applyDamage(state.player, 12);
+        damagedStructures[structureIndex] = 1;
+      }
+      continue;
+    }
+    if (code < 16_640) {
+      const pair = code - 256;
+      const projectile = state.pools.projectiles[Math.floor(pair / 64)]!;
+      const enemy = state.pools.enemies[pair % 64]!;
+      if (!projectile.active || !enemy.active) continue;
+      const damage = projectile.damage;
+      clearProjectile(projectile);
+      applyEnemyDamage(state.pools, pair % 64, damage);
+      continue;
+    }
+    const pair = code - 16_640;
     const projectile = state.pools.projectiles[Math.floor(pair / 64)]!;
-    const enemy = state.pools.enemies[pair % 64]!;
-    if (!projectile.active || !enemy.active) continue;
+    const structureIndex = Math.floor((pair % 64) / 4);
+    const moduleIndex = pair % 4;
+    const structure = state.pools.structures[structureIndex]!;
+    if (
+      !projectile.active ||
+      !structure.active ||
+      !structure.modules[moduleIndex]!.active
+    )
+      continue;
     const damage = projectile.damage;
-    projectile.active = false;
-    projectile.definitionId = "";
-    projectile.position.x =
-      projectile.position.y =
-      projectile.velocity.x =
-      projectile.velocity.y =
-        0;
-    projectile.damage = 0;
-    applyEnemyDamage(state.pools, pair % 64, damage);
+    clearProjectile(projectile);
+    applyStructureModuleDamage(
+      state.pools,
+      structureIndex,
+      moduleIndex,
+      damage,
+    );
   }
+}
+function clearProjectile(projectile: {
+  active: boolean;
+  definitionId: string;
+  position: { x: number; y: number };
+  velocity: { x: number; y: number };
+  damage: number;
+}): void {
+  projectile.active = false;
+  projectile.definitionId = "";
+  projectile.position.x =
+    projectile.position.y =
+    projectile.velocity.x =
+    projectile.velocity.y =
+      0;
+  projectile.damage = 0;
 }
 
 export function advanceRun(

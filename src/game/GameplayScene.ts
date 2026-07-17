@@ -11,7 +11,12 @@ import {
   SIMULATION_UNITS_PER_LOGICAL_PIXEL,
 } from "../simulation/aircraft";
 import { CombinedInput, KeyboardInput, PointerInput } from "./input";
-import { MAX_COINS, MAX_ENEMIES, MAX_PROJECTILES } from "../simulation/run";
+import {
+  MAX_COINS,
+  MAX_ENEMIES,
+  MAX_PROJECTILES,
+  MAX_STRUCTURES,
+} from "../simulation/run";
 import type { EntitySlot } from "../simulation/entities";
 
 export type GameplaySceneDependencies = {
@@ -36,6 +41,7 @@ export class GameplayScene extends Phaser.Scene {
   private diagnostic: Phaser.GameObjects.Text | undefined;
   private zones: Phaser.GameObjects.Graphics | undefined;
   private readonly entityGraphics: Phaser.GameObjects.Graphics[] = [];
+  private readonly structureGraphics: Phaser.GameObjects.Graphics[] = [];
   private readonly entityPools: Array<readonly EntitySlot[]> = [];
   private layout?: ViewportLayout;
   private cleanup: Array<() => void> = [];
@@ -272,6 +278,10 @@ export class GameplayScene extends Phaser.Scene {
       graphics.fillStyle(0x65b5ff).fillCircle(0, 0, 3);
       this.entityGraphics.push(graphics);
     }
+    for (let index = 0; index < MAX_STRUCTURES * 4; index += 1)
+      this.structureGraphics.push(
+        this.add.graphics().setDepth(3).setVisible(false),
+      );
   }
 
   private projectEntityPool(
@@ -309,10 +319,39 @@ export class GameplayScene extends Phaser.Scene {
           )
           .setVisible(true);
       }
+    let structureGraphicsIndex = 0;
+    let activeStructures = 0;
+    for (const structure of state.pools.structures)
+      for (let moduleIndex = 0; moduleIndex < 4; moduleIndex += 1) {
+        const graphics = this.structureGraphics[structureGraphicsIndex++]!;
+        const module = structure.modules[moduleIndex]!;
+        if (!structure.active || !module.active || this.layout === undefined) {
+          graphics.setVisible(false);
+          continue;
+        }
+        activeStructures += 1;
+        graphics
+          .clear()
+          .fillStyle(
+            module.health.current < module.health.max ? 0xe9b44c : 0x829ab1,
+          )
+          .fillRect(-8, -6, 16, 12);
+        graphics
+          .setPosition(
+            this.layout.world.x +
+              (structure.position.x + (moduleIndex - 1) * 4096) /
+                SIMULATION_UNITS_PER_LOGICAL_PIXEL,
+            this.layout.world.y +
+              structure.position.y / SIMULATION_UNITS_PER_LOGICAL_PIXEL,
+          )
+          .setVisible(true);
+      }
     this.dependencies.root.dataset.poolCapacity = String(
-      this.entityGraphics.length,
+      this.entityGraphics.length + this.structureGraphics.length,
     );
     this.dependencies.root.dataset.activeEntities = String(activeEntities);
+    this.dependencies.root.dataset.activeStructureModules =
+      String(activeStructures);
     this.dependencies.root.dataset.broadPhaseCandidates = String(
       state.broadPhase.candidateCount,
     );
@@ -381,6 +420,7 @@ export class GameplayScene extends Phaser.Scene {
     this.zones?.destroy();
     this.zones = undefined;
     for (const graphics of this.entityGraphics.splice(0)) graphics.destroy();
+    for (const graphics of this.structureGraphics.splice(0)) graphics.destroy();
     this.diagnostic?.destroy();
     this.diagnostic = undefined;
     this.dependencies.session.destroy();

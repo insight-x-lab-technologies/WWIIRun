@@ -12,6 +12,7 @@ import {
 import { runGoldenVectors } from "./runGoldenVectors";
 import { runV2GoldenVectors } from "./runV2GoldenVectors";
 import { runV4GoldenVectors } from "./runV4GoldenVectors";
+import { runV5GoldenVectors } from "./runV5GoldenVectors";
 
 const runV3Checkpoints = [
   { tick: 0, hash: "ed1cf31232d871b7" },
@@ -19,7 +20,7 @@ const runV3Checkpoints = [
   { tick: 3, hash: "4bd178e4ff851577" },
   { tick: 8, hash: "fad2ea090cd25723" },
 ] as const;
-const { checkpoints: runV4Checkpoints } = runV4GoldenVectors;
+const { checkpoints: runV5Checkpoints } = runV5GoldenVectors;
 
 describe("headless run golden corpus", () => {
   test("matches literal hashes at every checkpoint", () => {
@@ -35,7 +36,7 @@ describe("headless run golden corpus", () => {
       }
     }
 
-    expect(actual).toEqual(runV4Checkpoints);
+    expect(actual).toEqual(runV5Checkpoints);
     expect(state.player).toEqual(runV2GoldenVectors.finalPlayer);
   });
 
@@ -56,7 +57,7 @@ describe("headless run golden corpus", () => {
     expect(batched).toEqual(stepped);
     expect(partitioned).toEqual(stepped);
     expect(repeated).toEqual(stepped);
-    expect(hashRunState(stepped)).toBe(runV4Checkpoints.at(-1)?.hash);
+    expect(hashRunState(stepped)).toBe(runV5Checkpoints.at(-1)?.hash);
   });
 });
 
@@ -89,5 +90,14 @@ test("preserves the literal historical v3 checkpoints", () => {
     { tick: 1, hash: "591a387cc0accd65" },
     { tick: 3, hash: "4bd178e4ff851577" },
     { tick: 8, hash: "fad2ea090cd25723" },
+  ]);
+});
+
+test("preserves the literal historical v4 fixture", () => {
+  expect(runV4GoldenVectors.checkpoints).toEqual([
+    { tick: 0, hash: "7872620e85f718a5" },
+    { tick: 1, hash: "f5669c004c76448c" },
+    { tick: 3, hash: "ec3b3be55012d628" },
+    { tick: 8, hash: "b142516a99acbc04" },
   ]);
 });

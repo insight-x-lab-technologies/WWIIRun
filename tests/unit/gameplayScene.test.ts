@@ -20,11 +20,11 @@ describe("GameplayScene resources", () => {
     expect(DEFAULT_GAMEPLAY_DIAGNOSTICS).toEqual({ showHitboxes: false });
     const disabled = createHarness(false);
     disabled.scene.create();
-    expect(disabled.graphics.created).toBe(450);
+    expect(disabled.graphics.created).toBe(514);
     disabled.shutdown();
     const enabled = createHarness(true);
     enabled.scene.create();
-    expect(enabled.graphics.created).toBe(451);
+    expect(enabled.graphics.created).toBe(515);
     enabled.shutdown();
   });
 
@@ -36,7 +36,7 @@ describe("GameplayScene resources", () => {
       expect(harness.listeners.active()).toBe(10);
       harness.shutdown();
       harness.scene.update(0, 1000 / 60);
-      expect(harness.graphics).toEqual({ created: 451, destroyed: 451 });
+      expect(harness.graphics).toEqual({ created: 515, destroyed: 515 });
       expect(harness.text).toEqual({ created: 1, destroyed: 1 });
       expect(harness.listeners.active()).toBe(0);
       expect(harness.session.update).toHaveBeenCalledTimes(1);

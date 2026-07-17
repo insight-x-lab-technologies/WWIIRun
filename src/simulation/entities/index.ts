@@ -1,4 +1,5 @@
 import { createCompoundHitbox, type CompoundHitbox } from "../collision";
+import { createStructurePools, type StructurePools } from "../structures";
 
 export const MAX_PROJECTILES = 256 as const;
 export const MAX_ENEMIES = 64 as const;
@@ -27,7 +28,13 @@ export type EntityPools = {
   readonly projectiles: EntitySlot[];
   readonly enemies: EntitySlot[];
   readonly coins: EntitySlot[];
-  cursors: { projectile: number; enemy: number; coin: number };
+  readonly structures: StructurePools["structures"];
+  cursors: {
+    projectile: number;
+    enemy: number;
+    coin: number;
+    structure: number;
+  };
 };
 export type SpawnResult =
   | { readonly status: "spawned"; readonly id: string }
@@ -119,11 +126,18 @@ const DEFINITIONS: readonly EntityDefinition[] = [
 ];
 
 export function createEntityPools(): EntityPools {
+  const structurePools = createStructurePools();
   return {
     projectiles: createSlots(MAX_PROJECTILES),
     enemies: createSlots(MAX_ENEMIES),
     coins: createSlots(MAX_COINS),
-    cursors: { projectile: 0, enemy: 0, coin: 0 },
+    structures: structurePools.structures,
+    cursors: {
+      projectile: 0,
+      enemy: 0,
+      coin: 0,
+      structure: structurePools.cursor,
+    },
   };
 }
 export function definitionFor(id: string): EntityDefinition | undefined {

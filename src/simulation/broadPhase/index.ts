@@ -1,14 +1,39 @@
 import { intersectsCompound, type CompoundHitbox } from "../collision";
-import { definitionFor, type EntityPools } from "../entities";
+import {
+  definitionFor,
+  MAX_COINS,
+  MAX_ENEMIES,
+  MAX_PROJECTILES,
+  type EntityPools,
+} from "../entities";
+import {
+  MAX_STRUCTURE_MODULES,
+  MAX_STRUCTURES,
+  structureDefinitionFor,
+} from "../structures";
 
 export const GRID_CELL_SIZE = 16_384 as const;
 export const MAX_CELL_OCCUPANCIES_PER_ENTITY = 64 as const;
-const MAX_OCCUPANCIES = (256 + 64 + 128 + 1) * MAX_CELL_OCCUPANCIES_PER_ENTITY;
-const MAX_CANDIDATES = 64 + 128 + 256 * 64;
+const MAX_OCCUPANCIES =
+  (MAX_PROJECTILES +
+    MAX_ENEMIES +
+    MAX_COINS +
+    1 +
+    MAX_STRUCTURES * MAX_STRUCTURE_MODULES) *
+  MAX_CELL_OCCUPANCIES_PER_ENTITY;
+const STRUCTURE_MODULES = MAX_STRUCTURES * MAX_STRUCTURE_MODULES;
+const PLAYER_ENEMY_END = MAX_ENEMIES;
+const PLAYER_COIN_END = PLAYER_ENEMY_END + MAX_COINS;
+const PLAYER_STRUCTURE_END = PLAYER_COIN_END + STRUCTURE_MODULES;
+const PROJECTILE_ENEMY_END =
+  PLAYER_STRUCTURE_END + MAX_PROJECTILES * MAX_ENEMIES;
+const MAX_CANDIDATES =
+  PROJECTILE_ENEMY_END + MAX_PROJECTILES * STRUCTURE_MODULES;
 const PLAYER = 0,
   PROJECTILE = 1,
   ENEMY = 2,
-  COIN = 3;
+  COIN = 3,
+  STRUCTURE = 4;
 export type CandidatePair = { first: string; second: string };
 export type BroadPhaseMetrics = {
   activeEntities: number;
@@ -24,14 +49,15 @@ export type BroadPhaseScratch = {
   readonly occupiedCellsY: Int32Array;
   readonly occupiedKinds: Uint8Array;
   readonly occupiedSlots: Uint16Array;
+  readonly occupiedModules: Uint8Array;
   readonly seen: Uint8Array;
+  readonly playerStructureDamage: Uint8Array;
   candidateCount: number;
   contactCount: number;
   occupancyCount: number;
   readonly metrics: BroadPhaseMetrics;
   readonly narrowMetrics: { primitiveComparisons: number };
 };
-
 export function createBroadPhaseScratch(): BroadPhaseScratch {
   return {
     candidateCodes: new Int32Array(MAX_CANDIDATES),
@@ -40,7 +66,9 @@ export function createBroadPhaseScratch(): BroadPhaseScratch {
     occupiedCellsY: new Int32Array(MAX_OCCUPANCIES),
     occupiedKinds: new Uint8Array(MAX_OCCUPANCIES),
     occupiedSlots: new Uint16Array(MAX_OCCUPANCIES),
+    occupiedModules: new Uint8Array(MAX_OCCUPANCIES),
     seen: new Uint8Array(MAX_CANDIDATES),
+    playerStructureDamage: new Uint8Array(MAX_STRUCTURES),
     candidateCount: 0,
     contactCount: 0,
     occupancyCount: 0,
@@ -54,7 +82,6 @@ export function createBroadPhaseScratch(): BroadPhaseScratch {
     narrowMetrics: { primitiveComparisons: 0 },
   };
 }
-
 export function collectContacts(
   pools: EntityPools,
   player: { position: { x: number; y: number } },
@@ -62,10 +89,40 @@ export function collectContacts(
   scratch: BroadPhaseScratch,
 ): BroadPhaseScratch {
   reset(scratch);
-  insert(player.position, playerHitboxes, PLAYER, 0, scratch);
+  insert(player.position, playerHitboxes, PLAYER, 0, 0, scratch);
   scan(pools.projectiles, PROJECTILE, scratch);
   scan(pools.enemies, ENEMY, scratch);
   scan(pools.coins, COIN, scratch);
+  for (
+    let structureIndex = 0;
+    structureIndex < pools.structures.length;
+    structureIndex += 1
+  ) {
+    const structure = pools.structures[structureIndex]!;
+    if (!structure.active) continue;
+    const definition = structureDefinitionFor(structure.definitionId);
+    if (!definition) throw new Error("active structure lacks definition");
+    for (
+      let moduleIndex = 0;
+      moduleIndex < definition.modules.length;
+      moduleIndex += 1
+    ) {
+      if (!structure.modules[moduleIndex]!.active) continue;
+      const module = definition.modules[moduleIndex]!;
+      scratch.metrics.activeEntities += 1;
+      insert(
+        {
+          x: structure.position.x + module.offset.x,
+          y: structure.position.y + module.offset.y,
+        },
+        module.hitboxes,
+        STRUCTURE,
+        structureIndex,
+        moduleIndex,
+        scratch,
+      );
+    }
+  }
   for (let index = 0; index < scratch.candidateCount; index += 1)
     narrow(
       scratch.candidateCodes[index]!,
@@ -83,13 +140,27 @@ export function candidateAt(
   if (!Number.isInteger(index) || index < 0 || index >= s.candidateCount)
     return undefined;
   const code = s.candidateCodes[index]!;
-  if (code < 64) return { first: "player:0", second: `enemy:${code}` };
-  if (code < 192) return { first: "player:0", second: `coin:${code - 64}` };
-  const pair = code - 192;
+  if (code < PLAYER_ENEMY_END)
+    return { first: "player:0", second: `enemy:${code}` };
+  if (code < PLAYER_COIN_END)
+    return { first: "player:0", second: `coin:${code - PLAYER_ENEMY_END}` };
+  if (code < PLAYER_STRUCTURE_END)
+    return { first: "player:0", second: structureId(code - PLAYER_COIN_END) };
+  if (code < PROJECTILE_ENEMY_END) {
+    const pair = code - PLAYER_STRUCTURE_END;
+    return {
+      first: `projectile:${Math.floor(pair / MAX_ENEMIES)}`,
+      second: `enemy:${pair % MAX_ENEMIES}`,
+    };
+  }
+  const pair = code - PROJECTILE_ENEMY_END;
   return {
-    first: `projectile:${Math.floor(pair / 64)}`,
-    second: `enemy:${pair % 64}`,
+    first: `projectile:${Math.floor(pair / STRUCTURE_MODULES)}`,
+    second: structureId(pair % STRUCTURE_MODULES),
   };
+}
+function structureId(code: number): string {
+  return `structure:${Math.floor(code / MAX_STRUCTURE_MODULES)}:module:${code % MAX_STRUCTURE_MODULES}`;
 }
 function scan(
   slots: EntityPools["enemies"],
@@ -100,10 +171,9 @@ function scan(
     const entity = slots[slot]!;
     if (!entity.active) continue;
     const definition = definitionFor(entity.definitionId);
-    if (definition === undefined)
-      throw new Error("active entity lacks definition");
+    if (!definition) throw new Error("active entity lacks definition");
     s.metrics.activeEntities += 1;
-    insert(entity.position, definition.hitboxes, kind, slot, s);
+    insert(entity.position, definition.hitboxes, kind, slot, 0, s);
   }
 }
 function insert(
@@ -111,6 +181,7 @@ function insert(
   hitboxes: CompoundHitbox,
   kind: number,
   slot: number,
+  module: number,
   s: BroadPhaseScratch,
 ): void {
   let minX = position.x,
@@ -119,8 +190,8 @@ function insert(
     maxY = position.y;
   for (const shape of hitboxes) {
     const ex = shape.kind === "aabb" ? shape.halfWidth : shape.radius,
-      ey = shape.kind === "aabb" ? shape.halfHeight : shape.radius;
-    const x = position.x + shape.offsetX,
+      ey = shape.kind === "aabb" ? shape.halfHeight : shape.radius,
+      x = position.x + shape.offsetX,
       y = position.y + shape.offsetY;
     if (x - ex < minX) minX = x - ex;
     if (x + ex > maxX) maxX = x + ex;
@@ -140,8 +211,10 @@ function insert(
           addAllowed(
             s.occupiedKinds[prior]!,
             s.occupiedSlots[prior]!,
+            s.occupiedModules[prior]!,
             kind,
             slot,
+            module,
             s,
           );
       const next = s.occupancyCount++;
@@ -149,21 +222,32 @@ function insert(
       s.occupiedCellsY[next] = y;
       s.occupiedKinds[next] = kind;
       s.occupiedSlots[next] = slot;
+      s.occupiedModules[next] = module;
       s.metrics.occupancies += 1;
     }
 }
 function addAllowed(
   aKind: number,
   aSlot: number,
+  _aModule: number,
   bKind: number,
   bSlot: number,
+  bModule: number,
   s: BroadPhaseScratch,
 ): void {
   let code = -1;
   if (aKind === PLAYER && bKind === ENEMY) code = bSlot;
-  else if (aKind === PLAYER && bKind === COIN) code = 64 + bSlot;
+  else if (aKind === PLAYER && bKind === COIN) code = PLAYER_ENEMY_END + bSlot;
+  else if (aKind === PLAYER && bKind === STRUCTURE)
+    code = PLAYER_COIN_END + bSlot * MAX_STRUCTURE_MODULES + bModule;
   else if (aKind === PROJECTILE && bKind === ENEMY)
-    code = 192 + aSlot * 64 + bSlot;
+    code = PLAYER_STRUCTURE_END + aSlot * MAX_ENEMIES + bSlot;
+  else if (aKind === PROJECTILE && bKind === STRUCTURE)
+    code =
+      PROJECTILE_ENEMY_END +
+      aSlot * STRUCTURE_MODULES +
+      bSlot * MAX_STRUCTURE_MODULES +
+      bModule;
   if (code < 0) return;
   s.metrics.rawPairs += 1;
   if (s.seen[code] === 1) return;
@@ -187,24 +271,50 @@ function narrow(
     leftHitboxes = playerHitboxes,
     right = player.position,
     rightHitboxes = playerHitboxes;
-  if (code < 64) {
+  if (code < PLAYER_ENEMY_END) {
     const slot = pools.enemies[code]!;
-    const definition = definitionFor(slot.definitionId)!;
     right = slot.position;
-    rightHitboxes = definition.hitboxes;
-  } else if (code < 192) {
-    const slot = pools.coins[code - 64]!;
-    const definition = definitionFor(slot.definitionId)!;
+    rightHitboxes = definitionFor(slot.definitionId)!.hitboxes;
+  } else if (code < PLAYER_COIN_END) {
+    const slot = pools.coins[code - PLAYER_ENEMY_END]!;
     right = slot.position;
-    rightHitboxes = definition.hitboxes;
-  } else {
-    const pair = code - 192,
-      projectile = pools.projectiles[Math.floor(pair / 64)]!,
-      enemy = pools.enemies[pair % 64]!;
+    rightHitboxes = definitionFor(slot.definitionId)!.hitboxes;
+  } else if (code < PLAYER_STRUCTURE_END) {
+    const key = code - PLAYER_COIN_END,
+      slot = pools.structures[Math.floor(key / MAX_STRUCTURE_MODULES)]!,
+      module = structureDefinitionFor(slot.definitionId)!.modules[
+        key % MAX_STRUCTURE_MODULES
+      ]!;
+    right = {
+      x: slot.position.x + module.offset.x,
+      y: slot.position.y + module.offset.y,
+    };
+    rightHitboxes = module.hitboxes;
+  } else if (code < PROJECTILE_ENEMY_END) {
+    const key = code - PLAYER_STRUCTURE_END,
+      projectile = pools.projectiles[Math.floor(key / MAX_ENEMIES)]!,
+      enemy = pools.enemies[key % MAX_ENEMIES]!;
     left = projectile.position;
     leftHitboxes = definitionFor(projectile.definitionId)!.hitboxes;
     right = enemy.position;
     rightHitboxes = definitionFor(enemy.definitionId)!.hitboxes;
+  } else {
+    const key = code - PROJECTILE_ENEMY_END,
+      projectile = pools.projectiles[Math.floor(key / STRUCTURE_MODULES)]!,
+      structure =
+        pools.structures[
+          Math.floor((key % STRUCTURE_MODULES) / MAX_STRUCTURE_MODULES)
+        ]!,
+      module = structureDefinitionFor(structure.definitionId)!.modules[
+        key % MAX_STRUCTURE_MODULES
+      ]!;
+    left = projectile.position;
+    leftHitboxes = definitionFor(projectile.definitionId)!.hitboxes;
+    right = {
+      x: structure.position.x + module.offset.x,
+      y: structure.position.y + module.offset.y,
+    };
+    rightHitboxes = module.hitboxes;
   }
   s.narrowMetrics.primitiveComparisons = 0;
   if (
@@ -221,6 +331,7 @@ function narrow(
 }
 function reset(s: BroadPhaseScratch): void {
   s.seen.fill(0);
+  s.playerStructureDamage.fill(0);
   s.candidateCount = 0;
   s.contactCount = 0;
   s.occupancyCount = 0;
