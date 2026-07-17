@@ -160,4 +160,35 @@ test("reprojects the logical profile across orientation changes without duplicat
     "data-enemy-health",
     /^(?:3|2|1)\/3$/,
   );
+  await expect(page.locator("#game-root")).toHaveAttribute(
+    "data-parallax-layer-count",
+    "4",
+  );
+  await expect(page.locator("#game-root")).toHaveAttribute(
+    "data-parallax-coverage",
+    "540x960",
+  );
+});
+
+test("keeps four cosmetic parallax layers covered through required viewports", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const root = page.locator("#game-root");
+  for (const [width, height, coverage] of [
+    [320, 568, "540x960"],
+    [568, 320, "960x540"],
+    [768, 1024, "540x960"],
+    [1024, 768, "960x540"],
+    [1920, 1080, "960x540"],
+  ] as const) {
+    await page.setViewportSize({ width, height });
+    await expect(root).toHaveAttribute("data-parallax-layer-count", "4");
+    await expect(root).toHaveAttribute("data-parallax-coverage", coverage);
+    await expect(root).toHaveAttribute(
+      "data-parallax-visual-ids",
+      "background.sky.v1,background.clouds.far.v1,background.terrain.distant.v1,background.terrain.mid.v1",
+    );
+    await expect(page.locator("#game-root canvas")).toHaveCount(1);
+  }
 });

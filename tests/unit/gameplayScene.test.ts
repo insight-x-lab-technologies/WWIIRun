@@ -20,11 +20,17 @@ describe("GameplayScene resources", () => {
     expect(DEFAULT_GAMEPLAY_DIAGNOSTICS).toEqual({ showHitboxes: false });
     const disabled = createHarness(false);
     disabled.scene.create();
-    expect(disabled.graphics.created).toBe(514);
+    expect(disabled.graphics.created).toBe(522);
+    expect(disabled.root.dataset).toMatchObject({
+      parallaxLayerCount: "4",
+      parallaxCoverage: "540x960",
+      parallaxVisualIds:
+        "background.sky.v1,background.clouds.far.v1,background.terrain.distant.v1,background.terrain.mid.v1",
+    });
     disabled.shutdown();
     const enabled = createHarness(true);
     enabled.scene.create();
-    expect(enabled.graphics.created).toBe(515);
+    expect(enabled.graphics.created).toBe(523);
     enabled.shutdown();
   });
 
@@ -36,18 +42,45 @@ describe("GameplayScene resources", () => {
       expect(harness.listeners.active()).toBe(10);
       harness.shutdown();
       harness.scene.update(0, 1000 / 60);
-      expect(harness.graphics).toEqual({ created: 515, destroyed: 515 });
+      expect(harness.graphics).toEqual({ created: 523, destroyed: 523 });
       expect(harness.text).toEqual({ created: 1, destroyed: 1 });
       expect(harness.listeners.active()).toBe(0);
       expect(harness.session.update).toHaveBeenCalledTimes(1);
       expect(harness.events.pending()).toBe(0);
     }
   });
+
+  test("reuses the four tiles and projects the same snapshot tick idempotently", () => {
+    const harness = createHarness(false);
+    harness.scene.create();
+    const tiles = (
+      harness.scene as unknown as {
+        parallaxLayers: Array<{ tilePositionX: number; textureKey: string }>;
+      }
+    ).parallaxLayers;
+    expect(tiles.map((tile) => tile.textureKey)).toEqual([
+      "parallax.placeholder.background.sky.v1",
+      "parallax.placeholder.background.clouds.far.v1",
+      "parallax.placeholder.background.terrain.distant.v1",
+      "parallax.placeholder.background.terrain.mid.v1",
+    ]);
+    const snapshot = harness.session.snapshot();
+    snapshot.state.tick = 100;
+    harness.session.snapshot.mockReturnValue(snapshot);
+    harness.scene.update(0, 1000 / 60);
+    expect(tiles.map((tile) => tile.tilePositionX)).toEqual([0, 5, 15, 35]);
+    const createdAfterWarmup = harness.graphics.created;
+    harness.scene.update(0, 1000 / 60);
+    expect(tiles.map((tile) => tile.tilePositionX)).toEqual([0, 5, 15, 35]);
+    expect(harness.graphics.created).toBe(createdAfterWarmup);
+    harness.shutdown();
+  });
 });
 
 function createHarness(showHitboxes: boolean) {
   const graphics = { created: 0, destroyed: 0 };
   const text = { created: 0, destroyed: 0 };
+  const textures = { removed: [] as string[] };
   const listeners = listenerRegistry();
   const events = eventRegistry();
   const status = { textContent: "" };
@@ -124,6 +157,11 @@ function createHarness(showHitboxes: boolean) {
     add: {
       value: {
         graphics: () => makeResource(graphics),
+        tileSprite: (...args: unknown[]) => {
+          const resource = makeResource(graphics);
+          resource.textureKey = args[4];
+          return resource;
+        },
         text: () => makeResource(text),
       },
     },
@@ -132,12 +170,20 @@ function createHarness(showHitboxes: boolean) {
     },
     game: { value: { canvas } },
     scale: { value: { resize: vi.fn() } },
+    textures: {
+      value: {
+        exists: () => false,
+        remove: (key: string) => textures.removed.push(key),
+      },
+    },
     events: { value: events },
   });
   return {
     scene,
+    root,
     graphics,
     text,
+    textures,
     listeners,
     events,
     session,

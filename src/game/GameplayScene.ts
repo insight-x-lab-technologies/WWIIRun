@@ -18,6 +18,15 @@ import {
   MAX_STRUCTURES,
 } from "../simulation/run";
 import type { EntitySlot } from "../simulation/entities";
+import {
+  PARALLAX_LAYERS,
+  PARALLAX_PATTERN_HEIGHT,
+  parallaxOffsetForTick,
+  parallaxTextureKey,
+  resolveParallaxTexture,
+  technicalPlaceholderInstructions,
+  type ParallaxVisualResolver,
+} from "./parallax";
 
 export type GameplaySceneDependencies = {
   root: HTMLElement;
@@ -26,6 +35,7 @@ export type GameplaySceneDependencies = {
   pointer: PointerInput;
   combined: CombinedInput;
   diagnostics?: GameplaySceneDiagnostics;
+  parallaxResolver?: ParallaxVisualResolver;
 };
 
 export type GameplaySceneDiagnostics = {
@@ -42,10 +52,13 @@ export class GameplayScene extends Phaser.Scene {
   private zones: Phaser.GameObjects.Graphics | undefined;
   private readonly entityGraphics: Phaser.GameObjects.Graphics[] = [];
   private readonly structureGraphics: Phaser.GameObjects.Graphics[] = [];
+  private readonly parallaxLayers: Phaser.GameObjects.TileSprite[] = [];
+  private readonly parallaxTextureKeys: string[] = [];
   private readonly entityPools: Array<readonly EntitySlot[]> = [];
   private layout?: ViewportLayout;
   private cleanup: Array<() => void> = [];
   private resizeFrame: number | undefined;
+  private parallaxTick = 0;
   private active = false;
   public constructor(private readonly dependencies: GameplaySceneDependencies) {
     super("gameplay");
@@ -58,6 +71,7 @@ export class GameplayScene extends Phaser.Scene {
     if (world === undefined)
       throw new Error("Gameplay viewport was not initialized.");
     this.cameras.main.setBackgroundColor("#101820");
+    this.createParallax();
     this.aircraft = this.drawAircraft();
     this.createEntityPool();
     if (
@@ -85,6 +99,8 @@ export class GameplayScene extends Phaser.Scene {
     const snapshot = this.dependencies.session.snapshot();
     const input = snapshot.state.input;
     const player = snapshot.state.player;
+    this.parallaxTick = snapshot.state.tick;
+    this.projectParallax();
     this.projectEntityPool(snapshot.state);
     if (this.aircraft !== undefined && this.layout !== undefined) {
       const x =
@@ -221,6 +237,7 @@ export class GameplayScene extends Phaser.Scene {
       this.layout.logicalWidth,
       this.layout.logicalHeight,
     );
+    this.layoutParallax();
     const radiusCss = Math.min(
       96,
       Math.min(this.layout.safeArea.width, this.layout.safeArea.height) * 0.25,
@@ -253,6 +270,106 @@ export class GameplayScene extends Phaser.Scene {
     });
     root.dataset.orientation = this.layout.orientation;
     if (this.zones !== undefined) this.drawZones();
+  }
+
+  private createParallax(): void {
+    try {
+      for (const layer of PARALLAX_LAYERS) {
+        const textureKey = resolveParallaxTexture(
+          layer,
+          this.dependencies.parallaxResolver,
+        );
+        if (textureKey === parallaxTextureKey(layer))
+          this.createPlaceholderTexture(layer, textureKey);
+        const sprite = this.add
+          .tileSprite(0, 0, 1, 1, textureKey)
+          .setOrigin(0)
+          .setDepth(layer.depth)
+          .setTint(layer.placeholder.color)
+          .setAlpha(layer.placeholder.alpha);
+        this.parallaxLayers.push(sprite);
+      }
+      this.layoutParallax();
+    } catch (error) {
+      for (const sprite of this.parallaxLayers.splice(0)) sprite.destroy();
+      for (const key of this.parallaxTextureKeys.splice(0))
+        this.textures.remove(key);
+      throw error;
+    }
+  }
+
+  private createPlaceholderTexture(
+    layer: (typeof PARALLAX_LAYERS)[number],
+    textureKey: string,
+  ): void {
+    if (this.textures.exists(textureKey)) return;
+    const graphics = this.add.graphics();
+    try {
+      graphics.fillStyle(0xffffff, 1);
+      for (const instruction of technicalPlaceholderInstructions(layer)) {
+        if (instruction.kind === "rect")
+          graphics.fillRect(
+            instruction.x,
+            instruction.y,
+            instruction.width,
+            instruction.height,
+          );
+        else if (instruction.kind === "circle")
+          graphics.fillCircle(instruction.x, instruction.y, instruction.radius);
+        else
+          graphics.fillTriangle(
+            instruction.x1,
+            instruction.y1,
+            instruction.x2,
+            instruction.y2,
+            instruction.x3,
+            instruction.y3,
+          );
+      }
+      graphics.generateTexture(
+        textureKey,
+        layer.placeholder.period,
+        PARALLAX_PATTERN_HEIGHT,
+      );
+      this.parallaxTextureKeys.push(textureKey);
+    } finally {
+      graphics.destroy();
+    }
+  }
+
+  private layoutParallax(): void {
+    if (this.layout === undefined || this.parallaxLayers.length === 0) return;
+    for (let index = 0; index < PARALLAX_LAYERS.length; index += 1) {
+      const definition = PARALLAX_LAYERS[index]!;
+      const sprite = this.parallaxLayers[index]!;
+      const width = this.layout.logicalWidth + definition.overscan * 2;
+      sprite
+        .setPosition(-definition.overscan, 0)
+        .setSize(width, this.layout.logicalHeight);
+    }
+    this.projectParallax();
+    this.dependencies.root.dataset.parallaxLayerCount = String(
+      this.parallaxLayers.length,
+    );
+    this.dependencies.root.dataset.parallaxCoverage = `${this.layout.logicalWidth}x${this.layout.logicalHeight}`;
+    this.dependencies.root.dataset.parallaxVisualIds = PARALLAX_LAYERS.map(
+      (layer) => layer.visualId,
+    ).join(",");
+  }
+
+  private projectParallax(): void {
+    if (this.layout === undefined) return;
+    for (let index = 0; index < PARALLAX_LAYERS.length; index += 1) {
+      const definition = PARALLAX_LAYERS[index]!;
+      const sprite = this.parallaxLayers[index];
+      if (sprite === undefined) continue;
+      sprite.tilePositionX = parallaxOffsetForTick(
+        this.parallaxTick,
+        definition,
+        definition.placeholder.period,
+      );
+      sprite.tilePositionY = 0;
+    }
   }
 
   private drawZones(): void {
@@ -428,6 +545,9 @@ export class GameplayScene extends Phaser.Scene {
     this.hitboxOverlay = undefined;
     this.zones?.destroy();
     this.zones = undefined;
+    for (const sprite of this.parallaxLayers.splice(0)) sprite.destroy();
+    for (const key of this.parallaxTextureKeys.splice(0))
+      this.textures.remove(key);
     for (const graphics of this.entityGraphics.splice(0)) graphics.destroy();
     for (const graphics of this.structureGraphics.splice(0)) graphics.destroy();
     this.diagnostic?.destroy();

@@ -8,6 +8,8 @@ F1 — Vertical slice jogável geométrico.
 
 ## Concluído
 
+- F1-07 aprovado em recheck independente e movido para `Done`: `F1-07-VISUAL-01` foi fechado com padrões técnicos repetíveis distintos para céu, nuvens e relevos, períodos próprios, offsets visuais por tick, reuso e teardown. Gates independentes: foco 8/8, `npm run check`, determinismo 12/12, E2E, PWA e `git diff --check` verdes; E2E/PWA exigiram execução fora do sandbox devido a `listen EPERM 127.0.0.1:4173`. Core, hashes/corpus, dependências, workflow, baselines e assets licenciáveis permaneceram intactos. O proprietário promoveu F1-08 a `Ready`; próximo passo exato: `$next-roadmap-item F1-08`.
+
 - F1-06 aprovado em revisão independente e movido para `Done`: `F1-06-GATE-01`/`F1-06-PERF-01`/`F1-06-GATE-02` foram fechados por assertion correta, hot path de contato limitado à janela de moedas e remoção de whitespace. Rechecks independentes passaram: coverage focada 83/83 e completa, `npm run check`, determinismo 12/12, E2E, PWA e `git diff --check ee18883..HEAD`. F1-07, dependente somente de F1-01 já `Done`, foi promovido a `Ready` por autorização do proprietário. Próximo passo exato: `$specify-roadmap-item F1-07`; não iniciar F1-08.
 
 - F1-05 aprovado em revisão independente e movido para `Done`: estrutura modular v5, pool 16×4, contatos por módulo, hash/corpus v5 e placeholders foram rechecados; `F1-05-REGRESSION-01`, `F1-05-DET-01`, `F1-05-TRACE-01` e `F1-05-PERF-01` foram fechados. Focados/coverage, determinismo, `npm run check` e `git diff --check` passaram. PWA permanece uma lacuna ambiental conhecida no sandbox (`listen EPERM 127.0.0.1:4174`), sem finding de implementação.
@@ -123,7 +125,7 @@ F1 — Vertical slice jogável geométrico.
 
 ## Próximo passo exato
 
-Executar `$specify-roadmap-item F1-07`; o item está `Ready` e depende somente de F1-01, já `Done`. Não iniciar F1-08 nesta unidade.
+F1-07 está `Done`. F1-08 está `Ready` por autorização do proprietário; próximo passo: `$next-roadmap-item F1-08`.
 
 ## Bloqueios
 
