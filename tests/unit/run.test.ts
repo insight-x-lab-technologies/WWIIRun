@@ -305,6 +305,9 @@ describe("fixed-tick transition", () => {
     const stepped = createRunState(validConfig());
     const batched = createRunState(validConfig());
     const partitioned = createRunState(validConfig());
+    const scratch = stepped.broadPhase;
+    const candidates = scratch.candidateCodes;
+    const contacts = scratch.contactCodes;
 
     for (const input of inputs) stepRun(stepped, input);
     advanceRun(batched, inputs);
@@ -312,8 +315,12 @@ describe("fixed-tick transition", () => {
     advanceRun(partitioned, []);
     advanceRun(partitioned, inputs.slice(1));
 
-    expect(batched).toEqual(stepped);
-    expect(partitioned).toEqual(stepped);
+    const expectedHash = hashRunState(stepped);
+    expect(hashRunState(batched)).toBe(expectedHash);
+    expect(hashRunState(partitioned)).toBe(expectedHash);
+    expect(stepped.broadPhase).toBe(scratch);
+    expect(stepped.broadPhase.candidateCodes).toBe(candidates);
+    expect(stepped.broadPhase.contactCodes).toBe(contacts);
   });
 
   test("validates the complete batch before mutating", () => {
