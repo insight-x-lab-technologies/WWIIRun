@@ -3,7 +3,7 @@ import type { RunState, StateHash, StateHashAlgorithm } from "./types";
 
 export const STATE_HASH_ALGORITHM: StateHashAlgorithm = "fnv1a64-v1";
 
-const LAYOUT_TAG = "wwiirun.run-state.v3";
+const LAYOUT_TAG = "wwiirun.run-state.v4";
 const FNV_OFFSET_BASIS = 0xcbf29ce484222325n;
 const FNV_PRIME = 0x00000100000001b3n;
 const UINT64_MASK = 0xffffffffffffffffn;
@@ -30,6 +30,7 @@ export function hashRunState(state: RunState): StateHash {
     hasher.writeAscii(modifierId);
   }
   hasher.writeUint32(state.tick);
+  hasher.writeUint32(state.primaryCooldownTicks);
   hasher.writeByte(state.input.moveX & 0xff);
   hasher.writeByte(state.input.moveY & 0xff);
   hasher.writeUint16(state.input.actions);
@@ -72,6 +73,10 @@ function writePool(
     definitionId: string;
     position: { x: number; y: number };
     velocity: { x: number; y: number };
+    damage: number;
+    health: { current: number; max: number };
+    behavior: string;
+    contactDamage: number;
   }[],
   cursor: number,
 ): void {
@@ -85,6 +90,11 @@ function writePool(
     hasher.writeUint32(slot.position.y);
     hasher.writeUint32(slot.velocity.x);
     hasher.writeUint32(slot.velocity.y);
+    hasher.writeUint32(slot.damage);
+    hasher.writeUint32(slot.health.current);
+    hasher.writeUint32(slot.health.max);
+    hasher.writeAscii(slot.behavior);
+    hasher.writeUint32(slot.contactDamage);
   }
 }
 

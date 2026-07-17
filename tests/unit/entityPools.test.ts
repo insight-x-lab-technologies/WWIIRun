@@ -48,6 +48,10 @@ describe("bounded entity pools", () => {
       definitionId: "",
       position: { x: 0, y: 0 },
       velocity: { x: 0, y: 0 },
+      damage: 0,
+      health: { current: 0, max: 0 },
+      behavior: "",
+      contactDamage: 0,
     });
   });
   test("exhaustion is atomic and cursors affect the canonical hash", () => {

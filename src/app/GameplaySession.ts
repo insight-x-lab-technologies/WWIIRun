@@ -1,4 +1,9 @@
-import { createRunState, stepRun, type RunState } from "../simulation/run";
+import {
+  activateEnemy,
+  createRunState,
+  stepRun,
+  type RunState,
+} from "../simulation/run";
 import type { Seed128 } from "../simulation/random";
 import type { InputSource } from "../game/input";
 
@@ -74,6 +79,14 @@ export class GameplaySession {
   snapshot(): { state: RunState; paused: boolean } {
     this.assertAlive();
     return { state: this.state, paused: this.paused.size > 0 };
+  }
+  activateDiagnosticEnemy(
+    definitionId: "enemy.scout.v1" | "enemy.interceptor.v1",
+    x: number,
+    y: number,
+  ): void {
+    this.assertAlive();
+    activateEnemy(this.state.pools, definitionId, x, y);
   }
   destroy(): void {
     if (this.destroyed) return;

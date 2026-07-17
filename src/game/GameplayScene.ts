@@ -12,6 +12,7 @@ import {
 } from "../simulation/aircraft";
 import { CombinedInput, KeyboardInput, PointerInput } from "./input";
 import { MAX_COINS, MAX_ENEMIES, MAX_PROJECTILES } from "../simulation/run";
+import type { EntitySlot } from "../simulation/entities";
 
 export type GameplaySceneDependencies = {
   root: HTMLElement;
@@ -35,9 +36,7 @@ export class GameplayScene extends Phaser.Scene {
   private diagnostic: Phaser.GameObjects.Text | undefined;
   private zones: Phaser.GameObjects.Graphics | undefined;
   private readonly entityGraphics: Phaser.GameObjects.Graphics[] = [];
-  private readonly entityPools: Array<
-    readonly { active: boolean; position: { x: number; y: number } }[]
-  > = [];
+  private readonly entityPools: Array<readonly EntitySlot[]> = [];
   private layout?: ViewportLayout;
   private cleanup: Array<() => void> = [];
   private resizeFrame: number | undefined;
@@ -103,6 +102,9 @@ export class GameplayScene extends Phaser.Scene {
       status.textContent = `${snapshot.paused ? "Paused" : "Active"}; ${this.layout?.orientation ?? "unknown"}; tick ${snapshot.state.tick}`;
     this.dependencies.root.dataset.input = `${input.moveX},${input.moveY},${input.actions}`;
     this.dependencies.root.dataset.player = `${player.position.x},${player.position.y},${player.health.current},${player.status}`;
+    this.dependencies.root.dataset.weaponCooldown = String(
+      snapshot.state.primaryCooldownTicks,
+    );
   }
 
   private bindEvents(): void {
@@ -290,6 +292,14 @@ export class GameplayScene extends Phaser.Scene {
           continue;
         }
         activeEntities += 1;
+        graphics.clear();
+        if (slot.definitionId === "enemy.scout.v1")
+          graphics.fillStyle(0xe9b44c).fillTriangle(-8, 0, 8, -6, 8, 6);
+        else if (slot.definitionId === "enemy.interceptor.v1")
+          graphics.fillStyle(0xff5a5f).fillRect(-8, -4, 16, 8);
+        else if (slot.definitionId === "projectile.placeholder.v1")
+          graphics.fillStyle(0x65b5ff).fillRect(-4, -1, 8, 2);
+        else graphics.fillStyle(0xf4f0e6).fillCircle(0, 0, 3);
         graphics
           .setPosition(
             this.layout.world.x +
@@ -309,6 +319,12 @@ export class GameplayScene extends Phaser.Scene {
     this.dependencies.root.dataset.broadPhaseContacts = String(
       state.broadPhase.contactCount,
     );
+    let enemyHealth = "";
+    for (const slot of state.pools.enemies) {
+      if (!slot.active) continue;
+      enemyHealth += `${enemyHealth === "" ? "" : ","}${slot.health.current}/${slot.health.max}`;
+    }
+    this.dependencies.root.dataset.enemyHealth = enemyHealth;
   }
 
   private drawHitboxes(): Phaser.GameObjects.Graphics {

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { runV2GoldenVectors as runGoldenVectors } from "../determinism/runV2GoldenVectors";
+import { runV4GoldenVectors as runGoldenVectors } from "../determinism/runV4GoldenVectors";
 
 type BrowserRunState = {
   readonly tick: number;

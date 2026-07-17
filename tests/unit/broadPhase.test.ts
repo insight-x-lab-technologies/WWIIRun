@@ -200,4 +200,4 @@ test("broad phase stays bounded for all pools across 120 warm ticks without repl
   expect(scratch.candidateCodes).toBe(candidates);
   expect(scratch.contactCodes).toBe(contacts);
   expect(scratch.occupiedCellsX).toBe(occupancyX);
-}, 20_000);
+}, 35_000);

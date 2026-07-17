@@ -21,6 +21,7 @@ export type GameplayAircraftDefinition = {
   readonly maxSpeed: number;
   readonly drag: number;
   readonly spawn: Readonly<{ x: number; y: number }>;
+  readonly muzzle: Readonly<{ x: number; y: number }>;
   readonly bounds: Readonly<{
     minX: number;
     maxX: number;
@@ -39,6 +40,7 @@ export const PLACEHOLDER_AIRCRAFT: GameplayAircraftDefinition = Object.freeze({
   maxSpeed: 768,
   drag: 64,
   spawn: Object.freeze({ x: 160 * U, y: 270 * U }),
+  muzzle: Object.freeze({ x: 28 * U, y: 0 }),
   bounds: Object.freeze({
     minX: 48 * U,
     maxX: 320 * U,

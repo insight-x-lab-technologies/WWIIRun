@@ -1,12 +1,23 @@
 import { createRngStreams, parseSeedHex } from "../random";
-import { createPlayerState, stepPlayer } from "../aircraft";
-import { createEntityPools, stepEntityPools } from "../entities";
+import {
+  applyDamage,
+  createPlayerState,
+  PLACEHOLDER_AIRCRAFT,
+  stepPlayer,
+} from "../aircraft";
+import {
+  applyEnemyDamage,
+  createEntityPools,
+  MACHINE_GUN,
+  stepEnemyBehaviors,
+  stepEntityPools,
+  tryActivateProjectile,
+} from "../entities";
 import { createBroadPhaseScratch, collectContacts } from "../broadPhase";
-import { PLACEHOLDER_AIRCRAFT } from "../aircraft";
 import type { InputFrame, RunConfig, RunMode, RunState } from "./types";
 
 export const TICKS_PER_SECOND = 60 as const;
-export const RUN_STATE_SCHEMA_VERSION = 3 as const;
+export const RUN_STATE_SCHEMA_VERSION = 4 as const;
 
 export const InputActionBits = {
   firePrimary: 0x0001,
@@ -49,6 +60,7 @@ export function createRunState(config: RunConfig): RunState {
     rng: createRngStreams(canonicalConfig.seed),
     pools: createEntityPools(),
     broadPhase: createBroadPhaseScratch(),
+    primaryCooldownTicks: 0,
   };
 }
 
@@ -65,6 +77,22 @@ export function stepRun(state: RunState, input: InputFrame): void {
   stateInput.moveY = input.moveY;
   stateInput.actions = input.actions;
   stepPlayer(state.player, input);
+  if (state.primaryCooldownTicks > 0) state.primaryCooldownTicks -= 1;
+  if (
+    (input.actions & InputActionBits.firePrimary) !== 0 &&
+    state.player.status === "active" &&
+    state.primaryCooldownTicks === 0
+  ) {
+    const spawned = tryActivateProjectile(
+      state.pools,
+      state.player.position.x + PLACEHOLDER_AIRCRAFT.muzzle.x,
+      state.player.position.y + PLACEHOLDER_AIRCRAFT.muzzle.y,
+      MACHINE_GUN.velocityX,
+      MACHINE_GUN.damage,
+    );
+    if (spawned) state.primaryCooldownTicks = MACHINE_GUN.cooldownTicks;
+  }
+  stepEnemyBehaviors(state.pools, state.player.position.y);
   stepEntityPools(state.pools);
   collectContacts(
     state.pools,
@@ -72,7 +100,33 @@ export function stepRun(state: RunState, input: InputFrame): void {
     PLACEHOLDER_AIRCRAFT.hitboxes,
     state.broadPhase,
   );
+  resolveCombat(state);
   state.tick += 1;
+}
+function resolveCombat(state: RunState): void {
+  for (let i = 0; i < state.broadPhase.contactCount; i += 1) {
+    const code = state.broadPhase.contactCodes[i]!;
+    if (code < 64) {
+      const enemy = state.pools.enemies[code]!;
+      if (enemy.active) applyDamage(state.player, enemy.contactDamage);
+      continue;
+    }
+    if (code < 192) continue;
+    const pair = code - 192;
+    const projectile = state.pools.projectiles[Math.floor(pair / 64)]!;
+    const enemy = state.pools.enemies[pair % 64]!;
+    if (!projectile.active || !enemy.active) continue;
+    const damage = projectile.damage;
+    projectile.active = false;
+    projectile.definitionId = "";
+    projectile.position.x =
+      projectile.position.y =
+      projectile.velocity.x =
+      projectile.velocity.y =
+        0;
+    projectile.damage = 0;
+    applyEnemyDamage(state.pools, pair % 64, damage);
+  }
 }
 
 export function advanceRun(

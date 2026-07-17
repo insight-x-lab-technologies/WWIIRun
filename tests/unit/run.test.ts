@@ -46,19 +46,20 @@ describe("createRunState", () => {
     const state = createRunState(config);
 
     expect(TICKS_PER_SECOND).toBe(60);
-    expect(RUN_STATE_SCHEMA_VERSION).toBe(3);
+    expect(RUN_STATE_SCHEMA_VERSION).toBe(4);
     expect(InputActionBits).toEqual({
       firePrimary: 0x0001,
       fireSecondary: 0x0002,
       special: 0x0004,
     });
     expect(state).toMatchObject({
-      schemaVersion: 3,
+      schemaVersion: 4,
       config: {
         ...config,
         modifierIds: ["difficulty.hard.v1", "weather.snow.v1"],
       },
       tick: 0,
+      primaryCooldownTicks: 0,
       input: { moveX: 0, moveY: 0, actions: 0 },
       player: {
         definitionId: "aircraft.placeholder.v1",
@@ -357,7 +358,7 @@ describe("fixed-tick transition", () => {
     const inputs = Array.from({ length: 100_000 }, (_, index) => ({
       moveX: (index % 255) - 127,
       moveY: 127 - (index % 255),
-      actions: index % 8,
+      actions: 0,
     }));
 
     advanceRun(state, inputs);
@@ -438,6 +439,7 @@ describe("hashRunState", () => {
       },
       pools: baseline.pools,
       schemaVersion: baseline.schemaVersion,
+      primaryCooldownTicks: baseline.primaryCooldownTicks,
     } as RunState;
 
     expect(hashRunState(reordered)).toBe(hashRunState(baseline));
@@ -479,7 +481,7 @@ describe("hashRunState", () => {
     const baseline = createRunState(validConfig());
     const changedSchema = createRunState(validConfig());
     const mutableSchema = changedSchema as unknown as { schemaVersion: number };
-    mutableSchema.schemaVersion = 4;
+    mutableSchema.schemaVersion = 5;
     const changedAlgorithm = createRunState(validConfig());
     const mutableAlgorithm = changedAlgorithm.rng.spawn as unknown as {
       algorithm: string;

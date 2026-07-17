@@ -17,6 +17,12 @@ export type {
 } from "./types";
 export {
   activateEntity,
+  activateEnemy,
+  applyEnemyDamage,
+  INTERCEPTOR_ENEMY,
+  MACHINE_GUN,
+  SCOUT_ENEMY,
+  tryActivateProjectile,
   deactivateEntity,
   COIN_PLACEHOLDER,
   ENEMY_PLACEHOLDER,

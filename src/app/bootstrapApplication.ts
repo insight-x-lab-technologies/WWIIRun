@@ -20,6 +20,12 @@ export function bootstrapApplication(
   const pointer = new PointerInput();
   const combined = new CombinedInput(keyboard, pointer);
   const session = new GameplaySession(combined, lifecycle);
+  if (
+    new URLSearchParams(root.ownerDocument.defaultView?.location.search).get(
+      "combat-diagnostics",
+    ) === "1"
+  )
+    session.activateDiagnosticEnemy("enemy.scout.v1", 60_000, 69_120);
   const instructions = createInstructions(root, pointer);
   const game = createGame(root, { session, keyboard, pointer, combined });
   let destroyed = false;

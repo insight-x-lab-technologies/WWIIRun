@@ -22,7 +22,7 @@ export type InputFrame = {
 };
 
 export type RunState = {
-  readonly schemaVersion: 3;
+  readonly schemaVersion: 4;
   readonly config: RunConfig;
   tick: number;
   input: InputFrame;
@@ -30,6 +30,7 @@ export type RunState = {
   readonly rng: Record<RngStreamId, RngState>;
   readonly pools: EntityPools;
   readonly broadPhase: BroadPhaseScratch;
+  primaryCooldownTicks: number;
 };
 
 export type StateHashAlgorithm = "fnv1a64-v1";
