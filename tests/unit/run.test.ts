@@ -46,14 +46,14 @@ describe("createRunState", () => {
     const state = createRunState(config);
 
     expect(TICKS_PER_SECOND).toBe(60);
-    expect(RUN_STATE_SCHEMA_VERSION).toBe(4);
+    expect(RUN_STATE_SCHEMA_VERSION).toBe(5);
     expect(InputActionBits).toEqual({
       firePrimary: 0x0001,
       fireSecondary: 0x0002,
       special: 0x0004,
     });
     expect(state).toMatchObject({
-      schemaVersion: 4,
+      schemaVersion: 5,
       config: {
         ...config,
         modifierIds: ["difficulty.hard.v1", "weather.snow.v1"],
@@ -103,7 +103,12 @@ describe("createRunState", () => {
     expect(state.pools.projectiles).toHaveLength(256);
     expect(state.pools.enemies).toHaveLength(64);
     expect(state.pools.coins).toHaveLength(128);
-    expect(state.pools.cursors).toEqual({ projectile: 0, enemy: 0, coin: 0 });
+    expect(state.pools.cursors).toEqual({
+      projectile: 0,
+      enemy: 0,
+      coin: 0,
+      structure: 0,
+    });
     expect(state.config).not.toBe(config);
     expect(state.config.modifierIds).not.toBe(modifierIds);
     expect(Object.isFrozen(state.config)).toBe(true);
@@ -481,7 +486,7 @@ describe("hashRunState", () => {
     const baseline = createRunState(validConfig());
     const changedSchema = createRunState(validConfig());
     const mutableSchema = changedSchema as unknown as { schemaVersion: number };
-    mutableSchema.schemaVersion = 5;
+    mutableSchema.schemaVersion = 4;
     const changedAlgorithm = createRunState(validConfig());
     const mutableAlgorithm = changedAlgorithm.rng.spawn as unknown as {
       algorithm: string;

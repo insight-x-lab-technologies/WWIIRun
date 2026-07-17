@@ -54,10 +54,11 @@ describe("headless run golden corpus", () => {
     advanceRun(partitioned, runV2GoldenVectors.inputs.slice(3));
     advanceRun(repeated, runV2GoldenVectors.inputs);
 
-    expect(batched).toEqual(stepped);
-    expect(partitioned).toEqual(stepped);
-    expect(repeated).toEqual(stepped);
-    expect(hashRunState(stepped)).toBe(runV5Checkpoints.at(-1)?.hash);
+    const expectedHash = runV5Checkpoints.at(-1)?.hash;
+    expect(hashRunState(stepped)).toBe(expectedHash);
+    expect(hashRunState(batched)).toBe(expectedHash);
+    expect(hashRunState(partitioned)).toBe(expectedHash);
+    expect(hashRunState(repeated)).toBe(expectedHash);
   });
 });
 

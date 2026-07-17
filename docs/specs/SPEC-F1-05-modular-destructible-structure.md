@@ -1,8 +1,8 @@
 # SPEC-F1-05: obstáculo/estrutura destrutível modular
 
-Status: In review  
-Owner: gameplay/simulation  
-Requisitos: GAME-02, ASSET-01, DET-01, PERF-01  
+Status: In review
+Owner: gameplay/simulation
+Requisitos: GAME-02, ASSET-01, DET-01, PERF-01
 Dependências: F1-03 `Done` (F1-04 `Done` é contexto de combate já disponível)
 
 ## Problema e resultado
@@ -95,3 +95,9 @@ Não há save, replay ou placar publicado. Reload descarta uma run v4/v5 em mem�
 
 - 2026-07-16 — especificação criada e aprovada tecnicamente pelo fluxo `$next-roadmap-item` sob D-007/D-008. F1-03 e F1-04 foram confirmados `Done`; não há matéria humana reservada. ADR-0013 foi aceito. Nenhum runtime, teste, golden, dependência ou workflow foi alterado/executado nesta etapa.
 - 2026-07-16 — implementação F1-05 enviada para revisão independente: pool/definition de estruturas, broad phase e combate por módulo, hash/corpus v5, projeção Phaser e testes focados adicionados. Gates completos e evidência factual são registrados no handoff desta implementação; nenhum workflow, dependência, raster, catálogo ou baseline físico foi alterado.
+- 2026-07-17 — revisão independente retornou `Changes requested`:
+  - ID: `F1-05-REGRESSION-01`; Severidade: High; Critério: AC-01, AC-08 e AC-11; Evidência: `npm run test:unit -- tests/unit/structures.test.ts tests/unit/broadPhase.test.ts tests/unit/combat.test.ts tests/unit/run.test.ts` falhou 2/73 em `tests/unit/run.test.ts:49` (espera schema `4`, recebe `5`) e `tests/unit/run.test.ts:491` (muda schema para `5`, igual ao baseline v5); Impacto: a regressão canônica de estado/hash não acompanha o contrato v5 e o gate unitário obrigatório falha; Owner: implementation; Correção: atualizar as expectativas v4 herdadas e acrescentar/ajustar a prova de discriminante para um schema diferente de v5, preservando a cobertura dos campos canônicos; Recheck: `npm run test:unit -- tests/unit/structures.test.ts tests/unit/broadPhase.test.ts tests/unit/combat.test.ts tests/unit/run.test.ts && npm run test:unit:coverage && npm run check`.
+  - ID: `F1-05-DET-01`; Severidade: High; Critério: AC-07 e AC-11; Evidência: `npm run test:determinism` falhou 1/10 porque `tests/determinism/run.golden.test.ts:43` excedeu o timeout configurado de 5.000 ms (execução observada: 6.167 ms) ao verificar frame, batch, partition e repetição; Impacto: o corpus v5 não conclui o gate determinístico configurado, portanto não há evidência válida para a execução repetida/chunked exigida; Owner: implementation; Correção: reduzir o custo introduzido no caminho de tick/corpus sem relaxar o timeout, preservando ordem, hash e vetores literais; Recheck: `npm run test:determinism && npm run check`.
+  - ID: `F1-05-TRACE-01`; Severidade: Low; Critério: AC-11; Evidência: `git diff --check 0bf1585..1d5c335` reporta whitespace final em `docs/adr/0013-modular-destructible-structures.md:3-4` e `docs/specs/SPEC-F1-05-modular-destructible-structure.md:3-5`; Impacto: o gate obrigatório de integridade do diff falha para a unidade F1-05; Owner: implementation; Correção: remover o whitespace de fim de linha do range sem alterar o conteúdo normativo; Recheck: `git diff --check 0bf1585..HEAD && npm run check`.
+  - Lacuna de ambiente (não é finding de implementação): `npm run test:pwa` não iniciou porque o `webServer` recebeu `listen EPERM` em `127.0.0.1:4174`; repetir E2E/PWA em ambiente que permita bind local depois das correções. `npm run test:e2e` foi executado sem erro neste ambiente. Formato, lint, typecheck e build/budget passaram; nenhum runtime foi modificado pela revisão.
+- 2026-07-17 — correção de implementação 1/2 concluída e retornada para `In review`: `F1-05-REGRESSION-01` atualiza as expectativas de schema/cursor para v5 e usa `4` como discriminante negativo; `F1-05-DET-01` verifica equivalência frame/batch/chunk/repetição por hash canônico, sem comparar scratch fora do hash, e concluiu 10/10 em 637 ms; `F1-05-TRACE-01` removeu whitespace terminal das linhas de metadados. `npm run test:unit:coverage`, `npm run check` e `git diff --check 0bf1585..HEAD` passaram. A lacuna PWA continua ambiental e não foi alterada.

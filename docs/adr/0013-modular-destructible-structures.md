@@ -1,7 +1,7 @@
 # ADR-0013: estrutura modular fixa e estado de run v5
 
-Status: Accepted  
-Data: 2026-07-16  
+Status: Accepted
+Data: 2026-07-16
 Decisores: proprietário do projeto, por delegação D-007/D-008, e agente técnico
 
 ## Contexto
