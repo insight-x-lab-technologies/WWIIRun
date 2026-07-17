@@ -56,6 +56,7 @@ Esta pasta é a fonte de verdade do projeto. Em conflito, prevalecem: ADR aceito
 - [ADR-0011: pools limitados determinísticos e grade espacial canônica](adr/0011-deterministic-bounded-pools-spatial-grid.md)
 - [ADR-0012: combate dirigido por input e estado de inimigos versionado](adr/0012-input-driven-combat-state-and-enemy-behaviors.md)
 - [ADR-0013: estrutura modular fixa e estado de run v5](adr/0013-modular-destructible-structures.md)
+- [ADR-0014: loot determinístico, coleta e estatísticas da run v6](adr/0014-deterministic-loot-collection-run-statistics.md)
 
 ## ADRs propostos
 

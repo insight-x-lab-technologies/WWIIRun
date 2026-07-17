@@ -52,6 +52,7 @@ describe("bounded entity pools", () => {
       health: { current: 0, max: 0 },
       behavior: "",
       contactDamage: 0,
+      value: 0,
     });
   });
   test("exhaustion is atomic and cursors affect the canonical hash", () => {

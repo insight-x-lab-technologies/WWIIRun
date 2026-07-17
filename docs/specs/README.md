@@ -20,4 +20,5 @@ Specs concluídas permanecem no repositório como ligação entre requisito, dec
 - [`F1-02 — aeronave, movimento, vida/dano e colisões primitivas/compostas`](SPEC-F1-02-aircraft-movement-health-damage-collisions.md) — `Done`.
 - [`F1-03 — pools limitados de entidades e broad phase espacial`](SPEC-F1-03-bounded-pools-spatial-broad-phase.md) — `Done`.
 - [`F1-04 — metralhadora e dois inimigos com HP/comportamento`](SPEC-F1-04-machine-gun-two-enemies.md) — `Done`.
-- [`F1-05 — obstáculo/estrutura destrutível modular`](SPEC-F1-05-modular-destructible-structure.md) — `In review`.
+- [`F1-05 — obstáculo/estrutura destrutível modular`](SPEC-F1-05-modular-destructible-structure.md) — `Done`.
+- [`F1-06 — drops de moeda, coleta e estatísticas da run`](SPEC-F1-06-coin-drops-collection-run-statistics.md) — `In review`.

@@ -128,4 +128,22 @@ describe("GameplaySession", () => {
       input: { moveX: 127, moveY: 0, actions: 0 },
     });
   });
+
+  it("offers an opt-in diagnostic coin without bypassing the simulation", () => {
+    const session = new GameplaySession(
+      { sample: () => ({ moveX: 127, moveY: 0, actions: 0 }) },
+      { setRunActive: vi.fn() },
+    );
+    session.activateDiagnosticCoin(49_152, 69_120);
+    session.start();
+    for (let tick = 0; tick < 50; tick += 1) {
+      session.update(1000 / 60);
+    }
+    expect(session.snapshot().state.runStats).toEqual({
+      runCoins: 1,
+      coinsSpawned: 0,
+      coinsCollected: 1,
+      enemiesDestroyed: 0,
+    });
+  });
 });

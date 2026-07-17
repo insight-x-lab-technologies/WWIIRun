@@ -3,7 +3,7 @@ import type { RunState, StateHash, StateHashAlgorithm } from "./types";
 
 export const STATE_HASH_ALGORITHM: StateHashAlgorithm = "fnv1a64-v1";
 
-const LAYOUT_TAG = "wwiirun.run-state.v5";
+const LAYOUT_TAG = "wwiirun.run-state.v6";
 const FNV_OFFSET_BASIS = 0xcbf29ce484222325n;
 const FNV_PRIME = 0x00000100000001b3n;
 const UINT64_MASK = 0xffffffffffffffffn;
@@ -43,6 +43,11 @@ export function hashRunState(state: RunState): StateHash {
   hasher.writeUint32(state.player.health.max);
   hasher.writeUint32(state.player.invulnerabilityTicks);
   hasher.writeAscii(state.player.status);
+  hasher.writeAscii("runStats");
+  hasher.writeUint32(state.runStats.runCoins);
+  hasher.writeUint32(state.runStats.coinsSpawned);
+  hasher.writeUint32(state.runStats.coinsCollected);
+  hasher.writeUint32(state.runStats.enemiesDestroyed);
   hasher.writeUint32(STREAM_IDS.length);
   for (const streamId of STREAM_IDS) {
     const rng = state.rng[streamId];
@@ -94,6 +99,7 @@ function writePool(
     health: { current: number; max: number };
     behavior: string;
     contactDamage: number;
+    value: number;
   }[],
   cursor: number,
 ): void {
@@ -112,6 +118,7 @@ function writePool(
     hasher.writeUint32(slot.health.max);
     hasher.writeAscii(slot.behavior);
     hasher.writeUint32(slot.contactDamage);
+    hasher.writeUint32(slot.value);
   }
 }
 

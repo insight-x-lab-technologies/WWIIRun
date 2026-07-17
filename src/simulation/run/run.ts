@@ -1,4 +1,4 @@
-import { createRngStreams, parseSeedHex } from "../random";
+import { createRngStreams, nextUint32, parseSeedHex } from "../random";
 import {
   applyDamage,
   createPlayerState,
@@ -11,6 +11,7 @@ import {
   MACHINE_GUN,
   stepEnemyBehaviors,
   stepEntityPools,
+  tryActivateCoin,
   tryActivateProjectile,
 } from "../entities";
 import { applyStructureModuleDamage, stepStructures } from "../structures";
@@ -18,7 +19,7 @@ import { createBroadPhaseScratch, collectContacts } from "../broadPhase";
 import type { InputFrame, RunConfig, RunMode, RunState } from "./types";
 
 export const TICKS_PER_SECOND = 60 as const;
-export const RUN_STATE_SCHEMA_VERSION = 5 as const;
+export const RUN_STATE_SCHEMA_VERSION = 6 as const;
 
 export const InputActionBits = {
   firePrimary: 0x0001,
@@ -61,6 +62,12 @@ export function createRunState(config: RunConfig): RunState {
     rng: createRngStreams(canonicalConfig.seed),
     pools: createEntityPools(),
     broadPhase: createBroadPhaseScratch(),
+    runStats: {
+      runCoins: 0,
+      coinsSpawned: 0,
+      coinsCollected: 0,
+      enemiesDestroyed: 0,
+    },
     primaryCooldownTicks: 0,
   };
 }
@@ -102,10 +109,10 @@ export function stepRun(state: RunState, input: InputFrame): void {
     PLACEHOLDER_AIRCRAFT.hitboxes,
     state.broadPhase,
   );
-  resolveCombat(state);
+  resolveContacts(state);
   state.tick += 1;
 }
-function resolveCombat(state: RunState): void {
+function resolveContacts(state: RunState): void {
   const damagedStructures = state.broadPhase.playerStructureDamage;
   for (let i = 0; i < state.broadPhase.contactCount; i += 1) {
     const code = state.broadPhase.contactCodes[i]!;
@@ -131,7 +138,11 @@ function resolveCombat(state: RunState): void {
       if (!projectile.active || !enemy.active) continue;
       const damage = projectile.damage;
       clearProjectile(projectile);
-      applyEnemyDamage(state.pools, pair % 64, damage);
+      const enemyIndex = pair % 64;
+      const pivotX = enemy.position.x;
+      const pivotY = enemy.position.y;
+      if (applyEnemyDamage(state.pools, enemyIndex, damage) === "destroyed")
+        resolveEnemyLoot(state, pivotX, pivotY);
       continue;
     }
     const pair = code - 16_640;
@@ -154,6 +165,62 @@ function resolveCombat(state: RunState): void {
       damage,
     );
   }
+  collectCoins(state);
+}
+function resolveEnemyLoot(
+  state: RunState,
+  pivotX: number,
+  pivotY: number,
+): void {
+  incrementStat(state.runStats, "enemiesDestroyed");
+  if (nextUint32(state.rng.loot) >= 0x80000000) return;
+  if (tryActivateCoin(state.pools, pivotX, pivotY))
+    incrementStat(state.runStats, "coinsSpawned");
+}
+function collectCoins(state: RunState): void {
+  for (let i = 0; i < state.broadPhase.contactCount; i += 1) {
+    const code = state.broadPhase.contactCodes[i]!;
+    if (code < 64 || code >= 192) continue;
+    const coin = state.pools.coins[code - 64]!;
+    if (!coin.active) continue;
+    const value = coin.value;
+    clearCoin(coin);
+    addStat(state.runStats, "runCoins", value);
+    incrementStat(state.runStats, "coinsCollected");
+  }
+}
+function clearCoin(coin: {
+  active: boolean;
+  definitionId: string;
+  position: { x: number; y: number };
+  velocity: { x: number; y: number };
+  damage: number;
+  health: { current: number; max: number };
+  behavior: "" | "scout" | "interceptor";
+  contactDamage: number;
+  value: number;
+}): void {
+  coin.active = false;
+  coin.definitionId = "";
+  coin.position.x = coin.position.y = coin.velocity.x = coin.velocity.y = 0;
+  coin.damage = 0;
+  coin.health.current = coin.health.max = 0;
+  coin.behavior = "";
+  coin.contactDamage = 0;
+  coin.value = 0;
+}
+function incrementStat(
+  stats: RunState["runStats"],
+  key: keyof RunState["runStats"],
+): void {
+  addStat(stats, key, 1);
+}
+function addStat(
+  stats: RunState["runStats"],
+  key: keyof RunState["runStats"],
+  amount: number,
+): void {
+  stats[key] = Math.min(0xffffffff, stats[key] + amount);
 }
 function clearProjectile(projectile: {
   active: boolean;

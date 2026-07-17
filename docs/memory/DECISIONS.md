@@ -15,6 +15,7 @@
 | ADR-0011 | Aceita | Pools canônicos de slots limitados, cursores circulares e grade uniforme scratch reduzem pares sem afetar ordem, determinismo ou hash fora do estado de gameplay. |
 | ADR-0012 | Aceita | Combate F1-04 é dirigido por input em ticks inteiros; estado v4 serializa cooldown, dano/HP/comportamento e resolve contatos canonicamente sem RNG/diretor. |
 | ADR-0013 | Aceita | Estruturas F1-05 usam pool dedicado de 16 slots com até quatro módulos canônicos; HP/contatos por módulo entram no estado/hash v5. |
+| ADR-0014 | Aceita | F1-06 usa a stream `loot`, moedas transitórias em pool e estatísticas canônicas da run no estado/hash v6; não cria wallet, score ou persistência. |
 | D-004 | Aceita | “Indiano” significa Hindi (`hi`) e espanhol significa `es-ES`; há 9 locales confirmados e o décimo segue aberto. |
 | D-005 | Aceita | O jogo funciona offline; recursos sociais sincronizam quando há rede. |
 | D-006 | Aceita | Leaderboard central trata o cliente como não confiável e valida submissões. |

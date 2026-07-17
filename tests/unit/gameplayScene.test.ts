@@ -93,6 +93,12 @@ function createHarness(showHitboxes: boolean) {
           health: { current: 100, max: 100 },
           status: "active",
         },
+        runStats: {
+          runCoins: 0,
+          coinsSpawned: 0,
+          coinsCollected: 0,
+          enemiesDestroyed: 0,
+        },
       },
     })),
     pause: vi.fn(),

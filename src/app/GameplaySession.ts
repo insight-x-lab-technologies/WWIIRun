@@ -1,4 +1,5 @@
 import {
+  activateCoin,
   activateEnemy,
   activateStructure,
   createRunState,
@@ -99,6 +100,10 @@ export class GameplaySession {
       0,
       0,
     );
+  }
+  activateDiagnosticCoin(x: number, y: number): void {
+    this.assertAlive();
+    activateCoin(this.state.pools, x, y, 0, 0, 1);
   }
   destroy(): void {
     if (this.destroyed) return;

@@ -8,7 +8,10 @@ F1 — Vertical slice jogável geométrico.
 
 ## Concluído
 
-- F1-05 aprovado em revisão independente e movido para `Done`: estrutura modular v5, pool 16×4, contatos por módulo, hash/corpus v5 e placeholders foram rechecados; `F1-05-REGRESSION-01`, `F1-05-DET-01`, `F1-05-TRACE-01` e `F1-05-PERF-01` foram fechados. Focados/coverage, determinismo, `npm run check` e `git diff --check` passaram. PWA permanece uma lacuna ambiental conhecida no sandbox (`listen EPERM 127.0.0.1:4174`), sem finding de implementação. Próximo passo exato: `$specify-roadmap-item F1-06`; não iniciar item além dele.
+- F1-06 implementado e movido para `In review`: ADR-0014 foi aplicado com stream `loot`, threshold literal de 50%, pool de 128 moedas/cursor/valor/sentinelas, coleta por contatos canônicos e `runStats` saturado no estado/hash v6. A cena somente projeta placeholders/datasets diagnósticos; não há wallet, score, save, backend, rede, economia ou raster. Corpus v1–v5 permanece literal; os vetores v6 geral e de loot vencedor são independentes.
+- validações F1-06: focados/coverage, `npm run test:determinism`, `npm run check`, `npm run test:e2e`, `npm run test:pwa`, `git diff --check` e `graphify update .` passaram. E2E/PWA precisaram de execução fora do sandbox porque o servidor local não inicia sob a restrição de porta; isso não gerou finding de implementação. Próximo passo exato: `$review-roadmap-item F1-06`; não iniciar F1-07/F1-08.
+
+- F1-05 aprovado em revisão independente e movido para `Done`: estrutura modular v5, pool 16×4, contatos por módulo, hash/corpus v5 e placeholders foram rechecados; `F1-05-REGRESSION-01`, `F1-05-DET-01`, `F1-05-TRACE-01` e `F1-05-PERF-01` foram fechados. Focados/coverage, determinismo, `npm run check` e `git diff --check` passaram. PWA permanece uma lacuna ambiental conhecida no sandbox (`listen EPERM 127.0.0.1:4174`), sem finding de implementação.
 
 - realizado em 2026-07-04: workflow `$next-roadmap-item` criado com agentes separados para especificação, implementação e revisão, aprovação técnica automática e limite de duas correções; o trabalho ativo de F1-01 no checkout original foi preservado.
 - validação forward controlada do workflow em 2026-07-04: FT-01, FT-02, FT-03 e o probe corrigido de FT-04 produziram propostas conformes em contextos frescos, read-only e com fixtures sintéticas em `/tmp/wwiirun-roadmap-orchestration-green/`: FT-01 roteou specifier → implementer → reviewer distinto, autoaprovou a decisão técnica e terminou em `Done`; FT-02 classificou a asserção temporária inválida como `review-probe`, corrigida/descartada pelo reviewer sem retorno à implementação; FT-03 reutilizou o mesmo implementer e reviewer por duas correções, parou em `Changes requested` com `IMP-7` não resolvido e retomada explícita pelo proprietário; FT-04 materializou a spec, moveu o item do roadmap por seu lifecycle `Ready → Specified`, moveu o documento da spec separadamente por `Draft → Awaiting approval`, não iniciou implementação e exigiu a escolha exata entre autorizar serviço pago/orçamento ou revisar a aceitação. A primeira tentativa de FT-04 não exigia materialização lógica da spec e retornou o item em `Ready`; ela foi um probe incompleto, não evidência conforme, e seu raw foi preservado.
@@ -121,7 +124,7 @@ F1 — Vertical slice jogável geométrico.
 
 ## Próximo passo exato
 
-Executar `$implement-roadmap-item F1-05` usando `docs/specs/SPEC-F1-05-modular-destructible-structure.md`; o item está `Specified` e tecnicamente aprovado. Não iniciar F1-06 nesta unidade.
+Executar `$review-roadmap-item F1-06` usando `docs/specs/SPEC-F1-06-coin-drops-collection-run-statistics.md`; o item está `In review`. Não iniciar F1-07/F1-08 nesta unidade.
 
 ## Bloqueios
 

@@ -23,6 +23,7 @@ export type EntitySlot = {
   health: { current: number; max: number };
   behavior: EnemyBehavior;
   contactDamage: number;
+  value: number;
 };
 export type EntityPools = {
   readonly projectiles: EntitySlot[];
@@ -109,13 +110,16 @@ export const INTERCEPTOR_ENEMY: EntityDefinition &
   verticalAcceleration: 128,
   verticalSpeedCap: 768,
 });
-export const COIN_PLACEHOLDER: EntityDefinition = Object.freeze({
+export const COIN_PLACEHOLDER: EntityDefinition &
+  Readonly<{ velocityX: -256; value: 1 }> = Object.freeze({
   id: "coin.placeholder.v1",
   kind: "coin",
   pivot: Object.freeze({ x: 0, y: 0 }),
   hitboxes: createCompoundHitbox([
     { kind: "circle", offsetX: 0, offsetY: 0, radius: 512 },
   ]),
+  velocityX: -256,
+  value: 1,
 });
 const DEFINITIONS: readonly EntityDefinition[] = [
   PROJECTILE_PLACEHOLDER,
@@ -171,7 +175,8 @@ export function activateEntity(
     y,
     velocityX,
     velocityY,
-    1,
+    kind === "coin" ? COIN_PLACEHOLDER.value : 0,
+    0,
   );
   if (index >= 0) return { status: "spawned", id: `${kind}:${index}` };
   return { status: "exhausted" };
@@ -193,7 +198,58 @@ export function tryActivateProjectile(
     y,
     velocityX,
     0,
+    0,
     damage,
+  );
+  return index >= 0;
+}
+export function activateCoin(
+  pools: EntityPools,
+  x: number,
+  y: number,
+  velocityX: number,
+  velocityY: number,
+  value: number,
+): SpawnResult {
+  validateInteger("x", x);
+  validateInteger("y", y);
+  validateInteger("velocityX", velocityX);
+  validateInteger("velocityY", velocityY);
+  validatePositiveValue(value);
+  validateEnvelope(x, y, COIN_PLACEHOLDER);
+  const index = activateSlot(
+    pools,
+    "coin",
+    COIN_PLACEHOLDER,
+    COIN_PLACEHOLDER.id,
+    x,
+    y,
+    velocityX,
+    velocityY,
+    value,
+    0,
+  );
+  return index >= 0
+    ? { status: "spawned", id: `coin:${index}` }
+    : { status: "exhausted" };
+}
+/** Allocation-free hot-path spawn for deterministic loot. */
+export function tryActivateCoin(
+  pools: EntityPools,
+  x: number,
+  y: number,
+): boolean {
+  const index = activateSlot(
+    pools,
+    "coin",
+    COIN_PLACEHOLDER,
+    COIN_PLACEHOLDER.id,
+    x,
+    y,
+    COIN_PLACEHOLDER.velocityX,
+    0,
+    COIN_PLACEHOLDER.value,
+    0,
   );
   return index >= 0;
 }
@@ -298,6 +354,7 @@ function createSlots(capacity: number): EntitySlot[] {
       health: { current: 0, max: 0 },
       behavior: "",
       contactDamage: 0,
+      value: 0,
     });
   return slots;
 }
@@ -310,6 +367,7 @@ function activateSlot(
   y: number,
   velocityX: number,
   velocityY: number,
+  value: number,
   damage: number,
 ): number {
   const slots = slotsFor(pools, kind);
@@ -325,6 +383,7 @@ function activateSlot(
     slot.velocity.x = velocityX;
     slot.velocity.y = velocityY;
     if (kind === "projectile") slot.damage = damage;
+    if (kind === "coin") slot.value = value;
     if (kind === "enemy") {
       const enemy = combatEnemyDefinition(definition);
       slot.health.current = enemy?.health ?? 1;
@@ -356,6 +415,13 @@ function clearSlot(slot: EntitySlot): void {
   slot.health.max = 0;
   slot.behavior = "";
   slot.contactDamage = 0;
+  slot.value = 0;
+}
+function validatePositiveValue(value: number): void {
+  if (!Number.isInteger(value) || value <= 0 || value > SIMULATION_ENVELOPE)
+    throw new RangeError(
+      "value must be a positive integer within the simulation envelope.",
+    );
 }
 function combatEnemyDefinition(
   definition: EntityDefinition,

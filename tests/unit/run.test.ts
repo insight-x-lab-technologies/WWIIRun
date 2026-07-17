@@ -46,14 +46,14 @@ describe("createRunState", () => {
     const state = createRunState(config);
 
     expect(TICKS_PER_SECOND).toBe(60);
-    expect(RUN_STATE_SCHEMA_VERSION).toBe(5);
+    expect(RUN_STATE_SCHEMA_VERSION).toBe(6);
     expect(InputActionBits).toEqual({
       firePrimary: 0x0001,
       fireSecondary: 0x0002,
       special: 0x0004,
     });
     expect(state).toMatchObject({
-      schemaVersion: 5,
+      schemaVersion: 6,
       config: {
         ...config,
         modifierIds: ["difficulty.hard.v1", "weather.snow.v1"],
@@ -451,6 +451,7 @@ describe("hashRunState", () => {
       },
       pools: baseline.pools,
       schemaVersion: baseline.schemaVersion,
+      runStats: baseline.runStats,
       primaryCooldownTicks: baseline.primaryCooldownTicks,
     } as RunState;
 

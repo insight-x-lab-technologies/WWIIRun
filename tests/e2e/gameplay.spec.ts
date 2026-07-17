@@ -111,6 +111,19 @@ test("boots gameplay, accepts keyboard input, and exposes accessible touch actio
   await actions.first().dispatchEvent("pointerup", { pointerId: 10 });
 });
 
+test("projects transient coin statistics through the real keyboard gameplay path", async ({
+  page,
+}) => {
+  await page.goto("/?loot-diagnostics=1");
+  const root = page.locator("#game-root");
+  await expect(root).toHaveAttribute("data-run-coins", "0");
+  await expect(root).toHaveAttribute("data-coins-collected", "0");
+  await page.keyboard.down("ArrowRight");
+  await expect(root).toHaveAttribute("data-run-coins", "1");
+  await expect(root).toHaveAttribute("data-coins-collected", "1");
+  await page.keyboard.up("ArrowRight");
+});
+
 test("reprojects the logical profile across orientation changes without duplicating canvas", async ({
   page,
 }) => {

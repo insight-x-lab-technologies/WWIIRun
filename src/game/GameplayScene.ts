@@ -111,6 +111,15 @@ export class GameplayScene extends Phaser.Scene {
     this.dependencies.root.dataset.weaponCooldown = String(
       snapshot.state.primaryCooldownTicks,
     );
+    const stats = snapshot.state.runStats;
+    this.dependencies.root.dataset.runCoins = String(stats.runCoins);
+    this.dependencies.root.dataset.coinsSpawned = String(stats.coinsSpawned);
+    this.dependencies.root.dataset.coinsCollected = String(
+      stats.coinsCollected,
+    );
+    this.dependencies.root.dataset.enemiesDestroyed = String(
+      stats.enemiesDestroyed,
+    );
   }
 
   private bindEvents(): void {

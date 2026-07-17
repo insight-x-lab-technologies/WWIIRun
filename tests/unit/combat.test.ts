@@ -83,10 +83,11 @@ describe("F1-04 combat", () => {
       health: { current: 0, max: 0 },
       behavior: "",
       contactDamage: 0,
+      value: 0,
     };
     stepRun(state, { moveX: 0, moveY: 0, actions: 0 });
     expect(enemy.active).toBe(false);
-    expect(state.pools.projectiles[0].active).toBe(false);
+    expect(state.pools.projectiles[0]!.active).toBe(false);
   });
 
   test("includes cooldown and combat fields in the canonical hash", () => {
