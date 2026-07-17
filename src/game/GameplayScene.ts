@@ -27,6 +27,7 @@ import {
   technicalPlaceholderInstructions,
   type ParallaxVisualResolver,
 } from "./parallax";
+import { GameplayHud } from "./hud";
 
 export type GameplaySceneDependencies = {
   root: HTMLElement;
@@ -49,6 +50,7 @@ export class GameplayScene extends Phaser.Scene {
   private aircraft: Phaser.GameObjects.Graphics | undefined;
   private hitboxOverlay: Phaser.GameObjects.Graphics | undefined;
   private diagnostic: Phaser.GameObjects.Text | undefined;
+  private hud: GameplayHud | undefined;
   private zones: Phaser.GameObjects.Graphics | undefined;
   private readonly entityGraphics: Phaser.GameObjects.Graphics[] = [];
   private readonly structureGraphics: Phaser.GameObjects.Graphics[] = [];
@@ -86,6 +88,9 @@ export class GameplayScene extends Phaser.Scene {
         fontSize: "16px",
       })
       .setDepth(10);
+    this.hud = new GameplayHud(this);
+    this.hud.create();
+    if (this.layout !== undefined) this.hud.applyLayout(this.layout);
     this.drawZones();
     this.bindEvents();
     this.dependencies.session.start();
@@ -117,6 +122,7 @@ export class GameplayScene extends Phaser.Scene {
     this.diagnostic?.setText(
       `Gameplay tick ${snapshot.state.tick} | input ${input.moveX},${input.moveY},${input.actions} | HP ${player.health.current}/${player.health.max} | ${player.status}${result.dropped ? " | backlog dropped" : ""}`,
     );
+    this.hud?.update(snapshot.state, delta, this.dependencies.root);
     const status = this.dependencies.root.querySelector<HTMLElement>(
       "[data-gameplay-status]",
     );
@@ -269,6 +275,7 @@ export class GameplayScene extends Phaser.Scene {
       height: size,
     });
     root.dataset.orientation = this.layout.orientation;
+    this.hud?.applyLayout(this.layout);
     if (this.zones !== undefined) this.drawZones();
   }
 
@@ -552,6 +559,8 @@ export class GameplayScene extends Phaser.Scene {
     for (const graphics of this.structureGraphics.splice(0)) graphics.destroy();
     this.diagnostic?.destroy();
     this.diagnostic = undefined;
+    this.hud?.destroy();
+    this.hud = undefined;
     this.dependencies.session.destroy();
   }
 }

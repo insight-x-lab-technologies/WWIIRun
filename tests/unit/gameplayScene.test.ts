@@ -34,6 +34,28 @@ describe("GameplayScene resources", () => {
     enabled.shutdown();
   });
 
+  test("projects read-only HUD datasets and resets its local FPS estimate on layout", () => {
+    const harness = createHarness(false);
+    harness.scene.create();
+    const snapshot = harness.session.snapshot();
+    snapshot.state.tick = 180;
+    snapshot.state.player.velocity = { x: 256, y: -128 };
+    snapshot.state.player.health.current = 75;
+    snapshot.state.runStats.runCoins = 4;
+    harness.session.snapshot.mockReturnValue(snapshot);
+    harness.scene.update(0, 1000 / 60);
+    expect(harness.root.dataset).toMatchObject({
+      hudLife: "75/100",
+      hudDistance: "3 m",
+      hudCoins: "4",
+      hudFps: "60 FPS",
+      hudLevel: "1",
+      hudSpeed: "216 km/h",
+      hudSeed: "00112233445566778899aabbccddeeff",
+    });
+    harness.shutdown();
+  });
+
   test("releases graphics, text, listeners, callbacks and ignores update after five shutdowns", () => {
     for (let cycle = 0; cycle < 5; cycle += 1) {
       const harness = createHarness(true);
@@ -43,7 +65,7 @@ describe("GameplayScene resources", () => {
       harness.shutdown();
       harness.scene.update(0, 1000 / 60);
       expect(harness.graphics).toEqual({ created: 523, destroyed: 523 });
-      expect(harness.text).toEqual({ created: 1, destroyed: 1 });
+      expect(harness.text).toEqual({ created: 5, destroyed: 5 });
       expect(harness.listeners.active()).toBe(0);
       expect(harness.session.update).toHaveBeenCalledTimes(1);
       expect(harness.events.pending()).toBe(0);
@@ -120,9 +142,11 @@ function createHarness(showHitboxes: boolean) {
       paused: false,
       state: {
         tick: 1,
+        config: { seed: "00112233445566778899aabbccddeeff" },
         input: { moveX: 0, moveY: 0, actions: 0 },
         player: {
           position: { x: 40960, y: 69120 },
+          velocity: { x: 0, y: 0 },
           health: { current: 100, max: 100 },
           status: "active",
         },

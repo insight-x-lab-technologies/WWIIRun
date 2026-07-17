@@ -21,5 +21,6 @@ Specs concluídas permanecem no repositório como ligação entre requisito, dec
 - [`F1-03 — pools limitados de entidades e broad phase espacial`](SPEC-F1-03-bounded-pools-spatial-broad-phase.md) — `Done`.
 - [`F1-04 — metralhadora e dois inimigos com HP/comportamento`](SPEC-F1-04-machine-gun-two-enemies.md) — `Done`.
 - [`F1-05 — obstáculo/estrutura destrutível modular`](SPEC-F1-05-modular-destructible-structure.md) — `Done`.
-- [`F1-06 — drops de moeda, coleta e estatísticas da run`](SPEC-F1-06-coin-drops-collection-run-statistics.md) — `In review`.
+- [`F1-06 — drops de moeda, coleta e estatísticas da run`](SPEC-F1-06-coin-drops-collection-run-statistics.md) — `Done` após revisão independente.
 - [`F1-07 — parallax de camadas e placeholders substituíveis`](SPEC-F1-07-parallax-replaceable-placeholders.md) — `Done` após revisão independente.
+- [`F1-08 — HUD de gameplay e telemetria da run`](SPEC-F1-08-gameplay-hud.md) — `In review`; aguarda revisão independente.

@@ -124,6 +124,34 @@ test("projects transient coin statistics through the real keyboard gameplay path
   await page.keyboard.up("ArrowRight");
 });
 
+test("projects the technical HUD through stable datasets across required viewports", async ({
+  page,
+}) => {
+  await page.goto("/?loot-diagnostics=1");
+  const root = page.locator("#game-root");
+  await expect(root).toHaveAttribute("data-hud-life", /^\d+\/100$/);
+  await expect(root).toHaveAttribute("data-hud-distance", /^\d+ m$/);
+  await expect(root).toHaveAttribute("data-hud-coins", "0");
+  await expect(root).toHaveAttribute("data-hud-fps", /^\d+ FPS$/);
+  await expect(root).toHaveAttribute("data-hud-level", "1");
+  await expect(root).toHaveAttribute("data-hud-speed", /^\d+ km\/h$/);
+  await expect(root).toHaveAttribute(
+    "data-hud-seed",
+    "00112233445566778899aabbccddeeff",
+  );
+  for (const [width, height] of [
+    [320, 568],
+    [568, 320],
+    [768, 1024],
+    [1024, 768],
+    [1920, 1080],
+  ] as const) {
+    await page.setViewportSize({ width, height });
+    await expect(root.locator("canvas")).toHaveCount(1);
+    await expect(root).toHaveAttribute("data-hud-distance", /^\d+ m$/);
+  }
+});
+
 test("reprojects the logical profile across orientation changes without duplicating canvas", async ({
   page,
 }) => {
