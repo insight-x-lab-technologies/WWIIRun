@@ -1,6 +1,6 @@
 # SPEC-F1-04: metralhadora e dois inimigos com HP/comportamento
 
-Status: In review  
+Status: Done  
 Owner: Codex  
 Requisitos: `GAME-02` (parcial), `ASSET-01` (parcial), `DET-01` (preservado), `PERF-01` (instrumentação)  
 Dependências: `F1-03` (`Done`); ADR-0001, ADR-0002, ADR-0005, ADR-0010, ADR-0011 e ADR-0012 aceitos
@@ -126,3 +126,4 @@ Não há save, replay ou placar publicado. Reload descarta run em memória pré-
   - Lacuna de ambiente (não é finding de implementação): `npm run test:e2e` e `npm run test:pwa` não iniciaram neste sandbox porque seus `webServer`s receberam `listen EPERM` em `127.0.0.1:4173` e `127.0.0.1:4174`, respectivamente. Próxima ação: repetir ambos em ambiente que permita bind local após `F1-04-TRACE-01`; não usar esta lacuna como evidência de aprovação.
   - Checks executados: `npm run test:unit` (300/300), `npm run test:determinism` (9/9), `npm run test:unit:coverage` e `npm run check` passaram; `git diff --check` passou. A inspeção confirmou corpus v4 literal importado pelo E2E e a preservação dos corpus v1/v2/v3 no diff, mas os gates de navegador permanecem não verificáveis neste ambiente.
 - 2026-07-16 — correção de `F1-04-TRACE-01` retornou para `In review`: a unidade completa de F1-04 foi materializada em um commit isolado, com autor e committer `Codex <codex@openai.com>`; `graphify-out/` gerado permaneceu fora da unidade. Rechecks: `npm run check` e `git diff --check` passaram. `npm run test:e2e` e `npm run test:pwa` foram novamente bloqueados neste sandbox por `listen EPERM` ao iniciar os web servers locais, preservando a lacuna de ambiente para a revisão independente.
+- 2026-07-16 — revisão independente aprovada, sem findings: `feb18b0` é uma unidade F1-04 isolada com autor e committer `Codex <codex@openai.com>` e sem `graphify-out/`; `npm run test:unit` (300/300), `npm run test:unit:coverage`, `npm run test:determinism` (9/9), `npm run check`, `npm run test:e2e`, `npm run test:pwa`, `git diff --check` e `git show --check HEAD` passaram. Critérios AC-01–AC-12 foram rastreados para estado/hash/corpus v4, testes de combate e pools, E2E de teclado/touch/resize, ficha de asset/ADR/rastreabilidade e o range versionado. F1-04 foi movido para `Done` e F1-06 tornou-se `Ready`.

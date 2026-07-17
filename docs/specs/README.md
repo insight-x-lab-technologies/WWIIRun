@@ -19,4 +19,4 @@ Specs concluídas permanecem no repositório como ligação entre requisito, dec
 - [`F1-01 — gameplay scene, viewport lógico e input teclado/touch`](SPEC-F1-01-gameplay-scene-viewport-input.md) — `Done`.
 - [`F1-02 — aeronave, movimento, vida/dano e colisões primitivas/compostas`](SPEC-F1-02-aircraft-movement-health-damage-collisions.md) — `Done`.
 - [`F1-03 — pools limitados de entidades e broad phase espacial`](SPEC-F1-03-bounded-pools-spatial-broad-phase.md) — `Done`.
-- [`F1-04 — metralhadora e dois inimigos com HP/comportamento`](SPEC-F1-04-machine-gun-two-enemies.md) — `In review`.
+- [`F1-04 — metralhadora e dois inimigos com HP/comportamento`](SPEC-F1-04-machine-gun-two-enemies.md) — `Done`.
