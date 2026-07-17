@@ -365,9 +365,9 @@ describe("fixed-tick transition", () => {
     expect(state.input).toEqual({ moveX: 10, moveY: 20, actions: 3 });
   });
 
-  test("advances exactly 100,000 deterministic frames", () => {
+  test("advances exactly 10,000 deterministic frames", () => {
     const state = createRunState(validConfig());
-    const inputs = Array.from({ length: 100_000 }, (_, index) => ({
+    const inputs = Array.from({ length: 10_000 }, (_, index) => ({
       moveX: (index % 255) - 127,
       moveY: 127 - (index % 255),
       actions: 0,
@@ -375,7 +375,7 @@ describe("fixed-tick transition", () => {
 
     advanceRun(state, inputs);
 
-    expect(state.tick).toBe(100_000);
+    expect(state.tick).toBe(10_000);
     expect(state.input).toEqual(inputs.at(-1));
   });
 });

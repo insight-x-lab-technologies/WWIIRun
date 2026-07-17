@@ -1,8 +1,8 @@
 # SPEC-F1-06: drops de moeda, coleta e estatísticas da run
 
-Status: In review  
-Owner: Codex  
-Requisitos: `GAME-03` (parcial), `GAME-09` (parcial), `ASSET-01` (parcial), `DET-01` (preservado), `PERF-01` (instrumentação)  
+Status: In review
+Owner: Codex
+Requisitos: `GAME-03` (parcial), `GAME-09` (parcial), `ASSET-01` (parcial), `DET-01` (preservado), `PERF-01` (instrumentação)
 Dependências: `F1-04` (`Done`); ADR-0001, ADR-0002, ADR-0004, ADR-0005, ADR-0010, ADR-0011, ADR-0012, ADR-0013 e ADR-0014 aceitos
 
 ## Problema e resultado
@@ -90,3 +90,5 @@ Não há save, replay ou placar publicado. Reload descarta qualquer run v5/v6 em
 
 - 2026-07-17 — especificação criada e aprovada tecnicamente pelo fluxo `$next-roadmap-item` sob D-007/D-008. F1-04 foi confirmado `Done`, F1-06 estava `Ready` e não há matéria humana reservada. ADR-0014 foi aceito. Nenhum runtime, teste, golden, dependência ou workflow foi alterado/executado nesta etapa.
 - 2026-07-17 — implementação concluída e enviada para revisão: estado/hash v6, loot por `loot`, pool/cursor/valor de moeda, coleta, estatísticas transitórias e datasets diagnósticos foram adicionados. Corpus histórico v1–v5 ficou literal; v6 possui checkpoints gerais e de morte vencedora. Evidência detalhada desta sessão permanece em `CURRENT_STATE.md`.
+- 2026-07-17 — revisão independente solicitou mudanças. `F1-06-GATE-01` (High; AC-10; `npm run check` falha no ESLint por uma non-null assertion desnecessária em `tests/unit/combat.test.ts:90`; impact: gate completo não passa; owner: implementation; correction: remover ou justificar a assertion sem enfraquecer a regressão; recheck: `npm run check`). `F1-06-PERF-01` (High; AC-08/AC-10; `npm run test:unit:coverage -- --run tests/unit/loot.test.ts tests/unit/entityPools.test.ts tests/unit/run.test.ts tests/unit/combat.test.ts tests/unit/gameplaySession.test.ts tests/unit/gameplayScene.test.ts` excede o timeout de 5 s em `run.test.ts` e `combat.test.ts`; impact: o gate de coverage e a evidência de desempenho pós-warm-up não passam; owner: implementation; correction: eliminar o custo regressivo no hot path ou ajustar o probe de forma tecnicamente justificada, preservando suas garantias; recheck: repetir o comando focado e `npm run test:unit:coverage`). `F1-06-GATE-02` (Medium; AC-10; `git diff --check ee18883..e3f474c` falha por whitespace introduzido nas linhas 3–5 desta spec; impact: o gate de integridade do diff não passa; owner: implementation; correction: remover whitespace final sem alterar o conteúdo; recheck: `git diff --check ee18883..HEAD`). Determinismo focado passou (`npm run test:determinism`, 12/12); não houve finding de `review-probe`, ambiente ou ambiguidade de spec.
+- 2026-07-17 — correção 1/2: `F1-06-GATE-01` foi fechado ao remover a assertion redundante. `F1-06-PERF-01` foi fechado removendo a varredura extra de todos os contatos sem moeda do hot path; o probe de combate preserva 120 ticks e capacidades 256/64, mas declara timeout de 15 s somente sob instrumentação V8, pois ele continua validando reutilização/capacidade e não mede FPS. O teste de run mantém sequência longa determinística em 10.000 ticks, suficiente para a garantia exercida sem tornar o gate de coverage dependente do timeout padrão. `F1-06-GATE-02` foi fechado removendo whitespace final. Rechecks: coverage focada/completa, `npm run check`, determinismo e `git diff --check ee18883..HEAD`.

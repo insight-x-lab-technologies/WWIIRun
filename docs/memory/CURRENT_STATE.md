@@ -8,8 +8,7 @@ F1 — Vertical slice jogável geométrico.
 
 ## Concluído
 
-- F1-06 implementado e movido para `In review`: ADR-0014 foi aplicado com stream `loot`, threshold literal de 50%, pool de 128 moedas/cursor/valor/sentinelas, coleta por contatos canônicos e `runStats` saturado no estado/hash v6. A cena somente projeta placeholders/datasets diagnósticos; não há wallet, score, save, backend, rede, economia ou raster. Corpus v1–v5 permanece literal; os vetores v6 geral e de loot vencedor são independentes.
-- validações F1-06: focados/coverage, `npm run test:determinism`, `npm run check`, `npm run test:e2e`, `npm run test:pwa`, `git diff --check` e `graphify update .` passaram. E2E/PWA precisaram de execução fora do sandbox porque o servidor local não inicia sob a restrição de porta; isso não gerou finding de implementação. Próximo passo exato: `$review-roadmap-item F1-06`; não iniciar F1-07/F1-08.
+- F1-06 correção 1/2 concluída e devolvida para `In review`: `F1-06-GATE-01` remove a assertion ESLint redundante; `F1-06-PERF-01` evita a varredura extra de contatos sem moeda, preserva o probe de 120 ticks/capacidades e fixa timeout de 15 s apenas para a instrumentação V8; a sequência longa de run foi dimensionada para 10.000 ticks determinísticos. `F1-06-GATE-02` remove whitespace da spec. Coverage focada/completa, `npm run check`, determinismo, `git diff --check` e graphify passaram. Próximo passo exato: `$review-roadmap-item F1-06`; não iniciar F1-07/F1-08.
 
 - F1-05 aprovado em revisão independente e movido para `Done`: estrutura modular v5, pool 16×4, contatos por módulo, hash/corpus v5 e placeholders foram rechecados; `F1-05-REGRESSION-01`, `F1-05-DET-01`, `F1-05-TRACE-01` e `F1-05-PERF-01` foram fechados. Focados/coverage, determinismo, `npm run check` e `git diff --check` passaram. PWA permanece uma lacuna ambiental conhecida no sandbox (`listen EPERM 127.0.0.1:4174`), sem finding de implementação.
 

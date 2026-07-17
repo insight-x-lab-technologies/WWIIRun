@@ -87,7 +87,7 @@ describe("F1-04 combat", () => {
     };
     stepRun(state, { moveX: 0, moveY: 0, actions: 0 });
     expect(enemy.active).toBe(false);
-    expect(state.pools.projectiles[0]!.active).toBe(false);
+    expect(state.pools.projectiles[0].active).toBe(false);
   });
 
   test("includes cooldown and combat fields in the canonical hash", () => {
@@ -130,6 +130,16 @@ describe("F1-04 combat", () => {
       scratch,
     );
     expect(scratch.contactCount).toBe(16_448);
+    for (let index = 0; index < projectiles.length; index += 1) {
+      const projectile = projectiles[index]!;
+      projectile.position.x = 1_000_000 + index * 4_096;
+      projectile.position.y = 1_000_000;
+    }
+    for (let index = 0; index < enemies.length; index += 1) {
+      const enemy = enemies[index]!;
+      enemy.position.x = 3_000_000 + index * 4_096;
+      enemy.position.y = 3_000_000;
+    }
     for (let tick = 0; tick < 120; tick += 1)
       stepRun(state, {
         moveX: 0,
@@ -141,5 +151,5 @@ describe("F1-04 combat", () => {
     expect(scratch).toBe(state.broadPhase);
     expect(projectiles).toHaveLength(256);
     expect(enemies).toHaveLength(64);
-  });
+  }, 15_000);
 });

@@ -114,6 +114,8 @@ export function stepRun(state: RunState, input: InputFrame): void {
 }
 function resolveContacts(state: RunState): void {
   const damagedStructures = state.broadPhase.playerStructureDamage;
+  let firstCoinContact = -1;
+  let afterCoinContact = -1;
   for (let i = 0; i < state.broadPhase.contactCount; i += 1) {
     const code = state.broadPhase.contactCodes[i]!;
     if (code < 64) {
@@ -121,7 +123,11 @@ function resolveContacts(state: RunState): void {
       if (enemy.active) applyDamage(state.player, enemy.contactDamage);
       continue;
     }
-    if (code < 192) continue;
+    if (code < 192) {
+      if (firstCoinContact < 0) firstCoinContact = i;
+      afterCoinContact = i + 1;
+      continue;
+    }
     if (code < 256) {
       const structureIndex = Math.floor((code - 192) / 4);
       if (damagedStructures[structureIndex] === 0) {
@@ -165,7 +171,8 @@ function resolveContacts(state: RunState): void {
       damage,
     );
   }
-  collectCoins(state);
+  if (firstCoinContact >= 0)
+    collectCoins(state, firstCoinContact, afterCoinContact);
 }
 function resolveEnemyLoot(
   state: RunState,
@@ -177,8 +184,8 @@ function resolveEnemyLoot(
   if (tryActivateCoin(state.pools, pivotX, pivotY))
     incrementStat(state.runStats, "coinsSpawned");
 }
-function collectCoins(state: RunState): void {
-  for (let i = 0; i < state.broadPhase.contactCount; i += 1) {
+function collectCoins(state: RunState, first: number, after: number): void {
+  for (let i = first; i < after; i += 1) {
     const code = state.broadPhase.contactCodes[i]!;
     if (code < 64 || code >= 192) continue;
     const coin = state.pools.coins[code - 64]!;
