@@ -8,7 +8,7 @@ F1 — Vertical slice jogável geométrico.
 
 ## Concluído
 
-- F1-08 implementado e movido para `In review`: `src/game/hud.ts` adiciona projeção read-only de vida, distância técnica (`floor(tick / 60) m`), moedas transitórias, FPS local por janela limitada, nível técnico `1`, velocidade e seed compacta/completa; `GameplayScene` cria, atualiza, relayout e libera quatro textos HUD. Unitários focados 4/4, `npm run typecheck`, determinismo 12/12, `npm run check`, E2E e PWA passaram; E2E/PWA exigiram execução fora do sandbox devido ao bind do servidor local. `git diff --check` passou. Core, hash/corpus/goldens, save, assets, dependências, workflow, PWA e baselines físicos não foram alterados. Risco: a inspeção visual manual de contraste/oclusão em aparelho físico permanece para a matriz F1; `graphify-out/` preexistente não foi alterado. Próximo passo exato: `$review-roadmap-item F1-08`.
+- F1-08 corrigido (1/2) e devolvido a `In review`: `F1-08-HUD-01` foi resolvido ao extrair `hudProjection.ts` puro, eliminando o import Phaser nos unitários Node; `F1-08-LAYOUT-01` reprojeta datasets HUD do snapshot após resize/rotação; `F1-08-GATE-01` alinha a asserção histórica de estruturas ao schema v6. Foco HUD/cena/estruturas 10/10, unitários 319/319, Playwright serial do HUD, `npm run check`, E2E, PWA e `git diff --check` passaram; E2E/PWA exigiram execução fora do sandbox pelo bind local. Core, corpus/goldens, dependências, workflow, assets e baselines permaneceram intactos; `graphify-out/` preexistente não foi alterado. Próximo passo exato: `$review-roadmap-item F1-08`.
 
 - F1-07 aprovado em recheck independente e movido para `Done`: `F1-07-VISUAL-01` foi fechado com padrões técnicos repetíveis distintos para céu, nuvens e relevos, períodos próprios, offsets visuais por tick, reuso e teardown. Gates independentes: foco 8/8, `npm run check`, determinismo 12/12, E2E, PWA e `git diff --check` verdes; E2E/PWA exigiram execução fora do sandbox devido a `listen EPERM 127.0.0.1:4173`. Core, hashes/corpus, dependências, workflow, baselines e assets licenciáveis permaneceram intactos. O proprietário promoveu F1-08 a `Ready`; próximo passo exato: `$next-roadmap-item F1-08`.
 
@@ -127,7 +127,7 @@ F1 — Vertical slice jogável geométrico.
 
 ## Próximo passo exato
 
-F1-07 está `Done`. F1-08 está `Ready` por autorização do proprietário; próximo passo: `$next-roadmap-item F1-08`.
+F1-08 está `Changes requested`; próximo passo: `$implement-roadmap-item F1-08` para fechar `F1-08-HUD-01`, `F1-08-LAYOUT-01` e `F1-08-GATE-01` e retornar a `In review`.
 
 ## Bloqueios
 

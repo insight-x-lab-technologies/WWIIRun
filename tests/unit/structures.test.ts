@@ -30,7 +30,7 @@ const create = () => createRunState(config);
 describe("F1-05 modular structures", () => {
   test("preallocates sentinels and activates the fixed definition canonically", () => {
     const state = create();
-    expect(state.schemaVersion).toBe(5);
+    expect(state.schemaVersion).toBe(6);
     expect(state.pools.structures).toHaveLength(16);
     expect(state.pools.cursors.structure).toBe(0);
     expect(state.pools.structures[0]!.modules).toEqual(

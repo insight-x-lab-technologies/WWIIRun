@@ -276,6 +276,7 @@ export class GameplayScene extends Phaser.Scene {
     });
     root.dataset.orientation = this.layout.orientation;
     this.hud?.applyLayout(this.layout);
+    this.hud?.reproject(this.dependencies.session.snapshot().state, root);
     if (this.zones !== undefined) this.drawZones();
   }
 

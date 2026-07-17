@@ -6,7 +6,7 @@ import {
   formatSpeed,
   projectHud,
   RenderFpsWindow,
-} from "../../src/game/hud";
+} from "../../src/game/hudProjection";
 
 describe("F1-08 HUD projection", () => {
   test("formats only canonical snapshot fields with the specified units", () => {
