@@ -56,6 +56,10 @@ export class GameplayHud {
     this.publish(projectHud(state, this.fpsValue), root);
   }
 
+  public textCount(): number {
+    return this.active ? 4 : 0;
+  }
+
   private publish(model: HudViewModel, root: HTMLElement): void {
     this.life?.setText(`Life ${model.life}`);
     this.distance?.setText(`Distance ${model.distance}`);

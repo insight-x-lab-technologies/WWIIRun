@@ -1,6 +1,6 @@
 # Estado atual
 
-Atualizado em: 2026-07-17
+Atualizado em: 2026-07-18
 
 ## Fase
 
@@ -8,7 +8,7 @@ F1 — Vertical slice jogável geométrico.
 
 ## Concluído
 
-- F1-08 corrigido (1/2) e devolvido a `In review`: `F1-08-HUD-01` foi resolvido ao extrair `hudProjection.ts` puro, eliminando o import Phaser nos unitários Node; `F1-08-LAYOUT-01` reprojeta datasets HUD do snapshot após resize/rotação; `F1-08-GATE-01` alinha a asserção histórica de estruturas ao schema v6. Foco HUD/cena/estruturas 10/10, unitários 319/319, Playwright serial do HUD, `npm run check`, E2E, PWA e `git diff --check` passaram; E2E/PWA exigiram execução fora do sandbox pelo bind local. Core, corpus/goldens, dependências, workflow, assets e baselines permaneceram intactos; `graphify-out/` preexistente não foi alterado. Próximo passo exato: `$review-roadmap-item F1-08`.
+- F1-08 aprovado em revisão independente e movido para `Done`: nenhum finding permaneceu; `F1-08-VISUAL-01` foi rechecado com os quatro textos HUD sem diagnóstico concorrente, inclusive nos cinco viewports Chromium. `npm run test:unit:coverage`, determinismo 12/12, foco HUD/cena/estruturas, `npm run check`, E2E, PWA e `git diff --check` passaram. Core, corpus/goldens, dependências, workflow, assets e baselines permaneceram intactos. F1-09 foi promovido a `Ready`; próximo passo exato: `$specify-roadmap-item F1-09`.
 
 - F1-07 aprovado em recheck independente e movido para `Done`: `F1-07-VISUAL-01` foi fechado com padrões técnicos repetíveis distintos para céu, nuvens e relevos, períodos próprios, offsets visuais por tick, reuso e teardown. Gates independentes: foco 8/8, `npm run check`, determinismo 12/12, E2E, PWA e `git diff --check` verdes; E2E/PWA exigiram execução fora do sandbox devido a `listen EPERM 127.0.0.1:4173`. Core, hashes/corpus, dependências, workflow, baselines e assets licenciáveis permaneceram intactos. O proprietário promoveu F1-08 a `Ready`; próximo passo exato: `$next-roadmap-item F1-08`.
 
@@ -127,7 +127,7 @@ F1 — Vertical slice jogável geométrico.
 
 ## Próximo passo exato
 
-F1-08 está `Changes requested`; próximo passo: `$implement-roadmap-item F1-08` para fechar `F1-08-HUD-01`, `F1-08-LAYOUT-01` e `F1-08-GATE-01` e retornar a `In review`.
+F1-08 está `In review`; próximo passo: `$review-roadmap-item F1-08` para reavaliar a correção de `F1-08-VISUAL-01` e decidir o item.
 
 ## Bloqueios
 

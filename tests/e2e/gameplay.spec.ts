@@ -124,7 +124,7 @@ test("projects transient coin statistics through the real keyboard gameplay path
   await page.keyboard.up("ArrowRight");
 });
 
-test("projects the technical HUD through stable datasets across required viewports", async ({
+test("projects an unobscured technical HUD through stable datasets across required viewports", async ({
   page,
 }) => {
   await page.goto("/?loot-diagnostics=1");
@@ -139,6 +139,7 @@ test("projects the technical HUD through stable datasets across required viewpor
     "data-hud-seed",
     "00112233445566778899aabbccddeeff",
   );
+  await expect(root).toHaveAttribute("data-hud-overlay-text-count", "4");
   for (const [width, height] of [
     [320, 568],
     [568, 320],

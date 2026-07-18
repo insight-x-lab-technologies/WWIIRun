@@ -49,7 +49,6 @@ export const DEFAULT_GAMEPLAY_DIAGNOSTICS: GameplaySceneDiagnostics =
 export class GameplayScene extends Phaser.Scene {
   private aircraft: Phaser.GameObjects.Graphics | undefined;
   private hitboxOverlay: Phaser.GameObjects.Graphics | undefined;
-  private diagnostic: Phaser.GameObjects.Text | undefined;
   private hud: GameplayHud | undefined;
   private zones: Phaser.GameObjects.Graphics | undefined;
   private readonly entityGraphics: Phaser.GameObjects.Graphics[] = [];
@@ -81,15 +80,11 @@ export class GameplayScene extends Phaser.Scene {
         .showHitboxes
     )
       this.hitboxOverlay = this.drawHitboxes();
-    this.diagnostic = this.add
-      .text(12, 12, "Gameplay tick 0 | input 0,0,0", {
-        color: "#f4f0e6",
-        fontFamily: "system-ui, sans-serif",
-        fontSize: "16px",
-      })
-      .setDepth(10);
     this.hud = new GameplayHud(this);
     this.hud.create();
+    this.dependencies.root.dataset.hudOverlayTextCount = String(
+      this.hud.textCount(),
+    );
     if (this.layout !== undefined) this.hud.applyLayout(this.layout);
     this.drawZones();
     this.bindEvents();
@@ -100,7 +95,7 @@ export class GameplayScene extends Phaser.Scene {
 
   public override update(_time: number, delta: number): void {
     if (!this.active) return;
-    const result = this.dependencies.session.update(delta);
+    this.dependencies.session.update(delta);
     const snapshot = this.dependencies.session.snapshot();
     const input = snapshot.state.input;
     const player = snapshot.state.player;
@@ -119,9 +114,6 @@ export class GameplayScene extends Phaser.Scene {
         .setAlpha(player.status === "active" ? 1 : 0.35);
       this.hitboxOverlay?.setPosition(x, y);
     }
-    this.diagnostic?.setText(
-      `Gameplay tick ${snapshot.state.tick} | input ${input.moveX},${input.moveY},${input.actions} | HP ${player.health.current}/${player.health.max} | ${player.status}${result.dropped ? " | backlog dropped" : ""}`,
-    );
     this.hud?.update(snapshot.state, delta, this.dependencies.root);
     const status = this.dependencies.root.querySelector<HTMLElement>(
       "[data-gameplay-status]",
@@ -558,8 +550,6 @@ export class GameplayScene extends Phaser.Scene {
       this.textures.remove(key);
     for (const graphics of this.entityGraphics.splice(0)) graphics.destroy();
     for (const graphics of this.structureGraphics.splice(0)) graphics.destroy();
-    this.diagnostic?.destroy();
-    this.diagnostic = undefined;
     this.hud?.destroy();
     this.hud = undefined;
     this.dependencies.session.destroy();

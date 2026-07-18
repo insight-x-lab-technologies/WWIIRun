@@ -26,6 +26,7 @@ describe("GameplayScene resources", () => {
       parallaxCoverage: "540x960",
       parallaxVisualIds:
         "background.sky.v1,background.clouds.far.v1,background.terrain.distant.v1,background.terrain.mid.v1",
+      hudOverlayTextCount: "4",
     });
     disabled.shutdown();
     const enabled = createHarness(true);
@@ -65,7 +66,7 @@ describe("GameplayScene resources", () => {
       harness.shutdown();
       harness.scene.update(0, 1000 / 60);
       expect(harness.graphics).toEqual({ created: 523, destroyed: 523 });
-      expect(harness.text).toEqual({ created: 5, destroyed: 5 });
+      expect(harness.text).toEqual({ created: 4, destroyed: 4 });
       expect(harness.listeners.active()).toBe(0);
       expect(harness.session.update).toHaveBeenCalledTimes(1);
       expect(harness.events.pending()).toBe(0);
