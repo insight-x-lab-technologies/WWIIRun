@@ -30,6 +30,7 @@ export class GameplaySession {
   private readonly paused = new Set<PauseReason>();
   private accumulator = 0;
   private started = false;
+  private finished = false;
   private destroyed = false;
   public constructor(
     private readonly input: InputSource,
@@ -45,7 +46,7 @@ export class GameplaySession {
     this.assertAlive();
     if (!Number.isFinite(renderDeltaMs) || renderDeltaMs < 0)
       throw new RangeError("renderDeltaMs must be finite and non-negative.");
-    if (!this.started || this.paused.size > 0) {
+    if (!this.started || this.finished || this.paused.size > 0) {
       this.updateResult.ticks = 0;
       this.updateResult.dropped = false;
       return this.updateResult;
@@ -54,14 +55,21 @@ export class GameplaySession {
     const available = Math.floor(
       (this.accumulator + Number.EPSILON * 100) / STEP_MS,
     );
-    const ticks = Math.min(available, MAX_TICKS_PER_UPDATE);
-    for (let index = 0; index < ticks; index += 1) {
+    const limit = Math.min(available, MAX_TICKS_PER_UPDATE);
+    let ticks = 0;
+    for (let index = 0; index < limit; index += 1) {
       const frame =
         this.input.sampleInto?.(this.inputFrame) ?? this.input.sample();
       stepRun(this.state, frame);
+      ticks += 1;
+      if (this.state.player.status === "destroyed") {
+        this.finish();
+        break;
+      }
     }
-    const dropped = available > MAX_TICKS_PER_UPDATE;
-    this.accumulator = dropped ? 0 : this.accumulator - ticks * STEP_MS;
+    const dropped = !this.finished && available > MAX_TICKS_PER_UPDATE;
+    this.accumulator =
+      this.finished || dropped ? 0 : this.accumulator - ticks * STEP_MS;
     this.updateResult.ticks = ticks;
     this.updateResult.dropped = dropped;
     return this.updateResult;
@@ -80,7 +88,18 @@ export class GameplaySession {
   }
   snapshot(): { state: RunState; paused: boolean } {
     this.assertAlive();
-    return { state: this.state, paused: this.paused.size > 0 };
+    return {
+      state: this.state,
+      paused: this.finished || this.paused.size > 0,
+    };
+  }
+  finish(): void {
+    this.assertAlive();
+    if (this.finished) return;
+    this.finished = true;
+    this.accumulator = 0;
+    this.input.reset?.();
+    if (this.started) this.lifecycle.setRunActive(false);
   }
   activateDiagnosticEnemy(
     definitionId: "enemy.scout.v1" | "enemy.interceptor.v1",
@@ -105,11 +124,21 @@ export class GameplaySession {
     this.assertAlive();
     activateCoin(this.state.pools, x, y, 0, 0, 1);
   }
+  activateDiagnosticGameOver(): void {
+    this.assertAlive();
+    for (let index = 0; index < 7; index += 1)
+      activateEnemy(
+        this.state.pools,
+        "enemy.interceptor.v1",
+        40_960 + index * 24_000,
+        69_120,
+      );
+  }
   destroy(): void {
     if (this.destroyed) return;
     this.destroyed = true;
     this.input.reset?.();
-    if (this.started) this.lifecycle.setRunActive(false);
+    if (this.started && !this.finished) this.lifecycle.setRunActive(false);
   }
   private assertAlive(): void {
     if (this.destroyed) throw new Error("GameplaySession is destroyed.");

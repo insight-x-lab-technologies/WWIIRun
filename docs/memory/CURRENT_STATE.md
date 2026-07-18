@@ -8,6 +8,8 @@ F1 — Vertical slice jogável geométrico.
 
 ## Concluído
 
+- F1-09 aprovado em rechecagem independente e movido para `Done`: `F1-09-TERM-01` (`High`) foi resolvido; `GameplaySession.update()` detecta `destroyed` após cada `stepRun`, encerra no tick letal e descarta ticks acumulados posteriores. A regressão prova cinco ticks disponíveis com contato letal no primeiro, `tick === 1`, um tick executado, input/lifecycle encerrados e update seguinte nulo. Gates independentes passaram: `npm run test:unit:coverage`, determinismo 12/12, `npm run check`, E2E, PWA e `git diff --check 04a434f`. Core, corpus/goldens, dependências, workflow, assets e baselines permaneceram inalterados; `.gitignore` preexistente foi preservado. O proprietário promoveu F1-10 a `Ready`; próximo passo exato: `$specify-roadmap-item F1-10`.
+
 - F1-08 aprovado em revisão independente e movido para `Done`: nenhum finding permaneceu; `F1-08-VISUAL-01` foi rechecado com os quatro textos HUD sem diagnóstico concorrente, inclusive nos cinco viewports Chromium. `npm run test:unit:coverage`, determinismo 12/12, foco HUD/cena/estruturas, `npm run check`, E2E, PWA e `git diff --check` passaram. Core, corpus/goldens, dependências, workflow, assets e baselines permaneceram intactos. F1-09 foi promovido a `Ready`; próximo passo exato: `$specify-roadmap-item F1-09`.
 
 - F1-07 aprovado em recheck independente e movido para `Done`: `F1-07-VISUAL-01` foi fechado com padrões técnicos repetíveis distintos para céu, nuvens e relevos, períodos próprios, offsets visuais por tick, reuso e teardown. Gates independentes: foco 8/8, `npm run check`, determinismo 12/12, E2E, PWA e `git diff --check` verdes; E2E/PWA exigiram execução fora do sandbox devido a `listen EPERM 127.0.0.1:4173`. Core, hashes/corpus, dependências, workflow, baselines e assets licenciáveis permaneceram intactos. O proprietário promoveu F1-08 a `Ready`; próximo passo exato: `$next-roadmap-item F1-08`.
@@ -127,7 +129,7 @@ F1 — Vertical slice jogável geométrico.
 
 ## Próximo passo exato
 
-F1-08 está `In review`; próximo passo: `$review-roadmap-item F1-08` para reavaliar a correção de `F1-08-VISUAL-01` e decidir o item.
+F1-09 está `Done`; F1-10 está `Ready`. Próximo passo: `$specify-roadmap-item F1-10`.
 
 ## Bloqueios
 

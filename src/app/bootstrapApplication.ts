@@ -1,6 +1,12 @@
 import { createGame } from "../game/createGame";
 import { CombinedInput, KeyboardInput, PointerInput } from "../game/input";
 import { GameplaySession, type RunLifecyclePort } from "./GameplaySession";
+import {
+  mountGameOverPresentation,
+  mountTechnicalHome,
+  type PresentationHandle,
+} from "./gameOverPresentation";
+import { projectGameOverSummary } from "./gameOverSummary";
 
 export interface ApplicationHandle {
   destroy(): void;
@@ -16,22 +22,70 @@ export function bootstrapApplication(
     );
   }
 
-  const keyboard = new KeyboardInput();
-  const pointer = new PointerInput();
-  const combined = new CombinedInput(keyboard, pointer);
-  const session = new GameplaySession(combined, lifecycle);
   const search = new URLSearchParams(
     root.ownerDocument.defaultView?.location.search,
   );
-  if (search.get("combat-diagnostics") === "1") {
-    session.activateDiagnosticEnemy("enemy.scout.v1", 60_000, 69_120);
-    session.activateDiagnosticStructure(90_000, 69_120);
-  }
-  if (search.get("loot-diagnostics") === "1")
-    session.activateDiagnosticCoin(49_152, 69_120);
-  const instructions = createInstructions(root, pointer);
-  const game = createGame(root, { session, keyboard, pointer, combined });
+  let gameplay: GameplayHandle | undefined;
+  let presentation: PresentationHandle | undefined;
   let destroyed = false;
+
+  const closePresentation = (): void => {
+    presentation?.destroy();
+    presentation = undefined;
+  };
+  const closeGameplay = (): void => {
+    const current = gameplay;
+    if (current === undefined) return;
+    gameplay = undefined;
+    const canvas = current.game.canvas;
+    current.game.destroy(true);
+    canvas.remove();
+    current.instructions.remove();
+  };
+  const startGameplay = (): void => {
+    if (destroyed) return;
+    root.dataset.presentation = "gameplay";
+    const keyboard = new KeyboardInput();
+    const pointer = new PointerInput();
+    const combined = new CombinedInput(keyboard, pointer);
+    const session = new GameplaySession(combined, lifecycle);
+    applyDiagnostics(session, search);
+    const instructions = createInstructions(root, pointer);
+    const game = createGame(root, {
+      session,
+      keyboard,
+      pointer,
+      combined,
+      onTerminalSnapshot: (state) => {
+        if (gameplay?.session !== session || destroyed) return;
+        instructions.inert = true;
+        game.canvas.style.pointerEvents = "none";
+        root.dataset.presentation = "game-over";
+        presentation = mountGameOverPresentation(
+          root,
+          projectGameOverSummary(state),
+          {
+            retry: () => {
+              closePresentation();
+              closeGameplay();
+              startGameplay();
+            },
+            home: () => {
+              closePresentation();
+              closeGameplay();
+              root.dataset.presentation = "home";
+              presentation = mountTechnicalHome(root, () => {
+                closePresentation();
+                startGameplay();
+              });
+            },
+          },
+        );
+      },
+    });
+    gameplay = { game, session, instructions };
+  };
+  startGameplay();
 
   return {
     destroy(): void {
@@ -40,12 +94,30 @@ export function bootstrapApplication(
       }
 
       destroyed = true;
-      const canvas = game.canvas;
-      game.destroy(true);
-      canvas.remove();
-      instructions.remove();
+      closePresentation();
+      closeGameplay();
     },
   };
+}
+
+type GameplayHandle = {
+  game: ReturnType<typeof createGame>;
+  session: GameplaySession;
+  instructions: HTMLElement;
+};
+
+function applyDiagnostics(
+  session: GameplaySession,
+  search: URLSearchParams,
+): void {
+  if (search.get("combat-diagnostics") === "1") {
+    session.activateDiagnosticEnemy("enemy.scout.v1", 60_000, 69_120);
+    session.activateDiagnosticStructure(90_000, 69_120);
+  }
+  if (search.get("loot-diagnostics") === "1")
+    session.activateDiagnosticCoin(49_152, 69_120);
+  if (search.get("game-over-diagnostics") === "1")
+    session.activateDiagnosticGameOver();
 }
 
 function createInstructions(

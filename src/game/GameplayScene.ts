@@ -37,6 +37,9 @@ export type GameplaySceneDependencies = {
   combined: CombinedInput;
   diagnostics?: GameplaySceneDiagnostics;
   parallaxResolver?: ParallaxVisualResolver;
+  onTerminalSnapshot?(
+    state: ReturnType<GameplaySession["snapshot"]>["state"],
+  ): void;
 };
 
 export type GameplaySceneDiagnostics = {
@@ -61,6 +64,8 @@ export class GameplayScene extends Phaser.Scene {
   private resizeFrame: number | undefined;
   private parallaxTick = 0;
   private active = false;
+  private inputEnabled = true;
+  private terminalObserved = false;
   public constructor(private readonly dependencies: GameplaySceneDependencies) {
     super("gameplay");
   }
@@ -97,6 +102,16 @@ export class GameplayScene extends Phaser.Scene {
     if (!this.active) return;
     this.dependencies.session.update(delta);
     const snapshot = this.dependencies.session.snapshot();
+    if (
+      !this.terminalObserved &&
+      snapshot.state.player.status === "destroyed"
+    ) {
+      this.terminalObserved = true;
+      this.inputEnabled = false;
+      this.dependencies.combined.reset?.();
+      this.dependencies.session.finish();
+      this.dependencies.onTerminalSnapshot?.(snapshot.state);
+    }
     const input = snapshot.state.input;
     const player = snapshot.state.player;
     this.parallaxTick = snapshot.state.tick;
@@ -140,14 +155,16 @@ export class GameplayScene extends Phaser.Scene {
     const canvas = this.game.canvas;
     const onKeyDown = (event: KeyboardEvent): void => {
       if (
-        document.activeElement === canvas ||
-        document.activeElement === document.body
+        this.inputEnabled &&
+        (document.activeElement === canvas ||
+          document.activeElement === document.body)
       )
         if (this.dependencies.keyboard.keyDown(event.code))
           event.preventDefault();
     };
     const onKeyUp = (event: KeyboardEvent): void => {
-      const handled = this.dependencies.keyboard.keyUp(event.code);
+      const handled =
+        this.inputEnabled && this.dependencies.keyboard.keyUp(event.code);
       if (
         handled &&
         (document.activeElement === canvas ||
@@ -156,7 +173,7 @@ export class GameplayScene extends Phaser.Scene {
         event.preventDefault();
     };
     const onPointerDown = (event: PointerEvent): void => {
-      const point = this.toLogical(event);
+      const point = this.inputEnabled ? this.toLogical(event) : undefined;
       if (
         point !== undefined &&
         this.dependencies.pointer.pointerDown(event.pointerId, point.x, point.y)
@@ -164,7 +181,7 @@ export class GameplayScene extends Phaser.Scene {
         canvas.setPointerCapture?.(event.pointerId);
     };
     const onPointerMove = (event: PointerEvent): void => {
-      const point = this.toLogical(event);
+      const point = this.inputEnabled ? this.toLogical(event) : undefined;
       if (point !== undefined)
         this.dependencies.pointer.pointerMove(
           event.pointerId,
@@ -173,7 +190,8 @@ export class GameplayScene extends Phaser.Scene {
         );
     };
     const onPointerEnd = (event: PointerEvent): void => {
-      this.dependencies.pointer.pointerUp(event.pointerId);
+      if (this.inputEnabled)
+        this.dependencies.pointer.pointerUp(event.pointerId);
     };
     const onVisibility = (): void =>
       document.hidden

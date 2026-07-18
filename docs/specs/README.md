@@ -24,3 +24,4 @@ Specs concluídas permanecem no repositório como ligação entre requisito, dec
 - [`F1-06 — drops de moeda, coleta e estatísticas da run`](SPEC-F1-06-coin-drops-collection-run-statistics.md) — `Done` após revisão independente.
 - [`F1-07 — parallax de camadas e placeholders substituíveis`](SPEC-F1-07-parallax-replaceable-placeholders.md) — `Done` após revisão independente.
 - [`F1-08 — HUD de gameplay e telemetria da run`](SPEC-F1-08-gameplay-hud.md) — `Done` após revisão independente.
+- [`F1-09 — overlay de game over, retry/home e resumo da run`](SPEC-F1-09-game-over-overlay-retry-home-summary.md) — `Done` após revisão independente.

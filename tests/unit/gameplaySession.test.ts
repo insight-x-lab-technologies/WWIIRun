@@ -83,6 +83,51 @@ describe("GameplaySession", () => {
     ).toHaveLength(5);
   });
 
+  it("finishes a terminal presentation without executing another simulation tick", () => {
+    const lifecycle = { setRunActive: vi.fn() };
+    const session = new GameplaySession({ sample: () => neutral }, lifecycle);
+    session.start();
+    session.update(1000 / 60);
+    session.finish();
+    session.update(1000);
+
+    expect(session.snapshot()).toMatchObject({
+      paused: true,
+      state: { tick: 1, input: neutral },
+    });
+    expect(lifecycle.setRunActive.mock.calls).toEqual([[true], [false]]);
+  });
+
+  it("stops on the first lethal tick of a multi-tick update", () => {
+    const reset = vi.fn();
+    const lifecycle = { setRunActive: vi.fn() };
+    const session = new GameplaySession(
+      { sample: () => neutral, reset },
+      lifecycle,
+    );
+    session.activateDiagnosticEnemy("enemy.scout.v1", 40_960, 69_120);
+    session.snapshot().state.player.health.current = 10;
+    session.start();
+
+    expect(session.update(5 * (1000 / 60))).toEqual({
+      ticks: 1,
+      dropped: false,
+    });
+    expect(session.snapshot()).toMatchObject({
+      paused: true,
+      state: {
+        tick: 1,
+        player: { status: "destroyed", health: { current: 0 } },
+      },
+    });
+    expect(session.update(5 * (1000 / 60))).toEqual({
+      ticks: 0,
+      dropped: false,
+    });
+    expect(reset).toHaveBeenCalledTimes(1);
+    expect(lifecycle.setRunActive.mock.calls).toEqual([[true], [false]]);
+  });
+
   it("reuses one input frame allocation across production ticks", () => {
     const targets = new Set<object>();
     const session = new GameplaySession(

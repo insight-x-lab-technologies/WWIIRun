@@ -37,8 +37,8 @@ Objetivo: uma run curta e divertida com placeholders, validando arquitetura comp
 | F1-06 | Drops de moeda, coleta e estatísticas da run | F1-04 | Done |
 | F1-07 | Parallax de 3+ camadas e placeholders substituíveis | F1-01 | Done |
 | F1-08 | HUD: vida, distância, moedas, FPS, nível, velocidade e seed | F1-06 | Done |
-| F1-09 | Game over overlay, retry/home e resumo | F1-08 | Ready |
-| F1-10 | Testes E2E portrait/landscape/desktop e stress da slice | F1-09 | Backlog |
+| F1-09 | Game over overlay, retry/home e resumo | F1-08 | Done |
+| F1-10 | Testes E2E portrait/landscape/desktop e stress da slice | F1-09 | Ready |
 
 Exit: run de 3–5 min; colisões legíveis; estruturas/inimigos destruíveis; moedas; parallax; game over; 60 FPS na matriz provisória; troca placeholder→sprite demonstrada sem mudar golden hash.
 

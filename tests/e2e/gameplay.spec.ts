@@ -124,6 +124,48 @@ test("projects transient coin statistics through the real keyboard gameplay path
   await page.keyboard.up("ArrowRight");
 });
 
+test("freezes game over, contains focus, and replaces presentation through retry and home", async ({
+  page,
+}) => {
+  test.setTimeout(60_000);
+  await page.goto("/?game-over-diagnostics=1");
+  const root = page.locator("#game-root");
+  const dialog = page.locator("[data-game-over]");
+  await expect(dialog).toHaveCount(1, { timeout: 10_000 });
+  await expect(dialog).toHaveAttribute(
+    "data-seed",
+    "00112233445566778899aabbccddeeff",
+  );
+  await expect(dialog).toHaveAttribute("data-distance-meters", /^\d+$/);
+  await expect(dialog).toHaveAttribute("data-duration-ticks", /^\d+$/);
+  await expect(root).toHaveAttribute("data-presentation", "game-over");
+  const frozenTicks = await dialog.getAttribute("data-duration-ticks");
+  await page.keyboard.press("Escape");
+  await page.setViewportSize({ width: 568, height: 320 });
+  await expect(dialog).toHaveCount(1);
+  await expect(dialog).toHaveAttribute(
+    "data-duration-ticks",
+    frozenTicks ?? "",
+  );
+  await expect(dialog.getByRole("button", { name: "Retry" })).toBeFocused();
+  for (let cycle = 0; cycle < 4; cycle += 1) {
+    await page.getByRole("button", { name: "Retry" }).click();
+    await expect(page.locator("[data-game-over]")).toHaveCount(1, {
+      timeout: 10_000,
+    });
+    await expect(root.locator("canvas")).toHaveCount(1);
+  }
+  await dialog.getByRole("button", { name: "Home" }).click();
+  await expect(page.locator("[data-technical-home]")).toHaveCount(1);
+  await expect(root.locator("canvas")).toHaveCount(0);
+  await page.getByRole("button", { name: "Start preview" }).click();
+  await expect(page.locator("[data-technical-home]")).toHaveCount(0);
+  await expect(page.locator("[data-game-over]")).toHaveCount(1, {
+    timeout: 10_000,
+  });
+  await expect(root.locator("canvas")).toHaveCount(1);
+});
+
 test("projects an unobscured technical HUD through stable datasets across required viewports", async ({
   page,
 }) => {

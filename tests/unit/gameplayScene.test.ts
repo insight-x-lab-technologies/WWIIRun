@@ -98,6 +98,26 @@ describe("GameplayScene resources", () => {
     expect(harness.graphics.created).toBe(createdAfterWarmup);
     harness.shutdown();
   });
+
+  test("observes only the first destroyed snapshot, clears input, and finishes the session", () => {
+    const harness = createHarness(false);
+    const onTerminalSnapshot = vi.fn();
+    const snapshot = harness.session.snapshot();
+    snapshot.state.player.status = "destroyed";
+    harness.session.snapshot.mockReturnValue(snapshot);
+    (
+      harness.scene as unknown as { dependencies: GameplaySceneDependencies }
+    ).dependencies.onTerminalSnapshot = onTerminalSnapshot;
+    harness.scene.create();
+    harness.scene.update(0, 1000 / 60);
+    harness.scene.update(0, 1000 / 60);
+
+    expect(harness.session.finish).toHaveBeenCalledTimes(1);
+    expect(harness.combined.reset).toHaveBeenCalledTimes(1);
+    expect(onTerminalSnapshot).toHaveBeenCalledTimes(1);
+    expect(onTerminalSnapshot).toHaveBeenCalledWith(snapshot.state);
+    harness.shutdown();
+  });
 });
 
 function createHarness(showHitboxes: boolean) {
@@ -162,6 +182,7 @@ function createHarness(showHitboxes: boolean) {
     pause: vi.fn(),
     resume: vi.fn(),
     destroy: vi.fn(),
+    finish: vi.fn(),
   };
   const dependencies = {
     root,
@@ -174,7 +195,7 @@ function createHarness(showHitboxes: boolean) {
       pointerMove: vi.fn(),
       pointerUp: vi.fn(),
     },
-    combined: {},
+    combined: { reset: vi.fn() },
     diagnostics: { showHitboxes },
   } as unknown as GameplaySceneDependencies;
   const scene = new GameplayScene(dependencies);
@@ -212,6 +233,7 @@ function createHarness(showHitboxes: boolean) {
     listeners,
     events,
     session,
+    combined: dependencies.combined,
     shutdown: () => events.emitAll(),
   };
 }

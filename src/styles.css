@@ -77,6 +77,70 @@ body {
   outline-offset: 2px;
 }
 
+.game-over-overlay,
+.technical-home {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+  background: rgb(4 10 15 / 82%);
+}
+
+.game-over-panel,
+.technical-home__panel {
+  width: min(100%, 560px);
+  max-height: 100%;
+  overflow: auto;
+  border: 2px solid #d5a94e;
+  border-radius: 16px;
+  padding: clamp(16px, 4vw, 32px);
+  color: #f4f0e6;
+  background: #182733;
+  box-shadow: 0 16px 48px rgb(0 0 0 / 55%);
+}
+
+.game-over-panel h1,
+.technical-home__panel h1 {
+  margin-top: 0;
+}
+
+.game-over-panel dl {
+  display: grid;
+  gap: 6px;
+  margin: 16px 0;
+  overflow-wrap: anywhere;
+}
+
+.game-over-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.game-over-actions button,
+.technical-home__panel button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 2px solid #65b5ff;
+  border-radius: 8px;
+  color: #101820;
+  background: #f4f0e6;
+  font:
+    700 16px system-ui,
+    sans-serif;
+}
+
+.game-over-actions button:focus-visible,
+.technical-home__panel button:focus-visible {
+  outline: 3px solid #d5a94e;
+  outline-offset: 3px;
+}
+
 .pwa-notice {
   position: fixed;
   z-index: 10;
